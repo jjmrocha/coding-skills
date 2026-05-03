@@ -1,0 +1,21 @@
+# brainstorm
+
+A Claude Code skill for Socratic requirements discovery. Turns vague ideas into concrete, validated design specs through guided dialogue — one question at a time, no implementation until the design is approved.
+
+## When to Use
+
+- A user presents a vague idea ("I want to build X")
+- Requirements are unclear and need to be drawn out before coding
+- A feature should be scoped and designed before a plan is written
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| [SKILL.md](SKILL.md) | Core skill — workflow, Socratic rules, principles |
+| [references/spec-template.md](references/spec-template.md) | Starting structure for the output spec |
+| [expected_outputs/sample-session.md](expected_outputs/sample-session.md) | Worked example session |
+
+## Credit
+
+Based on the [SuperClaude Framework's `/sc:brainstorm` command](https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/master/src/superclaude/commands/brainstorm.md) (MIT-licensed).

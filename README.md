@@ -1,2 +1,49 @@
 # skills
-Coding Skills for Claude Code and Compatible Agents
+
+A collection of Claude Code skills for software development — reusable behavioral modules that load specialist mindsets, enforce discipline, and structure complex workflows.
+
+## What's a Skill?
+
+A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the root. The file starts with a YAML header declaring a `name` and `description`. Claude Code loads it on demand via the `/skill-name` slash command, injecting focused instructions for a specific domain.
+
+## Skills
+
+| Skill | What it does |
+|-------|-------------|
+| [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
+| [coding-discipline](coding-discipline/) | Names the five most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift) and the counter-move for each. |
+| [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
+| [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
+
+## Installation
+
+Copy the skill directories you want into your Claude Code skills folder:
+
+```bash
+cp -r brainstorm coding-discipline style-checker using-software-specialists ~/.claude/skills/
+```
+
+Skills are then available as slash commands in any Claude Code session:
+
+```
+/brainstorm
+/coding-discipline
+/style-checker
+/using-software-specialists
+```
+
+## Usage
+
+Invoke a skill by typing its slash command, optionally followed by a description of your task:
+
+```
+/brainstorm I want to build a rate limiter for our API
+/style-checker review the auth module
+/using-software-specialists add OAuth support to the backend
+```
+
+See each skill's own `README.md` for detailed usage, file structure, and examples.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
