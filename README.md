@@ -10,6 +10,7 @@ A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the r
 
 | Skill | What it does |
 |-------|-------------|
+| [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, and security. Produces a prioritized findings report with an APPROVE / NEEDS-WORK / BLOCK verdict. |
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the five most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift) and the counter-move for each. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
@@ -20,7 +21,7 @@ A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the r
 Copy the skill directories you want into your Claude Code skills folder:
 
 ```bash
-cp -r brainstorm coding-discipline style-checker using-software-specialists ~/.claude/skills/
+cp -r analyze-code brainstorm coding-discipline style-checker using-software-specialists ~/.claude/skills/
 ```
 
 Skills are then available as slash commands in any Claude Code session:
