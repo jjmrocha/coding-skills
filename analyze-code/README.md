@@ -1,6 +1,6 @@
 # analyze-code
 
-A Claude Code skill for multi-lens code audits. Applies four specialist perspectives — architecture, quality, performance, and security — to existing code and produces a structured report with prioritized findings and a verdict.
+A Claude Code skill for multi-lens code audits. Applies five specialist perspectives — architecture, quality, performance, security, and coding style — to existing code and produces a structured report with prioritized findings and a verdict.
 
 ## When to Use
 
@@ -15,7 +15,7 @@ A Claude Code skill for multi-lens code audits. Applies four specialist perspect
 
 ## How It Works
 
-The skill runs four lenses in sequence, then synthesizes findings into a single ranked report:
+The skill runs five lenses in sequence, then synthesizes findings into a single ranked report:
 
 | Lens | Question it asks |
 |------|-----------------|
@@ -23,6 +23,7 @@ The skill runs four lenses in sequence, then synthesizes findings into a single 
 | **Quality** | What's hard to change, untested, or overly complex? |
 | **Performance** | Where is time actually spent, and what fails under realistic load? |
 | **Security** | What inputs are trusted, what auth is assumed, where's the insecure default? |
+| **Coding Style** | Does the code follow the language's style guide for formatting and naming? (delegates to the `/style-checker` skill) |
 
 The final report leads with a verdict (APPROVE / NEEDS-WORK / BLOCK), top priority actions, and findings grouped by lens and severity.
 
