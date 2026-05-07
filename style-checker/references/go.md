@@ -15,7 +15,10 @@ Sources:
 
 ## Naming Conventions
 
-Go uses **MixedCaps** (camelCase) exclusively — **no underscores** in identifiers.
+Go uses **MixedCaps** (camelCase) exclusively — **no underscores** in identifiers, with three explicit exceptions:
+1. Package names imported only by generated code.
+2. Test/Benchmark/Example function names in `*_test.go` files.
+3. Low-level libraries interfacing with the OS or cgo.
 
 | Identifier | Exported | Unexported | Example |
 |-----------|----------|------------|---------|
@@ -152,15 +155,38 @@ func NewWidget() *Widget { ... }
 func NewCacheEntry() {}    // "cache.CacheEntry" is redundant
 ```
 
-### Constructor Pattern
+### Comparison Style
+
+- Variable on **left**, constant on **right**: `if result == "foo"`.
+- Avoid **Yoda style**: `if "foo" == result`.
+
+### `any` Type
+
+- Prefer `any` over `interface{}` in new code (Go 1.18+).
+
+### Nil Slices
+
+- Prefer `nil` slice initialization for local variables over empty slice literals.
+- There is no functional difference; `nil` is idiomatic.
 
 ```go
-// Correct — package is "widget"
-func New() *Widget { ... }
+// Prefer
+var s []int
 
-// Wrong — redundant
-func NewWidget() *Widget { ... }
+// Avoid
+s := []int{}
 ```
+
+### Named Result Parameters
+
+- Use names when returning multiple parameters of the same type (to disambiguate).
+- Use names to suggest a required caller action (e.g., `dst` suggests caller reads it).
+- **Avoid** named results solely to enable naked `return` — only acceptable for small functions.
+- **Avoid** names that create repetition with the function signature.
+
+### `%q` Verb
+
+- Prefer `%q` for printing strings in double-quotes — it handles empty strings and special characters better than manual `%s` wrapping.
 
 ### Error Naming
 
@@ -265,3 +291,35 @@ cfg := &Config{"localhost", 8080}
 - `gofmt` manages blank lines between declarations.
 - Blank lines within a function body are used for logical grouping (not enforced mechanically).
 - No blank line between a function signature and its first statement.
+
+---
+
+## Error-Flow Indentation
+
+- **Handle errors before proceeding** with normal code — don't indent the happy path inside `else`.
+- Checking `err != nil` first lets the reader find the normal path quickly without tracking else branches.
+
+```go
+// Correct — happy path is not indented
+f, err := os.Open(name)
+if err != nil {
+    return err
+}
+return f.Chdir()
+
+// Avoid — happy path inside else
+f, err := os.Open(name)
+if err == nil {
+    return f.Chdir()
+} else {
+    return err
+}
+```
+
+---
+
+## Conditionals & Loops
+
+- `if` statements should **not be line-broken**; extract boolean operands to separate variables when the condition is too long.
+- `for` and `switch` (old-style `:` colon statements) should remain on a single line.
+- Yoda conditions (`if nil == err`) are **prohibited** — place the variable on the left.

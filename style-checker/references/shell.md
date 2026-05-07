@@ -171,6 +171,13 @@ main "$@"
 - Single quotes: for literal strings with no substitution.
 - Use `"$@"` (not `"$*"`) for passing arguments.
 
+### Variable Expansion Precedence
+1. Stay **consistent** with existing code.
+2. **Quote** variables (as above).
+3. Prefer `"${var}"` over `"$var"`.
+4. Single-character specials / positional parameters: **unbraced** unless needed (`$1`, `$?`, `$$`, `$!`).
+5. All other variables: **use braces** (`"${some_var}"`).
+
 ```bash
 # Correct
 echo "${my_var}"
@@ -179,6 +186,25 @@ echo "Result: $(command)"
 # Wrong
 echo $my_var
 echo "Result: `command`"
+```
+
+---
+
+## Testing & Comparisons
+
+- Prefer **`[[ ... ]]`** over `[ ... ]`, `test`, or `/usr/bin/[`.
+- Use **`==`** for string equality inside `[[ ... ]]` (not `=`).
+- Numeric comparisons: use **`(( ... ))`** or `-lt` / `-gt` inside `[[ ... ]]`.
+- For **empty strings**: use `-z` and `-n` rather than filler characters like `x`.
+
+```bash
+# Correct
+[[ "${file}" == "config.yml" ]]
+(( retries > 3 ))
+
+# Wrong
+[ "${file}" = "config.yml" ]
+[[ "${file}" = "config.yml" ]]  # = is allowed but == is preferred
 ```
 
 ---
@@ -215,6 +241,35 @@ backup_directory() {
 
 ---
 
+## Advanced Patterns
+
+### Error Output Function
+
+```bash
+# Write error messages to stderr
+err() {
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*" >&2
+}
+```
+
+### Arrays for Safe Quoting
+
+Use arrays to safely build command flags without complex quoting:
+
+```bash
+declare -a flags
+flags=(--foo --bar='baz')
+flags+=(--greeting="Hello ${name}")
+mybinary "${flags[@]}"
+```
+
+### Return Value Checking
+
+- Always check return values with `if` or by inspecting `$?`.
+- Use the `PIPESTATUS` array to check exit codes of individual pipeline stages.
+
+---
+
 ## Prohibited Patterns
 
 | Prohibited | Use instead |
@@ -227,6 +282,9 @@ backup_directory() {
 | `[` (single bracket) for tests | `[[` (double bracket) |
 | Unquoted variable expansion | `"${var}"` |
 | `$*` for argument passing | `"$@"` |
+| SUID/SGID on scripts | Use `sudo` or capabilities |
+| `*` glob expansion (bare) | `./*` prefix to avoid `-` filenames |
+| `command | while read` | Process substitution `< <(command)` or `readarray` |
 
 ```bash
 # Wrong

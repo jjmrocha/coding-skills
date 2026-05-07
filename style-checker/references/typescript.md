@@ -104,6 +104,9 @@ const foo = require('./foo');
 - Initialize fields at declaration when possible.
 - **No `public` modifier** except for non-readonly public parameter properties.
 - Visibility minimized: use `private` or `protected` where possible.
+- **No private static methods**: prefer module-local functions instead.
+- **Getters/setters**: allowed only if the getter is a pure function with no side effects; must not change observable state.
+- **Static methods**: do not rely on dynamic dispatch — call only on the base class. Don't use `this` or access private members of the base class.
 
 ---
 
@@ -137,6 +140,13 @@ const foo = require('./foo');
 - `Type | null` or `Type | undefined` instead of wrapper types.
 - Prefer optional fields (`?`) over `| undefined` in object types.
 - **Type aliases must not include `|null` or `|undefined`** in a union type.
+
+## Type Assertions
+
+- Use **`as` syntax** (`value as Type`), not angle brackets (`<Type>value`), to avoid JSX conflicts.
+- Avoid assertions where possible; prefer type annotations on declarations: `const foo: Foo = { ... }`.
+- Double assertions: cast through `unknown`: `value as unknown as NarrowType`.
+- **Never** use `@ts-ignore` or `@ts-nocheck`. Use `@ts-expect-error` with an explanatory comment, and only in tests.
 
 ---
 
@@ -190,3 +200,5 @@ function sendMessage(message: string): boolean {
 | `new String()`, `new Boolean()`, `new Number()` | Primitives directly |
 | `eval` or `Function(string)` | Explicit functions |
 | `debugger` in production | Remove before committing |
+| `@ts-ignore` / `@ts-nocheck` | `@ts-expect-error` with comment (tests only) |
+| `<Type>value` assertions | `value as Type` |

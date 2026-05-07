@@ -43,6 +43,8 @@ Source: https://google.github.io/styleguide/jsguide.html
 - K&R style: opening brace on the **same line**.
 - Braces **required** for all control structures, even single-line bodies.
 - Exception: simple `if` with no `else` can omit braces if it fits on one line.
+- **`for...of`** preferred for array iteration (over `for` and `for...in`).
+- **`for...in`** only for dict-style objects with `hasOwnProperty` check.
 
 ```javascript
 // Correct
@@ -67,6 +69,27 @@ else
 - Use **`const`** and **`let`**. **Never `var`.**
 - **One variable per declaration** (`const a = 1; const b = 2;` not `const a = 1, b = 2;`).
 - Declare variables as **close to first use** as possible.
+
+---
+
+## Functions
+
+- **Arrow functions**: preferred for callbacks and nested functions.
+- **Function declarations**: preferred for named top-level functions.
+- **Function expressions**: use only when rebinding `this` or for generators.
+- Rest parameters (`...args`) over the `arguments` object.
+- **Spread operator** (`...`) preferred over `Array.prototype.slice()` and `.concat()`.
+
+```javascript
+// Prefer — arrow function for callback
+items.map(x => x * 2);
+
+// Prefer — function declaration for named
+function processItems() { ... }
+
+// Avoid — function expression for named
+const processItems = function() { ... };
+```
 
 ---
 
@@ -144,6 +167,24 @@ function myFunc(
 
 ---
 
+## Error Handling
+
+- Always **`throw new Error()`** or a subclass — never throw primitives or plain objects.
+- **Empty catch blocks** require an explanatory comment (`// ignore` is not sufficient — explain why).
+
+```javascript
+// Correct
+if (!response.ok) throw new Error('Request failed');
+
+try {
+    riskyOp();
+} catch {
+    // Expected when network is offline; logging handled upstream
+}
+```
+
+---
+
 ## Comments
 
 - `/** ... */` (JSDoc): **only** for API documentation (classes, functions, public members).
@@ -175,3 +216,7 @@ function sendMessage(message) {
 | `new Object()` / `new Array()` | `{}` / `[]` literals |
 | Line continuation in strings (`\` at EOL) | Template literals |
 | `arguments` object | Rest parameter `...args` |
+| `for...in` on arrays | `for...of` with array methods |
+| `new Error()` omitted for throws | Always `throw new Error()` |
+| Empty catch without comment | Comment explaining why |
+| `Array.prototype.slice()`/`.concat()` | Spread operator `...` |

@@ -41,6 +41,7 @@ Section
 ### Unordered Lists
 - Use `*` for list markers (not `-` or `+`).
 - Nested items: **4-space indent**.
+- Single-line lists: 1 space between marker and text suffices for short, non-nested lists.
 
 ```markdown
 * First item
@@ -65,6 +66,25 @@ or:
 3. Third item
 ```
 
+### Lists with Code Blocks
+
+- Indent code blocks **4 additional spaces** from the list item to maintain list context.
+
+```markdown
+1. Step one:
+    ```python
+    print("hello")
+    ```
+```
+
+---
+
+## Tables
+
+- Use for **tabular data** with uniform distribution requiring quick scanning.
+- **Avoid** for sparse data or simple lists — use a bullet list instead.
+- Use **reference-style links** inside table cells to keep content concise and under the 80-char limit.
+
 ---
 
 ## Code Formatting
@@ -79,7 +99,15 @@ Use `myVariable` and save to `config.json`.
 ### Code Blocks
 - Use **fenced blocks** (triple backticks) with an explicit language tag.
 - **Never** use indented code blocks (4-space indent interpreted as code).
-- Use trailing backslash to escape newlines in command examples.
+- Use trailing backslash `\` to escape newlines in command examples (for copy-paste support).
+
+```markdown
+    ```bash
+    command1 \
+      --flag value \
+      --other flag
+    ```
+```
 
 ```markdown
     ```python
@@ -152,8 +180,17 @@ See [here](https://very-long-url.example.com).
 
 ## HTML
 
-- **Avoid inline HTML.** Prefer standard Markdown syntax.
+- **Strongly prefer Markdown over HTML** wherever possible.
 - Use HTML only when Markdown cannot express the required formatting.
+- HTML inside Markdown reduces portability (some renderers like Gitiles don't support it).
+
+---
+
+## Images
+
+- Use sparingly and prefer simple screenshots.
+- Always include **descriptive alt text** for accessibility.
+- Show rather than describe when appropriate.
 
 ---
 
@@ -180,3 +217,10 @@ Recommended layout:
 
 - Lowercase with underscores or dashes: `my_document.md`, `getting-started.md`.
 - `README.md` is the conventional name for directory-level documentation.
+
+---
+
+## Documentation Philosophy
+
+- Maintain a **small set of fresh and accurate docs**, not sprawling, outdated documentation.
+- **Better/Best Rule**: accept iterative improvements over perfectionism to maintain author productivity.

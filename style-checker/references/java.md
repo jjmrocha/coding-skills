@@ -132,6 +132,35 @@ transient volatile synchronized native strictfp
 
 ---
 
+## Text Blocks
+
+- Opening `"""` on its own line, same indentation as surrounding code.
+- Closing `"""` on its own line, aligned with the opening `"""`.
+- Contents may exceed the 100-character column limit.
+- Indentation of text block content is determined by the closing `"""` position.
+
+```java
+String sql = """
+        SELECT id, name
+        FROM users
+        WHERE active = true
+        """;
+```
+
+---
+
+## Unnamed Variables (`_`)
+
+- `_` syntax is allowed wherever applicable (Java 21+).
+- Use for unused parameters, catch parameters, or lambda parameters.
+
+```java
+list.stream().map(_ -> 1);  // Input ignored
+try { ... } catch (_) { ... }  // Exception variable unused
+```
+
+---
+
 ## Array Declarations
 
 - C-style forbidden: use `String[] args` not `String args[]`.
@@ -151,15 +180,34 @@ transient volatile synchronized native strictfp
 - Class/package/module annotations: immediately after documentation block, **one per line**.
 - Method/constructor annotations: same; single parameterless annotation may share first signature line.
 - Field annotations: multiple may appear on same line.
+- **Type-use annotations** (meta-annotated with `@Target(ElementType.TYPE_USE)`): appear immediately before the annotated type.
 
 ---
 
-## Switch Statements
+## Enum Classes
+
+- Simple enums with no methods or documentation may be formatted on a single line: `private enum Suit { CLUBS, HEARTS, SPADES, DIAMONDS }`.
+- Enums with methods follow class formatting rules (indentation, braces).
+
+---
+
+## Switch Statements & Expressions
 
 - Cases indented +2 from `switch`.
-- Case contents indented +2 from case label.
+- Case contents indented +2 from case label (old-style `:`) or on same line (new-style `->`).
 - Fall-through in old-style (`:`): always marked with `// fall through` comment.
 - All switch statements must be **exhaustive**: use `default` or cover all enum values.
+- New-style (`->`) rules: no fall-through, single line if it fits and respects column limit.
+- Non-empty blocks in new-style require a line break after the opening `{`.
+
+```java
+// New-style switch (no fall-through)
+switch (day) {
+    case MONDAY, FRIDAY -> System.out.println("Work day");
+    case SATURDAY -> { System.out.println("Weekend!"); }
+    default -> throw new IllegalStateException("Unknown day");
+}
+```
 
 ---
 

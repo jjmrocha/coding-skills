@@ -35,9 +35,14 @@ Allowed **only** for:
 
 ### Prohibited Naming Patterns
 - Dashes in module/file names (use underscores: `my_module.py` not `my-module.py`)
-- `__double_underscore__` names (reserved by Python)
+- `__double_underscore__` names (reserved by Python; beyond `__init__`, `__str__`, etc.)
 - Names ending with type information (e.g., don't use `id_to_name_dict`)
-- Never use `self` or `cls` as receiver names for regular methods (those are reserved)
+- Offensive terms or abbreviations unfamiliar outside the project
+
+### Required Receiver Names
+- `self` is **required** as the first parameter of instance methods.
+- `cls` is **required** as the first parameter of class methods.
+- These names are reserved and must not be used for other identifiers.
 
 ### Acronyms
 Treat as whole words in `CapWords`: `HttpServer`, `XmlParser` (not `HTTPServer`, `XMLParser`)
@@ -83,15 +88,35 @@ result = some_long_variable + another_variable \
 
 ## Imports
 
-- Imports always on separate lines. Exception: `from typing import X, Y` is allowed.
-- Import **entire modules**, not individual names. Exception: `from typing import ...` and `from collections.abc import ...`.
+- `from __future__ import` statements must appear first (before any other imports).
+- One import per line. Exception: `from typing import X, Y` and `from collections.abc import X, Y` are allowed.
+- Import **entire modules**, not individual names. Exception: `typing`, `collections.abc`, and `typing_extensions` modules.
 - **No relative imports** — always use full package paths.
-- Order (each group separated by a blank line):
+- **No wildcard imports** (`from module import *` is forbidden).
+- Sort order (each group separated by a blank line):
   1. `from __future__ import ...`
   2. Python standard library
   3. Third-party libraries
   4. Local/repository sub-packages
 - Sort **lexicographically** within each group (case-insensitive).
+
+### Import Aliases (`as`)
+
+Use `from x import y as z` when:
+- Two modules named `y` exist, or
+- `y` conflicts with a top-level or parameter name, or
+- `y` is inconveniently long or too generic.
+
+Use `import y as z` only when `z` is a standard abbreviation (e.g., `numpy as np`, `pandas as pd`).
+
+```python
+# Correct
+import numpy as np
+from os import path as os_path  # avoid shadowing
+
+# Wrong — unnecessary aliasing
+import mylongmodulename as m  # not standard
+```
 
 ```python
 # Correct
@@ -129,6 +154,21 @@ def func():
 
 ---
 
+### Trailing Commas
+
+- Recommended when the closing bracket does not appear on the same line as the final element.
+- Hints auto-formatters to produce one-item-per-line formatting.
+
+```python
+# Correct — trailing comma triggers multi-line formatting
+result = solve(
+    x,
+    y,
+)
+```
+
+---
+
 ## Blank Lines
 
 - **2 blank lines** between top-level definitions (functions, classes).
@@ -146,6 +186,7 @@ def func():
 - **No** trailing whitespace.
 - **No** vertical alignment of tokens across consecutive lines.
 - **Space** around binary operators (`=`, `==`, `<`, `>`, `!=`, `in`, `not in`, `is`, `is not`, `and`, `or`, `not`).
+- **Judgement call** for arithmetic operators (`+`, `-`, `*`, `/`, `//`, `%`, `**`, `@`): use your discretion, but be consistent within the file.
 - **No space** around `=` for keyword arguments or default parameters — **unless** a type annotation is present:
 
 ```python
@@ -164,6 +205,54 @@ def func(a: int = 0, b: str = ''):
 - **One statement per line.** Never two statements on the same line.
 - Exception: `if foo: bar(foo)` may be written on one line only if the entire statement fits on one line and has no `else`.
 - Never on one line for `try`/`except`.
+
+---
+
+## Lambdas & Comprehensions
+
+### Lambdas
+- Allowed **only for one-liners**; keep under 60–80 characters.
+- Prefer generator expressions or list comprehensions over `map()` / `filter()` with lambda.
+- If a lambda exceeds one line, refactor it into a named `def`.
+
+```python
+# Acceptable
+double = lambda x: x * 2
+
+# Prefer instead of map+lambda
+result = [x * 2 for x in items]
+```
+
+### Comprehensions & Generator Expressions
+- Allowed for **simple cases** where intent is clear.
+- **No multiple `for` clauses** or deeply nested filters — those belong in `for` loops.
+- Optimize for **readability** over conciseness.
+- Generator expressions acceptable as single function arguments.
+
+```python
+# Acceptable — simple comprehension
+squares = [x**2 for x in range(10)]
+
+# Too complex — refactor to a loop
+result = [f(x) for x in data if cond(x) for y in x.children if y.active]
+```
+
+---
+
+## Parentheses
+
+- Use **sparingly**; not required around tuples (except single-element tuples or empty tuples).
+- Not required in `return` or `if` statements unless clarifying grouping or splitting lines.
+- Acceptable for line continuation or to clarify the tuple vs. expression boundary.
+
+```python
+# Unnecessary parentheses (don't flag as violation, just note preference)
+return foo
+if x:
+
+# Necessary — 1-tuple
+return (value,)
+```
 
 ---
 
@@ -200,8 +289,25 @@ def func(x, y):
 
 ## Type Annotations
 
-- `X | None` instead of `Optional[X]`.
+- `X | None` instead of `Optional[X]` (Python 3.10+).
 - Use abstract container types: `collections.abc.Sequence` over `list`.
+- Prefer built-in generics: `list[T]` over `typing.List[T]`.
 - Import types from `typing` and `collections.abc` directly.
-- Use `TYPE_CHECKING` block for annotation-only imports.
+- Use `TYPE_CHECKING` block for annotation-only imports that would cause runtime cycles.
 - Private TypeVar: `_T = TypeVar("_T")`.
+- **Do not annotate** `self` or `cls` (unless using the `Self` type).
+- **Do not annotate** `__init__` return type.
+- Use `from __future__ import annotations` or quoted forward references for self-referencing types.
+
+## Logging
+
+- Use **pattern-string formatting** with `%`-placeholders, not f-strings:
+
+```python
+# Correct — deferred formatting
+logger.info("Found %d items in %s", count, path)
+
+# Wrong — eager evaluation
+logger.info(f"Found {count} items in {path}")
+```
+
