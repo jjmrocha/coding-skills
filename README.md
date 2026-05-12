@@ -15,6 +15,7 @@ A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the r
 | [coding-discipline](coding-discipline/) | Names the five most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift) and the counter-move for each. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
 | [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
+| [writing-unit-tests](writing-unit-tests/) | Guides unit test authorship in any language — scenario identification across four quadrants, FIRST-U principles, Arrange–Act–Assert structure, mocking strategy, and language-specific references. |
 
 ## Installation
 
