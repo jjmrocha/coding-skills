@@ -1,4 +1,4 @@
-# skills
+# coding-skills
 
 A collection of Claude Code skills for software development — reusable behavioral modules that load specialist mindsets, enforce discipline, and structure complex workflows.
 
