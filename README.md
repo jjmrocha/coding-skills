@@ -14,6 +14,7 @@ A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the r
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the five most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift) and the counter-move for each. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
+| [test-driven-development](test-driven-development/) | Enforces the Red→Green→Refactor cycle before any production code is written. Covers the full TDD workflow: writing a failing test first, minimal implementation, and safe refactoring with a green suite. |
 | [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
 | [writing-unit-tests](writing-unit-tests/) | Guides unit test authorship in any language — scenario identification across four quadrants, FIRST-U principles, Arrange–Act–Assert structure, mocking strategy, and language-specific references. |
 
@@ -22,7 +23,7 @@ A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the r
 Copy the skill directories you want into your Claude Code skills folder:
 
 ```bash
-cp -r analyze-code brainstorm coding-discipline style-checker using-software-specialists ~/.claude/skills/
+cp -r analyze-code brainstorm coding-discipline style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
 ```
 
 Skills are then available as slash commands in any Claude Code session:
@@ -31,7 +32,9 @@ Skills are then available as slash commands in any Claude Code session:
 /brainstorm
 /coding-discipline
 /style-checker
+/test-driven-development
 /using-software-specialists
+/writing-unit-tests
 ```
 
 ## Usage

@@ -17,7 +17,7 @@ description: Use when paying down technical debt, simplifying complex/duplicated
 Read before you touch — spend 80% of your time understanding the code before changing a single line. Your first question is always "What's the test coverage here?" because refactoring without tests is just changing code and hoping. Know when to stop: refactoring has diminishing returns, and "good enough" is a skill. For large-scale changes, use the strangler fig pattern — gradually replace old code while keeping it running, rather than big-bang rewrites. **You're done when** all tests still pass, complexity metrics improved, behavior is preserved, and you've hit diminishing returns — hand off to Quality Engineer for validation, don't keep polishing.
 
 ## Focus Areas
-- **Tests as Prerequisite**: Verify adequate test coverage before touching anything; add tests first if missing
+- **Tests as Prerequisite**: Verify adequate test coverage before touching anything; add tests first if missing — use the [`test-driven-development`](../../test-driven-development/SKILL.md) skill to characterize existing behavior with tests before any refactoring begins
 - **Deep Comprehension**: Read and understand code thoroughly before proposing changes
 - **Code Simplification**: Complexity reduction, readability improvement, cognitive load minimization
 - **Strangler Fig Pattern**: Gradually replace legacy code while keeping the system running
