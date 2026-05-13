@@ -36,9 +36,9 @@ This reference follows the **FIRST-U** principles (Fast, Isolated, Repeatable, S
 
 ---
 
-## 3. Given / When / Then (mandatory)
+## 3. Given / When / Then
 
-Every test that performs a discrete operation has three labelled sections:
+Every test that performs a discrete operation has three sections:
 
 ```go
 func TestDequeue(t *testing.T) {
@@ -46,10 +46,8 @@ func TestDequeue(t *testing.T) {
 	q := New[int]()
 	q.Enqueue(10)
 	q.Enqueue(20)
-
 	// when
 	result, ok := q.Dequeue()
-
 	// then
 	assert.True(t, ok)
 	assert.Equal(t, 10, result)
@@ -57,7 +55,8 @@ func TestDequeue(t *testing.T) {
 ```
 
 Rules:
-- `// given` — all state setup, object construction, preparation.
+- Write `// given`, `// when`, `// then` markers **only if the existing project tests already use them**; if they don't, keep the same three-block structure without comments.
+- When used: `// given` — all state setup, object construction, preparation.
 - `// when` — **only the call being tested**. Side effects of setup (cache prepopulation, etc.) belong in `// given`.
 - `// then` — all assertions.
 - If the call returns a value, assign it to `result`. Secondary returns (`ok`, `err`) keep their semantic names.
@@ -328,7 +327,6 @@ func TestSyncStackConcurrentPush(t *testing.T) {
 	const goroutines = 100
 	s := NewSyncStack[int]()
 	var wg sync.WaitGroup
-
 	// when
 	for i := range goroutines {
 		wg.Add(1)
@@ -338,7 +336,6 @@ func TestSyncStackConcurrentPush(t *testing.T) {
 		}(i)
 	}
 	wg.Wait()
-
 	// then
 	assert.Equal(t, int64(goroutines), s.Len())
 }
@@ -356,7 +353,6 @@ Functions or data structures that document nil-safe behaviour must have a dedica
 func TestSetNilSafety(t *testing.T) {
 	// given
 	var s Set[int]
-
 	// then
 	assert.Equal(t, 0, s.Len())
 	assert.False(t, s.Contains(1))
@@ -416,10 +412,8 @@ func TestHandlerCreateTask(t *testing.T) {
 		rec := httptest.NewRecorder()
 		context := e.NewContext(req, rec)
 		security.SetAuthenticatedUser(context, &users.User{ID: 1, Username: "alice"})
-
 		// when
 		err := handler.CreateTask(context)
-
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -448,10 +442,8 @@ func TestCreateUser(t *testing.T) {
 		userRepo := NewInMemoryUserRepository()
 		userService := NewService(userRepo)
 		user := &User{Username: "alice", Password: "S3cur3!", Role: Manager}
-
 		// when
 		err := userService.CreateUser(user)
-
 		// then
 		require.NoError(t, err)
 		savedUser, err := userService.UserByUsername(user.Username)
@@ -476,10 +468,8 @@ func TestToTask(t *testing.T) {
 	// given
 	user := &users.User{ID: 1, Username: "alice", Role: users.Technician}
 	request := &TaskCreateRequest{Summary: "Onboarding call"}
-
 	// when
 	task := request.toTask(user)
-
 	// then
 	assert.Equal(t, request.Summary, task.Summary)
 	assert.Equal(t, user.ID, task.Assignee.ID)
@@ -546,10 +536,8 @@ func TestStack(t *testing.T) {
 		s := New[int]()
 		s.Push(1)
 		s.Push(2)
-
 		// when
 		result, ok := s.Pop()
-
 		// then
 		assert.True(t, ok)
 		assert.Equal(t, 2, result)
@@ -559,10 +547,8 @@ func TestStack(t *testing.T) {
 	t.Run("pop on empty stack returns zero value and false", func(t *testing.T) {
 		// given
 		s := New[int]()
-
 		// when
 		result, ok := s.Pop()
-
 		// then
 		assert.False(t, ok)
 		assert.Equal(t, 0, result)

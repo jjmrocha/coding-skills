@@ -94,17 +94,15 @@ Use **the same parameter names** as the function under test for inputs — the c
 
 ## 5. Given / When / Then structure
 
-Use lowercase block comments to delimit phases — `# given`, `# when`, `# then`:
+Use lowercase block comments to delimit phases — `# given`, `# when`, `# then` — **only if the existing project tests already use them**. If they don't, keep the same three-block structure without comments:
 
 ```python
 def test_parse_date_iso_format_returns_date():
     # given
     class_under_test = DateParser()
     input = "2024-03-15"
-
     # when
     result = class_under_test.parse(input)
-
     # then
     assert result == date(2024, 3, 15)
 ```
@@ -167,7 +165,6 @@ Default to no message — pytest's diff is usually enough.
 def test_withdraw_insufficient_balance_raises_overdraft_error():
     # given
     class_under_test = Account(balance=Decimal("50"))
-
     # when / then
     with pytest.raises(OverdraftError, match="Withdrawal exceeds balance"):
         class_under_test.withdraw(Decimal("100"))
@@ -238,7 +235,6 @@ Use `@pytest.mark.parametrize` for table-driven scenarios. **Always include `ids
 def test_from_string(input, expected):
     # when
     result = HttpMethod.from_string(input)
-
     # then
     assert result == expected
 ```
@@ -260,10 +256,8 @@ def test_generate_token_uses_seeded_rng():
     import random
     rng = random.Random(42)
     class_under_test = TokenGenerator(rng=rng)
-
     # when
     result = class_under_test.generate()
-
     # then
     assert result == "expected_token_value"
 ```
@@ -293,10 +287,8 @@ def test_fetches_from_configured_url(monkeypatch):
     # given
     monkeypatch.setenv("API_URL", "https://test.example.com")
     monkeypatch.setattr("myapp.clock.now", lambda: datetime(2024, 1, 15, 12, 0, 0))
-
     # when
     result = fetch_config()
-
     # then
     assert result.base_url == "https://test.example.com"
 ```
@@ -312,10 +304,8 @@ def test_create_order_persists_order():
     mock_repository.save.return_value = Order(id="ord-1", total=Decimal("10"))
     class_under_test = OrderService(mock_repository)
     input_order = Order(id=None, total=Decimal("10"))
-
     # when
     result = class_under_test.create(input_order)
-
     # then
     assert result.id == "ord-1"
     mock_repository.save.assert_called_once_with(input_order)
@@ -343,10 +333,8 @@ import pytest
 async def test_fetch_returns_payload():
     # given
     class_under_test = AsyncFetcher(timeout=1.0)
-
     # when
     result = await class_under_test.fetch("/health")
-
     # then
     assert result.status == 200
 ```
@@ -385,10 +373,8 @@ def test_create_order_valid_cart_persists_order(class_under_test, mock_repositor
     # given
     input_order = Order(id=None, customer_id="cust-1", total=Decimal("10"))
     mock_repository.save.return_value = input_order.with_id("ord-1")
-
     # when
     result = class_under_test.create(input_order)
-
     # then
     assert result.id == "ord-1"
     assert result.status == Status.PENDING
@@ -397,7 +383,6 @@ def test_create_order_valid_cart_persists_order(class_under_test, mock_repositor
 def test_create_order_zero_total_raises_validation_error(class_under_test):
     # given
     input_order = Order(id=None, customer_id="cust-1", total=Decimal("0"))
-
     # when / then
     with pytest.raises(InvalidOrderError, match="total must be positive"):
         class_under_test.create(input_order)
@@ -415,10 +400,8 @@ def test_create_order_assigns_status_based_on_total(class_under_test, mock_repos
     # given
     input_order = Order(id=None, customer_id="cust-1", total=total)
     mock_repository.save.side_effect = lambda o: o.with_id("ord-x")
-
     # when
     result = class_under_test.create(input_order)
-
     # then
     assert result.status == expected_status
 ```

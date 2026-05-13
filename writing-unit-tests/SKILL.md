@@ -72,7 +72,7 @@ Structure every test in three blocks:
 2. **Act / When** — exactly **one** call. Multiple calls = multiple behaviors; split.
 3. **Assert / Then** — verify the observable result and any side effects.
 
-Use the three marker comments in every test body — `// given` / `// when` / `// then` for C-family languages (Go, Java, JavaScript) and `# given` / `# when` / `# then` for Python. They are never optional. For multiple cases sharing the same shape, use the language's idiomatic parameterized test mechanism — see the language reference.
+Write phase marker comments (`// given` / `// when` / `// then` for C-family languages; `# given` / `# when` / `# then` for Python) **only if the existing codebase already uses them** (as noted in §1). The three-block structure always applies; the literal comments follow the project's existing convention and are omitted when the project does not use them. For multiple cases sharing the same shape, use the language's idiomatic parameterized test mechanism — see the language reference.
 
 ---
 

@@ -96,17 +96,16 @@ void testParseDateWithIsoFormat() {
     // given
     var classUnderTest = new DateParser();
     var input = "2024-03-15";
-
     // when
     var result = classUnderTest.parse(input);
-
     // then
     assertThat(result).isEqualTo(LocalDate.of(2024, 3, 15));
 }
 ```
 
 Rules:
-- Always lowercase, no colons: `// given`, `// when`, `// then`.
+- Write `// given`, `// when`, `// then` markers **only if the existing project tests already use them**; if they don't, keep the same three-block structure without comments.
+- When used, always lowercase, no colons: `// given`, `// when`, `// then`.
 - **`// when` is one statement** — the call to the unit under test (plus `result = ...`).
 - **`// then` holds all assertions.**
 - Omit `// given` only when class-level fields already supply the setup.
@@ -204,7 +203,6 @@ When a method under test returns an **interface** but you need to assert on the 
 void testOk() {
     // when
     var result = HttpResponse.ok();
-
     // then
     assertThat(result).isInstanceOf(HttpResponseImpl.class);
     var classUnderTest = (HttpResponseImpl) result;
@@ -317,10 +315,8 @@ Do **not** use `assertThatThrownBy`. Use `catchThrowable`, then assert on the ca
 void testWithdrawRejectsInsufficientBalance() {
     // given
     var classUnderTest = new Account(BigDecimal.valueOf(50));
-
     // when
     var result = catchThrowable(() -> classUnderTest.withdraw(BigDecimal.valueOf(100)));
-
     // then
     assertThat(result).isInstanceOf(InsufficientBalanceException.class);
     assertThat(result).hasMessage("Withdrawal exceeds balance.");
@@ -342,7 +338,6 @@ Use `@ParameterizedTest` + `@MethodSource` with a private static factory returni
 void testFromString(String value, HttpMethod expected) {
     // when
     var result = HttpMethod.fromString(value);
-
     // then
     assertThat(result).isEqualTo(expected);
 }
@@ -415,10 +410,8 @@ JUnit 5 supports `CompletableFuture` directly with `Awaitility` or by joining in
 void testFetchReturnsPayload() throws Exception {
     // given
     var classUnderTest = new AsyncFetcher(Duration.ofSeconds(1));
-
     // when
     var result = classUnderTest.fetch("/health").get(2, TimeUnit.SECONDS);
-
     // then
     assertThat(result.getStatus()).isEqualTo(200);
 }
@@ -468,10 +461,8 @@ class OrderServiceTest {
         // given
         var input = buildOrder("cust-1", BigDecimal.TEN);
         given(orderRepository.save(input)).willReturn(input.withId("ord-1"));
-
         // when
         var result = classUnderTest.create(input);
-
         // then
         assertThat(result.getId()).isEqualTo("ord-1");
         assertThat(result.getStatus()).isEqualTo(Status.PENDING);
@@ -481,10 +472,8 @@ class OrderServiceTest {
     void testCreateOrderRejectsZeroTotal() {
         // given
         var input = buildOrder("cust-1", BigDecimal.ZERO);
-
         // when
         var result = catchThrowable(() -> classUnderTest.create(input));
-
         // then
         assertThat(result).isInstanceOf(InvalidOrderException.class);
         assertThat(result).hasMessage("Order total must be positive.");

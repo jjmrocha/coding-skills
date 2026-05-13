@@ -57,10 +57,8 @@ describe("OrderService", () => {
       const mockRepository = { save: jest.fn().mockResolvedValue({ id: "ord-1", total: 10 }) };
       const classUnderTest = new OrderService(mockRepository);
       const input = { customerId: "cust-1", total: 10 };
-
       // when
       const result = await classUnderTest.create(input);
-
       // then
       expect(result.id).toBe("ord-1");
       expect(mockRepository.save).toHaveBeenCalledWith(input);
@@ -98,17 +96,16 @@ it("returns the parsed date for an ISO string", () => {
   // given
   const classUnderTest = new DateParser();
   const input = "2024-03-15";
-
   // when
   const result = classUnderTest.parse(input);
-
   // then
   expect(result).toEqual(new Date("2024-03-15"));
 });
 ```
 
 Rules:
-- Always lowercase: `// given`, `// when`, `// then`. No colons.
+- Write `// given`, `// when`, `// then` markers **only if the existing project tests already use them**; if they don't, keep the same three-block structure without comments.
+- When used, always lowercase, no colons: `// given`, `// when`, `// then`.
 - `// when` is **one statement** — the call under test (`const result = ...`).
 - All `expect(...)` calls live under `// then`.
 - Omit `// given` only when there is genuinely no setup beyond what's in `beforeEach`.
@@ -211,7 +208,6 @@ expect(result).toMatchInlineSnapshot(`...`);  // inline snapshot — preferred f
 it("throws OverdraftError when balance is insufficient", () => {
   // given
   const classUnderTest = new Account(50);
-
   // when / then
   expect(() => classUnderTest.withdraw(100)).toThrow(OverdraftError);
   expect(() => classUnderTest.withdraw(100)).toThrow("Withdrawal exceeds balance");
@@ -224,7 +220,6 @@ Or capture the error explicitly when you need to assert on multiple properties:
 it("throws OverdraftError with the requested amount", () => {
   // given
   const classUnderTest = new Account(50);
-
   // when
   let caught: Error | undefined;
   try {
@@ -232,7 +227,6 @@ it("throws OverdraftError with the requested amount", () => {
   } catch (e) {
     caught = e as Error;
   }
-
   // then
   expect(caught).toBeInstanceOf(OverdraftError);
   expect((caught as OverdraftError).requested).toBe(100);
@@ -259,7 +253,6 @@ describe("HttpMethod.fromString", () => {
   ])("returns %p for input %p", (input, expected) => {
     // when
     const result = HttpMethod.fromString(input);
-
     // then
     expect(result).toBe(expected);
   });
@@ -276,7 +269,6 @@ it.each([
 ])("$name", ({ input, expected }) => {
   // when
   const result = HttpMethod.fromString(input);
-
   // then
   expect(result).toBe(expected);
 });
@@ -312,10 +304,8 @@ Use when you want real behavior plus the ability to assert on calls (a spy):
 
 ```typescript
 const spy = jest.spyOn(logger, "warn");
-
 // when
 classUnderTest.handle(invalidInput);
-
 // then
 expect(spy).toHaveBeenCalledWith("invalid input received");
 ```
@@ -373,10 +363,8 @@ it("does not send email on dry-run", async () => {
   // given
   const mockEmailService = { send: jest.fn() };
   const classUnderTest = new OrderService(mockEmailService, { dryRun: true });
-
   // when
   await classUnderTest.create({ customerId: "cust-1", total: 10 });
-
   // then
   expect(mockEmailService.send).not.toHaveBeenCalled();
 });
@@ -446,10 +434,8 @@ Inject a `Random` interface (or pass a seeded generator) so the test can supply 
 it("fetches the payload from the configured URL", async () => {
   // given
   const classUnderTest = new ApiClient("https://api.example.com");
-
   // when
   const result = await classUnderTest.fetchUser("u-1");
-
   // then
   expect(result).toEqual({ id: "u-1", name: "alice" });
 });
@@ -482,10 +468,8 @@ describe("OrderService", () => {
       // given
       const input: Order = { id: null, customerId: "cust-1", total: 10 };
       mockRepository.save.mockResolvedValue({ ...input, id: "ord-1" });
-
       // when
       const result = await classUnderTest.create(input);
-
       // then
       expect(result.id).toBe("ord-1");
       expect(result.status).toBe(Status.PENDING);
@@ -495,7 +479,6 @@ describe("OrderService", () => {
     it("throws InvalidOrderError when total is zero", async () => {
       // given
       const input: Order = { id: null, customerId: "cust-1", total: 0 };
-
       // when / then
       await expect(classUnderTest.create(input)).rejects.toThrow(InvalidOrderError);
       await expect(classUnderTest.create(input)).rejects.toThrow("total must be positive");
@@ -509,10 +492,8 @@ describe("OrderService", () => {
     ])("$name", async ({ repoReturn, expected }) => {
       // given
       mockRepository.findById.mockResolvedValue(repoReturn);
-
       // when
       const result = await classUnderTest.findById("ord-1");
-
       // then
       expect(result).toEqual(expected);
     });

@@ -65,7 +65,7 @@ Rules:
 
 ---
 
-## 4. Given / When / Then (mandatory)
+## 4. Given / When / Then
 
 Every test is annotated with three single-line lowercase comments:
 
@@ -78,10 +78,8 @@ func TestCreateTask(t *testing.T) {
         service := NewService(taskRepository, notificationService)
         user := &User{ID: 1, Username: "alice"}
         task := &Task{Summary: "Schedule onboarding call", Assignee: user}
-
         // when
         err := service.CreateTask(task)
-
         // then
         if err != nil {
             t.Errorf("expected no error, got %v", err)
@@ -94,7 +92,8 @@ func TestCreateTask(t *testing.T) {
 ```
 
 Rules:
-- Always lowercase, no colons: `// given`, `// when`, `// then`.
+- Write `// given`, `// when`, `// then` markers **only if the existing project tests already use them**; if they don't, keep the same three-block structure without comments.
+- When used, always lowercase, no colons: `// given`, `// when`, `// then`.
 - The `// when` block is normally **one statement** — the call under test (plus the assignment line if it returns).
 - All assertions go in `// then`.
 - Omit `// given` only when there is genuinely no setup.
@@ -273,10 +272,8 @@ func TestHandlerCreateTask(t *testing.T) {
 
         user := &users.User{ID: 1, Username: "alice", Role: users.Technician}
         security.SetAuthenticatedUser(context, user)
-
         // when
         err := handler.CreateTask(context)
-
         // then
         if err != nil {
             t.Errorf("expected no error, got %v", err)
@@ -320,10 +317,8 @@ func TestCreateUser(t *testing.T) {
         userRepo := NewInMemoryUserRepository()
         userService := NewService(userRepo)
         user := &User{Username: "alice", Password: "S3cur3!", Role: Manager}
-
         // when
         err := userService.CreateUser(user)
-
         // then
         if err != nil {
             t.Fatalf("expected no error, got %v", err)
@@ -356,10 +351,8 @@ func TestToTask(t *testing.T) {
     // given
     user := &users.User{ID: 1, Username: "alice", Role: users.Technician}
     request := &TaskCreateRequest{Summary: "Onboarding call"}
-
     // when
     task := request.toTask(user)
-
     // then
     if task.Summary != request.Summary {
         t.Errorf("expected task summary %s, got %s", request.Summary, task.Summary)
@@ -411,7 +404,6 @@ func TestSyncMapConcurrentSet(t *testing.T) {
     const goroutines = 100
     m := NewSyncMap[string, int]()
     var wg sync.WaitGroup
-
     // when
     for i := range goroutines {
         wg.Add(1)
@@ -421,7 +413,6 @@ func TestSyncMapConcurrentSet(t *testing.T) {
         }(i)
     }
     wg.Wait()
-
     // then
     if m.Len() != goroutines {
         t.Errorf("expected %d entries, got %d", goroutines, m.Len())
@@ -441,7 +432,6 @@ Types that document nil-safe behaviour must have a dedicated test exercising eve
 func TestSetNilSafety(t *testing.T) {
     // given
     var s Set[int]
-
     // then
     if s.Len() != 0 {
         t.Errorf("expected Len 0, got %d", s.Len())
@@ -474,7 +464,7 @@ Do not introduce without a strong reason:
 
 - [ ] File `<source>_test.go`, next to production file, same package.
 - [ ] One top-level `Test<Func>` per function; scenarios go in `t.Run` or table rows (§3).
-- [ ] Body has `// given`, `// when`, `// then` (omit `// given` only if no setup).
+- [ ] Body structured as given/when/then; add `// given`, `// when`, `// then` comments only if the project already uses them.
 - [ ] Only `testing` plus stdlib (and project helpers); no mock library.
 - [ ] If a mock is needed: hand-rolled `mocked<Iface>` struct of `…Func` fields at top of file.
 - [ ] If an in-memory production implementation exists: use it instead of a mock.
