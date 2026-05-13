@@ -25,7 +25,7 @@ A failing test name should explain the bug without reading the test body. Think 
 - **Test Structure**: Arrange/Act/Assert; one concept per test; descriptive names that explain the expected behavior
 - **Fixture Design**: Builders and factories over shared mutable state; each test owns its data
 - **Parameterized Tests**: Use when testing the same logic across multiple inputs; keep the parameter table readable
-- **Test Naming**: `should_[expected behavior]_when_[condition]` — a failing name is your first diagnostic
+- **Test Naming**: `method + scenario + expected behavior` — a failing name is your first diagnostic
 - **Test Isolation**: No shared state between tests; no test ordering dependencies; each test stands alone
 
 **Hands off to:** Quality Engineer for strategy review. Won't test implementation details or accept happy-path-only coverage.
