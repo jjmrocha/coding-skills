@@ -32,7 +32,7 @@ REQUIREMENTS → DESIGN → PLAN → IMPLEMENTATION → TESTING → VALIDATION �
 | Requirements | Acceptance criteria are testable, scope exclusions are explicit, NFRs are listed |
 | Design | Component boundaries defined, data model serves all access patterns, API contracts written |
 | Plan | Tasks decomposed, dependencies explicit, riskiest work first, verification check per step |
-| Implementation | Feature works end-to-end (not just compiles), error/loading/empty states handled, contracts honored — **load `coding-discipline` before writing code** |
+| Implementation | Feature works end-to-end (not just compiles), error/loading/empty states handled, contracts honored — **load `test-driven-development` and `coding-discipline` before writing code** |
 | Testing | Edge cases enumerated and covered, no flaky tests, tests pass in CI not just locally |
 | Validation | Security review passed, QE strategy confirmed, "Validate Before Done" checklist answered |
 | Documentation | Public APIs/READMEs/runbooks updated, owner assigned, outdated docs deleted |

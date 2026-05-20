@@ -35,7 +35,7 @@ Typical layered split inside a domain package:
 
 ---
 
-## What to test, by layer
+## 3. What to test, by layer
 
 | Layer | Mock | Don't mock | Focus |
 |-------|------|------------|-------|
@@ -47,7 +47,7 @@ Typical layered split inside a domain package:
 
 ---
 
-## 3. Test function naming
+## 4. Test function naming
 
 One top-level `Test<Func>` per function under test. Use `t.Run` subtests or table-driven tests inside it for multiple scenarios.
 
@@ -65,7 +65,7 @@ Rules:
 
 ---
 
-## 4. Given / When / Then
+## 5. Given / When / Then
 
 Every test is annotated with three single-line lowercase comments:
 
@@ -101,7 +101,9 @@ Rules:
 
 ---
 
-## 5. Variable naming
+## 6. Variable naming
+
+Go convention favors short, semantic names. Unlike other language references, this ref does not prescribe `classUnderTest` — use names that read naturally in Go (`service`, `handler`, `repo`).
 
 | Role | Name |
 |---|---|
@@ -126,7 +128,7 @@ echoError := err.(*echo.HTTPError)
 
 ---
 
-## 6. Mocking — hand-rolled function-field structs
+## 7. Mocking — hand-rolled function-field structs
 
 There is no mocking framework. Mocks are file-local structs whose fields are function values matching the interface signatures.
 
@@ -189,7 +191,7 @@ service.CreateTask(task)
 
 ---
 
-## 7. Table-driven tests
+## 8. Table-driven tests
 
 Table rows run inside `t.Run` so failures name the failing case:
 
@@ -226,7 +228,7 @@ Rules:
 
 ---
 
-## 8. Assertions — plain `if` + `t.Errorf`
+## 9. Assertions — plain `if` + `t.Errorf`
 
 - Use `t.Errorf` for value mismatches (test continues, all failures reported).
 - Use `t.Fatalf` / `t.Fatal` only when continuing would crash (nil-pointer dereference, setup failure).
@@ -251,7 +253,7 @@ Lowercase ("expected …, got …") by default; match the prevailing style of th
 
 ---
 
-## 9. HTTP handler tests — canonical recipe
+## 10. HTTP handler tests — canonical recipe
 
 ```go
 func TestHandlerCreateTask(t *testing.T) {
@@ -308,7 +310,7 @@ if echoError.Code != http.StatusUnauthorized { ... }
 
 ---
 
-## 10. Service-level tests — canonical recipe
+## 11. Service-level tests — canonical recipe
 
 ```go
 func TestCreateUser(t *testing.T) {
@@ -344,7 +346,7 @@ if err != ErrDuplicatedUsername {
 
 ---
 
-## 11. Boundary (DTO mapping) tests
+## 12. Boundary (DTO mapping) tests
 
 ```go
 func TestToTask(t *testing.T) {
@@ -369,7 +371,7 @@ func TestToTask(t *testing.T) {
 
 ---
 
-## 12. Context
+## 13. Context
 
 Use `t.Context()` (requires Go 1.21+) — it is cancelled automatically when the test and its subtests finish.
 
@@ -394,7 +396,7 @@ if !errors.Is(err, context.DeadlineExceeded) {
 
 ---
 
-## 13. Concurrency tests
+## 14. Concurrency tests
 
 Use a named constant for the goroutine count and `sync.WaitGroup` to synchronise:
 
@@ -424,7 +426,7 @@ Run with `go test -race ./...` to catch data races.
 
 ---
 
-## 14. Nil-safety tests
+## 15. Nil-safety tests
 
 Types that document nil-safe behaviour must have a dedicated test exercising every nil-safe operation:
 
@@ -448,7 +450,7 @@ func TestSetNilSafety(t *testing.T) {
 
 ---
 
-## 15. Features explicitly NOT used
+## 16. Features explicitly NOT used
 
 Do not introduce without a strong reason:
 
@@ -460,7 +462,7 @@ Do not introduce without a strong reason:
 
 ---
 
-## 16. Quick checklist for a new test
+## 17. Quick checklist for a new test
 
 - [ ] File `<source>_test.go`, next to production file, same package.
 - [ ] One top-level `Test<Func>` per function; scenarios go in `t.Run` or table rows (§3).

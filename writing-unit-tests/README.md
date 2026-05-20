@@ -1,6 +1,6 @@
 # writing-unit-tests
 
-A Claude Code skill for writing unit tests in any language. Guides test scenario identification, applies the FIRST-U quality principles, enforces Arrange–Act–Assert structure, and produces a runnable, passing suite.
+A Claude Code skill for writing unit tests in any language. The agent-facing [SKILL.md](SKILL.md) is a concise checklist (~560 words); the human-facing [docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md) is the detailed guide with rationale and examples.
 
 ## When to Use
 
@@ -47,9 +47,9 @@ That document is the canonical reference. [`SKILL.md`](SKILL.md) is its Claude-o
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Core skill — workflow, FIRST-U table, four-quadrant taxonomy, mocking guide, naming conventions, language dispatch |
-| [docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md) | Blueprint — the canonical document from which this skill's rules were derived |
-| [references/java_unit_test.md](references/java_unit_test.md) | JUnit 5 + AssertJ + Mockito patterns |
+| [SKILL.md](SKILL.md) | Agent-facing skill — scenario quadrants, FIRST-U table, AAA structure, mocking rules, language dispatch |
+| [docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md) | Human reference — the detailed guide with rationale, examples, and layer-by-layer guidance |
+| [references/java_unit_test.md](references/java_unit_test.md) | Agent reference — JUnit 5 + AssertJ + Mockito patterns |
 | [references/go_std_unit_test.md](references/go_std_unit_test.md) | Go `testing` stdlib patterns |
 | [references/go_testify_unit_test.md](references/go_testify_unit_test.md) | Go with testify (`assert`, `require`, `mock`) |
 | [references/python_pytest_unit_test.md](references/python_pytest_unit_test.md) | pytest + `monkeypatch` / `unittest.mock` |

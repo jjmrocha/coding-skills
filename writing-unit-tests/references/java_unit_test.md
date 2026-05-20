@@ -45,7 +45,7 @@ src/test/java/com/example/order/OrderServiceTest.java
 
 ---
 
-## What to test, by layer
+## 3. What to test, by layer
 
 | Layer | Mock | Don't mock | Focus |
 |-------|------|------------|-------|
@@ -57,7 +57,7 @@ src/test/java/com/example/order/OrderServiceTest.java
 
 ---
 
-## 3. Class and method modifiers
+## 4. Class and method modifiers
 
 Test classes and test methods are **package-private** — no `public`, no `protected`.
 
@@ -72,7 +72,7 @@ Helper methods are `private static` unless they need instance state.
 
 ---
 
-## 4. Canonical variable names
+## 5. Canonical variable names
 
 These are the names every test should use. Consistency makes the codebase scannable.
 
@@ -86,7 +86,7 @@ Do not use `sut`, `underTest`, `subject`, `actual`, `output`, or domain-specific
 
 ---
 
-## 5. Given / When / Then structure
+## 6. Given / When / Then structure
 
 Every test uses three lowercase comments to delimit phases:
 
@@ -113,7 +113,7 @@ Rules:
 
 ---
 
-## 6. Test method naming
+## 7. Test method naming
 
 Format: **`test` + PascalCase description**, no underscores, no `@DisplayName`.
 
@@ -136,7 +136,7 @@ Guidelines:
 
 ---
 
-## 7. Imports
+## 8. Imports
 
 Prefer `var` for locals. AssertJ and Mockito are imported statically.
 
@@ -161,7 +161,7 @@ Note: when a test class *only* asserts on enums, use `org.assertj.core.api.Asser
 
 ---
 
-## 8. Fixtures and helpers
+## 9. Fixtures and helpers
 
 Initialize stateless or cheap collaborators as `private final` fields:
 
@@ -194,7 +194,7 @@ Helpers may include `assertThat(...)` calls to fail fast on setup errors.
 
 ---
 
-## 9. The `isInstanceOf` + cast idiom
+## 10. The `isInstanceOf` + cast idiom
 
 When a method under test returns an **interface** but you need to assert on the concrete implementation's state, follow this pattern:
 
@@ -205,9 +205,9 @@ void testOk() {
     var result = HttpResponse.ok();
     // then
     assertThat(result).isInstanceOf(HttpResponseImpl.class);
-    var classUnderTest = (HttpResponseImpl) result;
-    assertThat(classUnderTest.getStatusCode()).isEqualTo(200);
-    assertThat(classUnderTest.getBody()).isNull();
+    var impl = (HttpResponseImpl) result;
+    assertThat(impl.getStatusCode()).isEqualTo(200);
+    assertThat(impl.getBody()).isNull();
 }
 ```
 
@@ -215,7 +215,7 @@ Even when `classUnderTest` is named only inside `// then`, keep the same variabl
 
 ---
 
-## 10. Time and randomness
+## 11. Time and randomness
 
 Determinism is non-negotiable. Pin both via injection or `MockedStatic` (see §15):
 
@@ -236,7 +236,7 @@ This guarantees the same sequence every run. Without it, tests fail **Repeatable
 
 ---
 
-## 11. Passing `null` for irrelevant arguments
+## 12. Passing `null` for irrelevant arguments
 
 When a constructor takes parameters the test does not care about, pass `null` rather than creating throwaway fixtures:
 
@@ -249,7 +249,7 @@ Only populate fields the test observes or exercises. Keeps `// given` focused.
 
 ---
 
-## 12. AssertJ — catalogue
+## 13. AssertJ — catalogue
 
 Prefer the most specific method for the type.
 
@@ -306,7 +306,7 @@ Chain while the subject does not change. Start a new `assertThat(...)` when the 
 
 ---
 
-## 13. Exception testing — `catchThrowable`
+## 14. Exception testing — `catchThrowable`
 
 Do **not** use `assertThatThrownBy`. Use `catchThrowable`, then assert on the caught throwable:
 
@@ -328,7 +328,7 @@ void testWithdrawRejectsInsufficientBalance() {
 
 ---
 
-## 14. Parameterized tests
+## 15. Parameterized tests
 
 Use `@ParameterizedTest` + `@MethodSource` with a private static factory returning `Stream<Arguments>`.
 
@@ -361,7 +361,7 @@ Rules:
 
 ---
 
-## 15. Mockito
+## 16. Mockito
 
 ### Mocking instances
 
@@ -401,7 +401,7 @@ The codebase asserts via observable state, not call counts. Reach for `verify(..
 
 ---
 
-## 16. Async tests
+## 17. Async tests
 
 JUnit 5 supports `CompletableFuture` directly with `Awaitility` or by joining in a plain `@Test`:
 
@@ -423,7 +423,7 @@ For reactive pipelines (Project Reactor, RxJava), block on the publisher:
 
 ---
 
-## 17. Features explicitly NOT used
+## 18. Features explicitly NOT used
 
 Do not introduce without a strong reason:
 
@@ -441,7 +441,7 @@ Do not introduce without a strong reason:
 
 ---
 
-## 18. Skeleton
+## 19. Skeleton
 
 ```java
 package com.example.order;
@@ -487,7 +487,7 @@ class OrderServiceTest {
 
 ---
 
-## 19. Quick reference
+## 20. Quick reference
 
 | Task                              | How                                                                    |
 |-----------------------------------|------------------------------------------------------------------------|

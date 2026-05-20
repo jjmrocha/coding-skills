@@ -24,7 +24,7 @@ This reference follows the **FIRST-U** principles (Fast, Isolated, Repeatable, S
 
 ---
 
-## What to test, by layer
+## 3. What to test, by layer
 
 | Layer | Mock | Don't mock | Focus |
 |-------|------|------------|-------|
@@ -36,7 +36,7 @@ This reference follows the **FIRST-U** principles (Fast, Isolated, Repeatable, S
 
 ---
 
-## 3. Given / When / Then
+## 4. Given / When / Then
 
 Every test that performs a discrete operation has three sections:
 
@@ -73,7 +73,7 @@ assert.Equal(t, expected, result)
 
 ---
 
-## 4. `assert` vs `require`
+## 5. `assert` vs `require`
 
 Use `assert` (non-fatal — every failure reported, test continues) **by default**.
 
@@ -118,7 +118,7 @@ assert.Contains(t, str, "substring")
 
 ---
 
-## 5. Test function structure
+## 6. Test function structure
 
 ### Single scenario → top-level `Test<Func>`
 
@@ -174,7 +174,7 @@ func TestPop(t *testing.T) {
 
 ---
 
-## 6. Table-driven tests
+## 7. Table-driven tests
 
 ```go
 func TestFilter(t *testing.T) {
@@ -211,7 +211,9 @@ Rules:
 
 ---
 
-## 7. Naming
+## 8. Naming
+
+Go convention favors short, semantic names. Unlike other language references, this ref does not prescribe `classUnderTest` — use names that read naturally in Go (`s`, `q`, `service`).
 
 | Concept | Name | Example |
 |---|---|---|
@@ -230,7 +232,7 @@ Function naming:
 
 ---
 
-## 8. Test helper functions
+## 9. Test helper functions
 
 Extract repeated setup into helpers when it appears in three or more tests.
 
@@ -253,7 +255,7 @@ Rules:
 
 ---
 
-## 9. Unordered collections
+## 10. Unordered collections
 
 Use `assert.ElementsMatch` instead of sorting and comparing:
 
@@ -273,7 +275,7 @@ assert.Contains(t, result, "2")
 
 ---
 
-## 10. Iterator / re-iteration tests
+## 11. Iterator / re-iteration tests
 
 When testing functions that return `iter.Seq[T]` or `iter.Seq2[K, V]`, include a re-iteration subtest to verify state is not shared:
 
@@ -294,7 +296,7 @@ t.Run("multiple iterations", func(t *testing.T) {
 
 ---
 
-## 11. Context
+## 12. Context
 
 Use `t.Context()` — it's cancelled automatically when the test and its subtests finish.
 
@@ -317,7 +319,7 @@ assert.ErrorIs(t, err, context.DeadlineExceeded)
 
 ---
 
-## 12. Concurrency tests
+## 13. Concurrency tests
 
 Named constant for goroutine count, `sync.WaitGroup` to synchronise:
 
@@ -345,7 +347,7 @@ Run with `go test -race ./...` to catch data races.
 
 ---
 
-## 13. Nil-safety tests
+## 14. Nil-safety tests
 
 Functions or data structures that document nil-safe behaviour must have a dedicated test exercising every nil-safe operation:
 
@@ -363,7 +365,7 @@ func TestSetNilSafety(t *testing.T) {
 
 ---
 
-## 14. Hand-rolled mocks (when not using testify's `mock.Mock`)
+## 15. Hand-rolled mocks (when not using testify's `mock.Mock`)
 
 Define a file-local struct whose fields are function values matching the interface:
 
@@ -393,7 +395,7 @@ mockedTaskService := &mockedTaskService{
 }
 ```
 
-## 15. Handler-level tests — canonical recipe
+## 16. Handler-level tests — canonical recipe
 
 ```go
 func TestHandlerCreateTask(t *testing.T) {
@@ -433,7 +435,7 @@ Conventions:
 4. Invoke the handler method **directly** — do not route through the framework's mux.
 5. Assert in this order: returned `err`, status code, body (decoded JSON).
 
-## 16. Service-level tests — canonical recipe
+## 17. Service-level tests — canonical recipe
 
 ```go
 func TestCreateUser(t *testing.T) {
@@ -461,7 +463,7 @@ Conventions:
 assert.ErrorIs(t, err, ErrDuplicatedUsername)
 ```
 
-## 17. Boundary (DTO mapping) tests
+## 18. Boundary (DTO mapping) tests
 
 ```go
 func TestToTask(t *testing.T) {
@@ -481,7 +483,7 @@ func TestToTask(t *testing.T) {
 
 ---
 
-## 18. Exception and error testing
+## 19. Exception and error testing
 
 Use `assert.ErrorIs` for sentinel errors and `assert.ErrorAs` for concrete error types. Both are non-fatal — they allow the test to report further failures.
 
@@ -518,7 +520,7 @@ assert.Panics(t, func() {
 
 ---
 
-## 19. Skeleton
+## 20. Skeleton
 
 ```go
 package mypackage
@@ -558,7 +560,7 @@ func TestStack(t *testing.T) {
 
 ---
 
-## 20. Features explicitly NOT used
+## 21. Features explicitly NOT used
 
 Do not introduce without a strong reason:
 
@@ -570,7 +572,7 @@ Do not introduce without a strong reason:
 
 ---
 
-## 21. Quick reference
+## 22. Quick reference
 
 ```
 TestFoo                      ← top-level function (one per public API entry point)

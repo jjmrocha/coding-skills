@@ -33,7 +33,7 @@ Naming:
 
 ---
 
-## What to test, by layer
+## 3. What to test, by layer
 
 | Layer | Mock | Don't mock | Focus |
 |-------|------|------------|-------|
@@ -45,7 +45,7 @@ Naming:
 
 ---
 
-## 3. Block structure — `describe` + `it`
+## 4. Block structure — `describe` + `it`
 
 Group tests by the unit (class or function) using `describe`. Inside, use `it` for individual cases. Read them as: *"<unit> — <scenario> — <expected behavior>."*
 
@@ -87,7 +87,7 @@ it("test1")                                                           // ❌ gen
 
 ---
 
-## 4. Given / When / Then comments
+## 5. Given / When / Then comments
 
 Use lowercase block comments inside each `it`:
 
@@ -112,11 +112,11 @@ Rules:
 
 ---
 
-## 5. Canonical variable names
+## 6. Canonical variable names
 
 | Variable          | Meaning                                                       |
 |-------------------|---------------------------------------------------------------|
-| `classUnderTest`  | The instance whose behavior is being tested. Always this name for class-based code. For free functions, you may use `subject` or call the function directly. |
+| `classUnderTest`  | The instance whose behavior is being tested. Always this name. For free functions, call the function directly. |
 | `result`          | The return value of the function under test.                  |
 | `expected`        | The expected value, when it needs a name.                     |
 | `mock<Thing>`     | A mock collaborator (`mockRepository`, `mockClock`).          |
@@ -125,7 +125,7 @@ Use **the same parameter names** as the function under test for inputs.
 
 ---
 
-## 6. `expect` matchers — catalogue
+## 7. `expect` matchers — catalogue
 
 Prefer the most specific matcher for the type.
 
@@ -202,7 +202,7 @@ expect(result).toMatchInlineSnapshot(`...`);  // inline snapshot — preferred f
 
 ---
 
-## 7. Exception testing — `toThrow`
+## 8. Exception testing — `toThrow`
 
 ```typescript
 it("throws OverdraftError when balance is insufficient", () => {
@@ -241,7 +241,7 @@ await expect(classUnderTest.create(invalidOrder)).rejects.toThrow(InvalidOrderEr
 
 ---
 
-## 8. Parameterized tests — `it.each` / `test.each`
+## 9. Parameterized tests — `it.each` / `test.each`
 
 ```typescript
 describe("HttpMethod.fromString", () => {
@@ -280,7 +280,7 @@ Rules:
 
 ---
 
-## 9. Test doubles
+## 10. Test doubles
 
 ### Hierarchy of preference
 
@@ -374,7 +374,7 @@ it("does not send email on dry-run", async () => {
 
 ---
 
-## 10. Lifecycle hooks
+## 11. Lifecycle hooks
 
 - `beforeEach` — set up state shared by every test in the block. Use it for cheap setup that should run anew per test (default).
 - `afterEach` — clean up resources, restore mocks (`jest.restoreAllMocks()`).
@@ -400,7 +400,7 @@ describe("OrderService", () => {
 
 ---
 
-## 11. Time and randomness
+## 12. Time and randomness
 
 Determinism is non-negotiable. Pin both.
 
@@ -424,7 +424,7 @@ Inject a `Random` interface (or pass a seeded generator) so the test can supply 
 
 ---
 
-## 12. Async tests
+## 13. Async tests
 
 - Always use `async`/`await` over `.then()` chains.
 - For promise rejection, use `await expect(...).rejects.toThrow(...)`.
@@ -443,7 +443,7 @@ it("fetches the payload from the configured URL", async () => {
 
 ---
 
-## 13. Skeleton
+## 14. Skeleton
 
 ```typescript
 import { OrderService } from "./orderService";
@@ -503,7 +503,7 @@ describe("OrderService", () => {
 
 ---
 
-## 14. Features explicitly NOT used
+## 15. Features explicitly NOT used
 
 Do not introduce without a strong reason:
 
@@ -516,7 +516,7 @@ Do not introduce without a strong reason:
 
 ---
 
-## 15. Quick reference
+## 16. Quick reference
 
 | Task                              | How                                                                |
 |-----------------------------------|--------------------------------------------------------------------|

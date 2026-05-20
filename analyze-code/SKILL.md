@@ -1,15 +1,15 @@
 ---
 name: analyze-code
-description: Use when auditing an existing codebase, module, or directory for health — legacy code assessments, pre-release gates, inherited-code reviews, or when you need a multi-lens view across quality, security, performance, and architecture concerns on code you didn't just write
+description: Use when auditing an existing codebase, module, or directory for health — legacy code assessments, inherited-code reviews, or when you need a multi-lens view across quality, security, performance, and architecture concerns on code you didn't just write
 ---
 
 # Analyze Code
 
-Multi-lens code audit. Applies five specialist perspectives to existing code and produces a structured report with prioritized findings and a verdict.
+Multi-lens code audit. Applies five specialist perspectives to existing code and produces a prioritized findings report — a deep review of what was found, not a gate decision.
 
 ## When to Use
 
-**Use for:** auditing a module, codebase health check, pre-release gate, evaluating inherited or legacy code, assessing technical debt before a large change.
+**Use for:** personal quality gate before opening a PR, auditing a module, codebase health check, evaluating inherited or legacy code, assessing technical debt before a large change.
 
 **When NOT to use:**
 - Writing new code → use `using-software-specialists`
@@ -44,60 +44,40 @@ Run them in this order: architecture frames the context, quality and performance
 
 **Rule:** Don't inflate severity. Low is low. Style nits stay Low.
 
-## Verdict
-
-After collecting findings across all five lenses, issue one verdict:
-
-| Verdict | When |
-|---------|------|
-| **APPROVE** | No Critical findings, ≤2 High findings |
-| **NEEDS-WORK** | 1 Critical, **or** 3+ High findings |
-| **BLOCK** | 2+ Critical findings, **or** systemic architectural/security issues requiring redesign |
-
 ## Workflow
 
-1. **Frame the target** — what are you analyzing, and why now? (pre-release, inheritance, regression, tech-debt assessment)
+1. **Frame the target** — what are you analyzing, and why now? (inheritance, regression, tech-debt assessment)
 2. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells
 3. **Quality lens** — assess test coverage, complexity, duplication
-4. **Performance lens** — identify hot paths, obvious algorithmic/DB issues; note profiling gaps (call them out as "unknown" rather than guessing)
+4. **Performance lens** — identify hot paths, algorithmic complexity issues, N+1 queries, unnecessary allocations. Report what the code reveals — don't note that profiling wasn't done.
 5. **Security lens** — apply `security-best-practices` for the language/framework; check auth, input trust, secrets handling
 6. **Coding Style lens** — invoke the `style-checker` skill on the target files/directory; map its severities into this skill's scale (most style violations are **Low**, only systemic style breakage rises to **Medium**)
-7. **Synthesize** — group related findings, dedupe, rank by severity, set verdict
-8. **Deliver report** — use the template below; lead with verdict and top 3 priorities
+7. **Synthesize** — group related findings, dedupe, rank by severity
+8. **Deliver report** — use the template below; lead with summary and top priorities
 
 ## Report Template
 
 ```markdown
 # Analysis: <target>
 
-**Verdict:** APPROVE | NEEDS-WORK | BLOCK
-**Summary:** <1-2 sentences — the headline finding>
+**Summary:** <1-2 sentences — the headline findings>
 
 ## Priority Actions
 1. [Critical|High] <action> — <file:line>
 2. ...
 
-## Findings by Lens
+## Findings
 
-### Architecture
 - [Severity] <Finding> — <file:line> — <impact> — <recommended action>
+- ...
 
-### Quality
-- [Severity] ...
+## Coding Style
 
-### Performance
-- [Severity] ...
-
-### Security
-- [Severity] ...
-
-### Coding Style
-- [Severity] <Finding> — <file:line> — <style rule violated> — <recommended fix>
-- _Generated via the `style-checker` skill; see its full report for the complete violation list._
-
-## Out of Scope
-- <what was intentionally not covered and why (e.g., "runtime profiling not run — no production access")>
+<Summary of style findings, or inline the most important ones. For full detail,
+reference the style-checker report.>
 ```
+
+Findings are listed in severity order (Critical first), not grouped by lens. The lenses are an internal analysis framework — the user reads a single prioritized list.
 
 ## Common Mistakes
 
@@ -107,7 +87,7 @@ After collecting findings across all five lenses, issue one verdict:
 | Re-deriving style rules inline | Delegate the Coding Style lens to the `style-checker` skill — it already encodes the language references |
 | Letting style nits dominate the report | Most style findings are Low; don't let them push real Critical/High issues out of the top priorities |
 | Dumping raw findings without synthesis | Group by severity, dedupe, rank — top priorities must read first |
+| Organizing output by lens | The lens-separated report is hard to scan. Output a single prioritized list — severity order, not lens order. |
 | Skipping architecture because "the code looks fine" | Architecture issues hide in the gap between what you see and how components interact |
 | Inflating severity to seem thorough | Low stays Low. Reserve Critical for real blast-radius issues |
-| Treating "no findings" as complete | State explicitly what you checked and what's out of scope |
-| Guessing at performance without evidence | If you can't profile, say "profiling gap" — don't invent numbers |
+| Reporting what wasn't checked as findings | Focus on what the code reveals. Don't list profiling gaps or tests not run as if they're defects. |

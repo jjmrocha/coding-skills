@@ -59,6 +59,7 @@ Disallowed reflexes:
 Code that references things that don't exist — an import path, a method signature, a config key.
 
 - **Look it up first.** Prefer [serena MCP](https://github.com/oraios/serena) symbolic tools (`find_symbol`, `get_symbols_overview`, `find_referencing_symbols`) over `Read`/`Grep`; [context7 MCP](https://github.com/upstash/context7) for external library docs; `grep`/`Read` otherwise.
+- **Check for existing helpers before creating new ones.** Before writing a utility function, grep the codebase for the name or purpose. Duplicating a function that already exists is a hallucination — you assumed it didn't exist without verifying.
 - **Run it before saying it's done.** *"It should work"* ≠ *"I ran it and it works."*
 - **Mark uncertainty.** *"I think it's `obj.foo()` but haven't confirmed"* lets the user catch a guess.
 
@@ -100,6 +101,7 @@ A "no" on any line: stop and revise, don't ship and explain.
 | "It should work" (without running it) | "Should work" ≠ "I ran it and it works" |
 | "Tests can come after" | You haven't named the verification |
 | "I lost track of what they wanted" | Drift — restate the goal before continuing |
+| "I'll just write a quick helper for that" | Did you grep first? It may already exist. |
 
 ## Tradeoff
 

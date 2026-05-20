@@ -23,7 +23,7 @@ The skill enforces three gates, one per cycle phase:
 | **GREEN** | Write the minimum code to pass the test | Full suite must be green — no regressions |
 | **REFACTOR** | Improve structure without changing behavior | Suite stays green throughout |
 
-Repeat until the feature is complete. The checklist at the end of [`SKILL.md`](SKILL.md) is the exit gate for marking a task done.
+Repeat until the feature is complete.
 
 ## Usage
 
@@ -37,7 +37,7 @@ Repeat until the feature is complete. The checklist at the end of [`SKILL.md`](S
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Core skill — cycle phases, gates, adapting to existing code, common shortcuts table, completion checklist |
+| [SKILL.md](SKILL.md) | Core skill — cycle phases with gates, adapting to existing code, excuse/reality table, red flags |
 
 ## Related Skills
 

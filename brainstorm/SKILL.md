@@ -21,10 +21,10 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 4. **Propose 2-3 approaches** — with trade-offs; lead with your recommendation and reasoning. For cross-domain work, load the relevant specialists from `using-software-specialists` (architect for system shape, security for trust boundaries, requirements-analyst for hidden assumptions) so trade-offs cover more than the happy path.
 5. **Present design** — section by section, confirm after each; cover architecture, components, data flow, error handling, testing
 6. **Probe non-functional requirements** — before finalizing the design, explicitly ask about performance targets, scalability, security posture, compliance, and accessibility. NFRs omitted here become rework later.
-7. **Write spec** — use `references/spec-template.md` as the starting structure; save to `docs/specs/YYYY-MM-DD-<topic>.md` or per project convention
-8. **Self-review spec** — scan for placeholders, contradictions, scope creep, ambiguity; fix inline
-9. **User reviews spec** — ask the user to review before handing off
-10. **Hand off to planning** — pass the approved spec to the `project-planner` specialist to produce a verifiable execution plan. Brainstorm ends at an approved spec; planning begins after.
+7. **Final design summary** — summarize the agreed design in conversation (architecture, components, data flow, error handling, testing). Self-review for placeholders, contradictions, and ambiguity before presenting.
+8. **Get final approval** — ask the user to approve the complete design summary. Revise as needed.
+9. **Write spec only if asked** — do NOT write a spec file automatically. Only save the design to disk if the user explicitly requests it. When they do, use `references/spec-template.md` as the starting structure and save to `docs/specs/YYYY-MM-DD-<topic>.md` or per project convention.
+10. **Hand off to planning** — pass the approved design to the `project-planner` specialist to produce a verifiable execution plan. Brainstorm ends at an approved design; planning begins after.
 
 ## Socratic Questioning
 
@@ -49,14 +49,16 @@ Ask questions that guide discovery rather than reveal the answer.
 - Confirm each section before moving on — don't write the full spec then ask for feedback
 - Design for isolation: break the system into components with one clear purpose each; changes to internals should not break consumers
 
-## Spec Self-Review
+## Design Validation (Before Final Approval)
 
-Before asking the user to review:
+Before presenting the final design summary, self-review:
 
 1. **Placeholder scan** — any TBD, TODO, incomplete requirements? Fix them.
 2. **Consistency** — does architecture match feature descriptions?
 3. **Scope** — focused enough for a single implementation plan?
 4. **Ambiguity** — can any requirement be read two ways? Pick one interpretation and make it explicit.
+
+Only write the spec to a file if the user explicitly asks for it.
 
 ## Example:
 
@@ -89,7 +91,7 @@ Q: "Architecture: a CLI that appends entries to a local JSON file,
     with a search command to retrieve by title or tag. Does that fit?"
 ```
 
-Spec saved to `docs/specs/YYYY-MM-DD-reading-tracker.md` after design approval.
+# Design approved and handed off to planning.
 
 ## Key Principles
 

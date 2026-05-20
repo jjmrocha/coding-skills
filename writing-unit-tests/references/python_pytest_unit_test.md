@@ -40,7 +40,7 @@ If the project uses `pytest-asyncio` or `anyio`, follow its conventions for `asy
 
 ---
 
-## What to test, by layer
+## 3. What to test, by layer
 
 | Layer | Mock | Don't mock | Focus |
 |-------|------|------------|-------|
@@ -52,7 +52,7 @@ If the project uses `pytest-asyncio` or `anyio`, follow its conventions for `asy
 
 ---
 
-## 3. Test function naming
+## 4. Test function naming
 
 Format: **`test_<function>_<scenario>_<expected>`**, snake_case, describing the unit, the condition, and the outcome.
 
@@ -79,7 +79,7 @@ class TestOrderService:
 
 ---
 
-## 4. Canonical variable names
+## 5. Canonical variable names
 
 | Variable           | Meaning                                                            |
 |--------------------|--------------------------------------------------------------------|
@@ -92,7 +92,7 @@ Use **the same parameter names** as the function under test for inputs — the c
 
 ---
 
-## 5. Given / When / Then structure
+## 6. Given / When / Then structure
 
 Use lowercase block comments to delimit phases — `# given`, `# when`, `# then` — **only if the existing project tests already use them**. If they don't, keep the same three-block structure without comments:
 
@@ -116,7 +116,7 @@ Rules:
 
 ---
 
-## 6. Assertions — plain `assert`
+## 7. Assertions — plain `assert`
 
 pytest rewrites `assert` to produce rich diffs. Use it for everything:
 
@@ -159,7 +159,7 @@ Default to no message — pytest's diff is usually enough.
 
 ---
 
-## 7. Exception testing — `pytest.raises`
+## 8. Exception testing — `pytest.raises`
 
 ```python
 def test_withdraw_insufficient_balance_raises_overdraft_error():
@@ -184,7 +184,7 @@ assert str(excinfo.value) == "Withdrawal exceeds balance."
 
 ---
 
-## 8. Fixtures
+## 9. Fixtures
 
 Use `@pytest.fixture` for reusable setup. Default to **function scope** — the cost of recreating state is almost always preferable to the risk of leaks between tests.
 
@@ -217,7 +217,7 @@ Rules:
 
 ---
 
-## 9. Parameterized tests
+## 10. Parameterized tests
 
 Use `@pytest.mark.parametrize` for table-driven scenarios. **Always include `ids=`** so test IDs read clearly in pytest output.
 
@@ -246,7 +246,7 @@ Rules:
 
 ---
 
-## 10. Time and randomness
+## 11. Time and randomness
 
 Determinism is non-negotiable. Pin both via `monkeypatch` or injection:
 
@@ -266,7 +266,7 @@ Without pinning time and randomness, tests fail the **Repeatable** principle fro
 
 ---
 
-## 11. Mocking
+## 12. Mocking
 
 ### Hierarchy of preference
 
@@ -322,7 +322,7 @@ Wrap external SDKs behind a port (your own interface/protocol) and mock the port
 
 ---
 
-## 12. Async tests
+## 13. Async tests
 
 If the project uses `pytest-asyncio`:
 
@@ -343,7 +343,7 @@ Configure `asyncio_mode = "auto"` in `pyproject.toml` if the project does so —
 
 ---
 
-## 13. Skeleton for a new test module
+## 14. Skeleton for a new test module
 
 ```python
 """Tests for myapp.orders.service."""
@@ -408,7 +408,7 @@ def test_create_order_assigns_status_based_on_total(class_under_test, mock_repos
 
 ---
 
-## 14. Features explicitly NOT used
+## 15. Features explicitly NOT used
 
 Do not introduce without a strong reason:
 
@@ -422,7 +422,7 @@ Do not introduce without a strong reason:
 
 ---
 
-## 15. Quick reference
+## 16. Quick reference
 
 | Task                              | How                                                                |
 |-----------------------------------|--------------------------------------------------------------------|

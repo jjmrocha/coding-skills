@@ -1,6 +1,6 @@
 # brainstorm
 
-A Claude Code skill for Socratic requirements discovery. Turns vague ideas into concrete, validated design specs through guided dialogue — one question at a time, no implementation until the design is approved.
+A Claude Code skill for Socratic requirements discovery. Turns vague ideas into concrete, validated designs through guided dialogue — one question at a time, no implementation until the design is approved. Only writes a spec file when the user explicitly asks for it.
 
 ## When to Use
 

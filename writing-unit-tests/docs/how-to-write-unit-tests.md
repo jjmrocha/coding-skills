@@ -1,4 +1,6 @@
-# How to Write Unit Tests
+# How to Write Unit Tests — Human Reference
+
+> **This document is a detailed guide for humans.** It explains the why behind each practice with rationale and examples. For the agent-facing checklist (what Claude reads when writing tests), see [SKILL.md](../SKILL.md).
 
 ---
 
