@@ -2,7 +2,7 @@
 
 A Claude Code skill that reviews code against **Google's official style guidelines**, focused on formatting and naming conventions only. Produces a structured violation report grouped by severity (Critical / High / Medium / Low).
 
-For logic, architecture, or code-quality concerns (SOLID, code smells, etc.), use the `code-reviewer` skill instead.
+For logic, architecture, or code-quality concerns (SOLID, code smells, etc.), use the `analyze-code` skill instead.
 
 ## When to Use
 

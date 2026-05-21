@@ -10,9 +10,9 @@ A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the r
 
 | Skill | What it does |
 |-------|-------------|
-| [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, and security. Produces a prioritized findings report with an APPROVE / NEEDS-WORK / BLOCK verdict. |
+| [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, security, and style. Produces a prioritized findings report — a deep review, not a gate decision. |
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
-| [coding-discipline](coding-discipline/) | Names the five most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift) and the counter-move for each. |
+| [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
 | [test-driven-development](test-driven-development/) | Enforces the Red→Green→Refactor cycle before any production code is written. Covers the full TDD workflow: writing a failing test first, minimal implementation, and safe refactoring with a green suite. |
 | [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
@@ -29,6 +29,7 @@ cp -r analyze-code brainstorm coding-discipline style-checker test-driven-develo
 Skills are then available as slash commands in any Claude Code session:
 
 ```
+/analyze-code
 /brainstorm
 /coding-discipline
 /style-checker

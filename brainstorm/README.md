@@ -8,6 +8,14 @@ A Claude Code skill for Socratic requirements discovery. Turns vague ideas into 
 - Requirements are unclear and need to be drawn out before coding
 - A feature should be scoped and designed before a plan is written
 
+## Usage
+
+```
+/brainstorm
+/brainstorm I want to build a rate limiter for our API
+/brainstorm add collaborative editing to the document service
+```
+
 ## Files
 
 | File | Purpose |
