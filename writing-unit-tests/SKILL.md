@@ -52,7 +52,7 @@ Use `// given` / `// when` / `// then` comments only if the existing codebase us
 
 ## Language References
 
-Read the matching reference before drafting tests. If no reference exists for the project's language, apply the principles above universally and mirror existing project conventions.
+If no reference exists for the project's language, apply the principles above and mirror existing project conventions.
 
 | Reference | Stack |
 |-----------|-------|
