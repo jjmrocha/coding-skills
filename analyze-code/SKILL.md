@@ -47,13 +47,15 @@ Run them in this order: architecture frames the context, quality and performance
 ## Workflow
 
 1. **Frame the target** — what are you analyzing, and why now? (inheritance, regression, tech-debt assessment)
-2. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells
-3. **Quality lens** — assess test coverage, complexity, duplication
-4. **Performance lens** — identify hot paths, algorithmic complexity issues, N+1 queries, unnecessary allocations. Report what the code reveals — don't note that profiling wasn't done.
-5. **Security lens** — apply `security-best-practices` for the language/framework; check auth, input trust, secrets handling
-6. **Coding Style lens** — invoke the `style-checker` skill on the target files/directory; map its severities into this skill's scale (most style violations are **Low**, only systemic style breakage rises to **Medium**)
-7. **Synthesize** — group related findings, dedupe, rank by severity
-8. **Deliver report** — use the template below; lead with summary and top priorities
+2. **Breaking-change scan (when auditing modified code)** — for every existing function, method, or public symbol whose signature, return type, raised errors, side effects, or invariants changed: enumerate every caller in the codebase using `find_referencing_symbols` (serena) or `grep`, and verify each call site still compiles and still gets correct behavior under the new contract. List affected callers as findings; severity tracks blast radius — public-API breaks are Critical/High, single internal caller is Medium. Skip this step on greenfield audits.
+3. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells
+4. **Quality lens** — assess test coverage, complexity, duplication
+5. **Performance lens** — identify hot paths, algorithmic complexity issues, N+1 queries, unnecessary allocations. Report what the code reveals — don't note that profiling wasn't done.
+6. **Security lens** — apply `security-best-practices` for the language/framework; check auth, input trust, secrets handling
+7. **Coding Style lens** — invoke the `style-checker` skill on the target files/directory; map its severities into this skill's scale (most style violations are **Low**, only systemic style breakage rises to **Medium**)
+8. **Run available tooling** — if the project has a configured linter, formatter, or test suite, run it (e.g., `eslint`, `ruff`, `go vet`, `pytest`, `go test`). Fold failures into the report at the severity their nature warrants (a failing security test → Critical; a lint nit → Low). If the tooling is configured but currently red, that's a finding in itself. If no tooling is configured, note it as a Medium "CI hygiene" finding — don't silently skip.
+9. **Synthesize** — group related findings, dedupe, rank by severity
+10. **Deliver report** — use the template below; lead with summary and top priorities
 
 ## Report Template
 
@@ -91,3 +93,5 @@ Findings are listed in severity order (Critical first), not grouped by lens. The
 | Skipping architecture because "the code looks fine" | Architecture issues hide in the gap between what you see and how components interact |
 | Inflating severity to seem thorough | Low stays Low. Reserve Critical for real blast-radius issues |
 | Reporting what wasn't checked as findings | Focus on what the code reveals. Don't list profiling gaps or tests not run as if they're defects. |
+| Reporting style/quality issues without running the linter or tests when they're configured | Run them; "looked at the code" is not a substitute for executing the available tooling |
+| Changing a function's signature/contract without sweeping its callers | Every modified existing symbol needs a caller sweep — `find_referencing_symbols` or `grep` — and each call site is checked against the new contract |

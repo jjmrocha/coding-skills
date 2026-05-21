@@ -15,7 +15,7 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 
 ## Steps
 
-1. **Explore context** — check existing project architecture, related files, prior decisions
+1. **Explore context and conventions** — check existing project architecture, related files, and prior decisions. For any capability that overlaps with what's already in the repo (pagination, auth, validation, error handling, persistence, logging, config), find how the codebase already does it: which libraries, which patterns, which file/module conventions. The design must align with what's already there unless there's an explicit, stated reason to diverge.
 2. **Assess scope** — if the idea spans multiple independent systems, decompose before going deeper; each sub-project gets its own spec → plan → implementation cycle
 3. **Ask clarifying questions** — one per message, Socratic style (see Questioning below)
 4. **Propose 2-3 approaches** — with trade-offs; lead with your recommendation and reasoning. For cross-domain work, load the relevant specialists from `using-software-specialists` (architect for system shape, security for trust boundaries, requirements-analyst for hidden assumptions) so trade-offs cover more than the happy path.
@@ -57,6 +57,7 @@ Before presenting the final design summary, self-review:
 2. **Consistency** — does architecture match feature descriptions?
 3. **Scope** — focused enough for a single implementation plan?
 4. **Ambiguity** — can any requirement be read two ways? Pick one interpretation and make it explicit.
+5. **Conformance** — does this design follow existing repo conventions (libraries, patterns, file/module layout)? If it introduces a new pattern for an already-solved problem class, is the divergence intentional and justified?
 
 Only write the spec to a file if the user explicitly asks for it.
 
@@ -112,3 +113,4 @@ Q: "Architecture: a CLI that appends entries to a local JSON file,
 | Accepting the first vague answer | Follow up: "Tell me more about that" |
 | Writing a spec without section-by-section approval | Confirm each section before writing the next |
 | Skipping scope check on large ideas | Decompose first, brainstorm the first sub-project |
+| Designing in a vacuum, ignoring existing repo patterns | Step 1 isn't optional — check how the codebase already solves overlapping problems and align the design |

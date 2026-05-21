@@ -7,9 +7,9 @@ description: Use when writing or modifying code, especially in agentic flows —
 
 **If you can name the failure mode you're about to commit, you usually won't commit it.**
 
-Five failure modes most commonly observed when LLMs write code, with the counter-move for each.
+Six failure modes most commonly observed when LLMs write code, with the counter-move for each.
 
-## The Five Failure Modes
+## The Six Failure Modes
 
 | Failure mode | What it looks like | Counter |
 |--------------|--------------------|---------|
@@ -18,6 +18,7 @@ Five failure modes most commonly observed when LLMs write code, with the counter
 | **Speculative complexity** | Adding config, abstraction, or error paths nobody asked for | Build the smallest thing that solves the stated problem |
 | **Hallucination** | Writing code that references symbols, APIs, or paths that don't exist | Verify before writing: read, run, or look it up |
 | **Drift** | Losing the original goal across long sessions or hand-offs | Stop when the verifiable check passes, not before |
+| **Parallel solution** | Writing a new helper, pattern, or solution for a problem the codebase already solves | Search first: how does this repo already do pagination / validation / auth / errors? Use that approach. |
 
 ## 1. Silent Assumption → Surface It
 
@@ -59,7 +60,6 @@ Disallowed reflexes:
 Code that references things that don't exist — an import path, a method signature, a config key.
 
 - **Look it up first.** Prefer [serena MCP](https://github.com/oraios/serena) symbolic tools (`find_symbol`, `get_symbols_overview`, `find_referencing_symbols`) over `Read`/`Grep`; [context7 MCP](https://github.com/upstash/context7) for external library docs; `grep`/`Read` otherwise.
-- **Check for existing helpers before creating new ones.** Before writing a utility function, grep the codebase for the name or purpose. Duplicating a function that already exists is a hallucination — you assumed it didn't exist without verifying.
 - **Run it before saying it's done.** *"It should work"* ≠ *"I ran it and it works."*
 - **Mark uncertainty.** *"I think it's `obj.foo()` but haven't confirmed"* lets the user catch a guess.
 
@@ -76,6 +76,18 @@ For multi-step work: state a 2–4 step plan, each paired with its check. Step d
 
 **Smell test:** If you can't name the check that proves it's done, you're not done.
 
+## 6. Parallel Solution → Use What's There
+
+Before writing a new helper, pattern, or solution, ask: *does this codebase already have an answer to this class of problem?*
+
+- **Pattern check.** Adding pagination? Find an existing paginated endpoint and copy its shape. Adding validation? Find the validation utility/library already in use. Same for auth, error handling, retries, logging, config, persistence.
+- **Helper check.** Before writing `formatDate`, `chunk`, or `parseId`, grep for similar names and inspect existing utils modules.
+- **Library check.** Reaching for a new dependency to do what `package.json` / `go.mod` / `pyproject.toml` already includes is a parallel-solution smell.
+
+Writing a parallel solution doubles maintenance, splits conventions across the repo, and confuses future readers about which version is canonical.
+
+**Smell test:** Can you point to where this same problem class was solved before in this repo? If you haven't looked, you don't know.
+
 ## Pre-Commit Self-Check
 
 Before sending a diff:
@@ -85,6 +97,7 @@ Before sending a diff:
 3. **Simplicity** — could a senior cut this in half?
 4. **Verification** — confirmed referenced symbols/APIs exist? Ran the code, not just wrote it?
 5. **Goal** — can you name the check that proves this is done?
+6. **Reuse** — checked the codebase for an existing solution to this problem class (helpers, patterns, libraries)?
 
 A "no" on any line: stop and revise, don't ship and explain.
 
@@ -102,6 +115,8 @@ A "no" on any line: stop and revise, don't ship and explain.
 | "Tests can come after" | You haven't named the verification |
 | "I lost track of what they wanted" | Drift — restate the goal before continuing |
 | "I'll just write a quick helper for that" | Did you grep first? It may already exist. |
+| "I'll write my own pagination/validator/retry" | The repo likely has a pattern for this. Find it and follow it. |
+| "I'll add a library for this" | Check if the repo already includes something equivalent. |
 
 ## Tradeoff
 
