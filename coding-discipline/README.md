@@ -1,6 +1,6 @@
 # coding-discipline
 
-A Claude Code skill that names the five most common LLM coding failure modes and the counter-move for each. Loaded on every coding turn.
+A Claude Code skill that names the six most common LLM coding failure modes and the counter-move for each. Loaded on every coding turn.
 
 ## When to Use
 
@@ -10,8 +10,7 @@ Any non-trivial code-writing or code-modifying task — feature, bug fix, refact
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Active skill — failure modes table, sections, smell tests, pre-commit checklist, red flags |
-| [SKILL.previous.md](SKILL.previous.md) | Previous version, kept temporarily for comparison; safe to delete once the new version has soaked |
+| [SKILL.md](SKILL.md) | Active skill — failure modes table, falsifiable tests, pre-commit checklist, red flags |
 
 ## Attribution & Provenance
 

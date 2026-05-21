@@ -1,97 +1,88 @@
 ---
 name: analyze-code
-description: Use when auditing an existing codebase, module, or directory for health — legacy code assessments, inherited-code reviews, or when you need a multi-lens view across quality, security, performance, and architecture concerns on code you didn't just write
+description: Use when auditing existing code — legacy or inherited code reviews, pre-PR self-review of changed modules, module health checks, or tech-debt assessment before a large change
 ---
 
 # Analyze Code
 
-Multi-lens code audit. Applies five specialist perspectives to existing code and produces a prioritized findings report — a deep review of what was found, not a gate decision.
+Multi-lens audit of existing code. Applies five specialist perspectives and produces a prioritized findings report — a deep review, not a gate decision.
 
-## When to Use
+## When NOT to Use
 
-**Use for:** personal quality gate before opening a PR, auditing a module, codebase health check, evaluating inherited or legacy code, assessing technical debt before a large change.
-
-**When NOT to use:**
-- Writing new code → use `using-software-specialists`
-- Diagnosing a specific bug → use `using-software-specialists` with the `troubleshooter` specialist
-
-**MCP enhancements (optional):**
-- `sequential-thinking` — for cross-lens synthesis to avoid single-lens tunnel vision. Fall back to step-by-step inline reasoning if unavailable.
-- `serena` — for code navigation across all four lenses. Prefer `get_symbols_overview` / `find_symbol` over full-file `Read`, and `find_referencing_symbols` over repo-wide `Grep`. Load symbol bodies only when a finding needs the detail.
+- Writing new code → `using-software-specialists`
+- Diagnosing a specific bug → `using-software-specialists` with `troubleshooter`
 
 ## The Five Lenses
 
-Each lens asks a different question. Apply **all five** — single-lens analysis misses cross-cutting issues.
+| Lens | Question it asks | Reference |
+|------|------------------|-----------|
+| **Architecture** | Where are coupling hotspots? What breaks when each component fails? | `system-architect` |
+| **Quality** | What's hard to change, untested, overly complex, or reinvents an existing helper/pattern? | `refactoring-expert` |
+| **Performance** | Where is time spent? What fails under realistic load? | `performance-engineer` |
+| **Security** | What inputs are trusted? What auth is assumed? Where's the insecure default? | `security-engineer` |
+| **Style** | Does the code follow the language's style guide? | `style-checker` skill |
 
-| Lens | Reference | Question it asks |
-|------|-----------|------------------|
-| **Architecture** | `system-architect` (via `using-software-specialists`) | Where are coupling hotspots, and what breaks when each component fails? |
-| **Quality** | `refactoring-expert` (via `using-software-specialists`) | What's hard to change, untested, or overly complex? |
-| **Performance** | `performance-engineer` (via `using-software-specialists`) | Where is time actually spent, and what fails under realistic load? |
-| **Security** | `security-engineer` (via `using-software-specialists`) | What inputs are trusted, what auth is assumed, where's the insecure default? |
-| **Coding Style** | `style-checker` skill | Does the code follow the language's style guide for formatting and naming? |
-
-Run them in this order: architecture frames the context, quality and performance surface implementation debt, security is the final gate, and coding style closes the audit with formatting/naming conformance. Invoking `using-software-specialists` for each lens is optional — adopting the lens question directly produces equivalent output. For the **Coding Style** lens, delegate to the `style-checker` skill rather than re-deriving rules inline; it already loads the right language reference (Go, Java, Python, JavaScript, TypeScript, Shell, Markdown) and produces a structured violation list you can fold into the report.
+Apply **all five** — single-lens audits miss cross-cutting issues. Order: architecture frames context → quality/performance surface debt → security gates → style closes. Adopting each lens's question directly is equivalent to invoking `using-software-specialists`; don't reflexively invoke it five times. Delegate the style lens to the `style-checker` skill rather than re-deriving rules.
 
 ## Severity Scale
 
-| Severity | Definition | Examples |
-|----------|-----------|----------|
-| **Critical** | Data loss, security breach, or production-outage risk | SQL injection, hardcoded secret, auth bypass, race condition in state writes |
-| **High** | Significant bug or smell with downstream blast radius | N+1 in hot path, missing input validation, god class, inverted test pyramid |
-| **Medium** | Maintainability debt or code smell | High cyclomatic complexity, missing edge-case tests, obvious anti-patterns |
-| **Low** | Style, naming, or non-blocking suggestion | Magic numbers, commented-out code, inconsistent naming |
+| Severity | Definition |
+|----------|-----------|
+| **Critical** | Data loss, security breach, or outage risk (SQLi, hardcoded secret, auth bypass, race in state writes) |
+| **High** | Significant bug or smell with downstream blast radius (N+1 in hot path, missing input validation, god class) |
+| **Medium** | Maintainability debt or anti-pattern (high complexity, missing edge-case tests) |
+| **Low** | Style, naming, magic numbers — non-blocking |
 
-**Rule:** Don't inflate severity. Low is low. Style nits stay Low.
+Don't inflate severity. Low stays Low.
 
 ## Workflow
 
-1. **Frame the target** — what are you analyzing, and why now? (inheritance, regression, tech-debt assessment)
-2. **Breaking-change scan (when auditing modified code)** — for every existing function, method, or public symbol whose signature, return type, raised errors, side effects, or invariants changed: enumerate every caller in the codebase using `find_referencing_symbols` (serena) or `grep`, and verify each call site still compiles and still gets correct behavior under the new contract. List affected callers as findings; severity tracks blast radius — public-API breaks are Critical/High, single internal caller is Medium. Skip this step on greenfield audits.
-3. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells
-4. **Quality lens** — assess test coverage, complexity, duplication
-5. **Performance lens** — identify hot paths, algorithmic complexity issues, N+1 queries, unnecessary allocations. Report what the code reveals — don't note that profiling wasn't done.
-6. **Security lens** — apply `security-best-practices` for the language/framework; check auth, input trust, secrets handling
-7. **Coding Style lens** — invoke the `style-checker` skill on the target files/directory; map its severities into this skill's scale (most style violations are **Low**, only systemic style breakage rises to **Medium**)
-8. **Run available tooling** — if the project has a configured linter, formatter, or test suite, run it (e.g., `eslint`, `ruff`, `go vet`, `pytest`, `go test`). Fold failures into the report at the severity their nature warrants (a failing security test → Critical; a lint nit → Low). If the tooling is configured but currently red, that's a finding in itself. If no tooling is configured, note it as a Medium "CI hygiene" finding — don't silently skip.
-9. **Synthesize** — group related findings, dedupe, rank by severity
-10. **Deliver report** — use the template below; lead with summary and top priorities
+1. **Frame** — what's the target, and why now (inheritance, regression, pre-change debt)?
+2. **Breaking-change scan** (audits of modified code only) — for each changed signature, return type, raised error, side effect, or invariant on an existing symbol, list every caller via `find_referencing_symbols` or `grep`, verify the new contract holds at each call site, and report any caller that breaks (compile error, wrong behavior under the new contract, or assumption violated) as a finding. Public-API breaks are Critical/High; a single internal caller is Medium. Skip on greenfield.
+3. **Convention & duplication scan** (audits of new or modified code only) — verify changes follow existing codebase patterns: same helper utilities, same error-handling style, same module layout, same naming conventions. For each new helper, type, or pattern introduced, search the codebase with `find_symbol`/`grep` for an existing equivalent before accepting it. Flag duplicated helpers, re-implemented utilities, or one-off solutions that diverge from established patterns. Severity: parallel implementation of an existing utility is **High**; convention drift (naming, error style) is usually **Medium**; minor inconsistency is **Low**. Skip on greenfield.
+4. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells.
+5. **Quality lens** — assess complexity, duplication, test coverage.
+6. **Performance lens** — hot paths, algorithmic complexity, N+1, unnecessary allocations. Report what the code reveals; don't flag missing profiling as a defect.
+7. **Security lens** — apply `security-best-practices` for the language/framework; check auth, input trust, secrets.
+8. **Style lens** — **if the project has a linter/formatter configured (eslint, ruff, golangci-lint, rubocop, etc.), run it — it is authoritative over generic style rules.** Only fall back to the `style-checker` skill when no linter is configured. Map severities (most → Low, systemic breakage → Medium).
+9. **Run configured tooling** — for every linter, formatter, or test suite the project ships (eslint, ruff, go vet, pytest, go test, mypy, tsc), **you must run it — "looked at the code" is not a substitute**. Fold failures into findings at their natural severity (failing security test → Critical; lint nit → Low). Tooling configured but currently red is itself a finding. No tooling configured at all is a Medium "CI hygiene" finding — don't silently skip.
+10. **Synthesize & deliver** — group, dedupe, rank by severity. Output one prioritized list, not lens-grouped.
+
+## MCP Enhancements (optional)
+
+- `sequential-thinking` — for cross-lens synthesis; fall back to inline reasoning if unavailable.
+- `serena` — prefer `get_symbols_overview`/`find_symbol` over full-file `Read`, and `find_referencing_symbols` over repo-wide `Grep`. Load symbol bodies only when a finding needs the detail.
 
 ## Report Template
 
 ```markdown
 # Analysis: <target>
 
-**Summary:** <1-2 sentences — the headline findings>
+**Summary:** <1-2 sentences — headline findings>
 
 ## Priority Actions
 1. [Critical|High] <action> — <file:line>
-2. ...
 
 ## Findings
-
 - [Severity] <Finding> — <file:line> — <impact> — <recommended action>
-- ...
 
 ## Coding Style
-
-<Summary of style findings, or inline the most important ones. For full detail,
-reference the style-checker report.>
+<Summary of style findings; reference the style-checker report for full detail.>
 ```
 
-Findings are listed in severity order (Critical first), not grouped by lens. The lenses are an internal analysis framework — the user reads a single prioritized list.
+Findings are severity-ordered, not lens-grouped. The lenses are the internal analysis framework; the user reads one list.
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|
-| Applying one lens only | All five lenses — single-lens analysis misses cross-cutting issues |
-| Re-deriving style rules inline | Delegate the Coding Style lens to the `style-checker` skill — it already encodes the language references |
-| Letting style nits dominate the report | Most style findings are Low; don't let them push real Critical/High issues out of the top priorities |
-| Dumping raw findings without synthesis | Group by severity, dedupe, rank — top priorities must read first |
-| Organizing output by lens | The lens-separated report is hard to scan. Output a single prioritized list — severity order, not lens order. |
-| Skipping architecture because "the code looks fine" | Architecture issues hide in the gap between what you see and how components interact |
-| Inflating severity to seem thorough | Low stays Low. Reserve Critical for real blast-radius issues |
-| Reporting what wasn't checked as findings | Focus on what the code reveals. Don't list profiling gaps or tests not run as if they're defects. |
-| Reporting style/quality issues without running the linter or tests when they're configured | Run them; "looked at the code" is not a substitute for executing the available tooling |
-| Changing a function's signature/contract without sweeping its callers | Every modified existing symbol needs a caller sweep — `find_referencing_symbols` or `grep` — and each call site is checked against the new contract |
+| Applying one lens only | All five — cross-cutting issues hide between lenses |
+| Lens-grouped output | Output one severity-ordered list; lenses are internal scaffolding |
+| Inflating severity | Low stays Low; reserve Critical for real blast radius |
+| Reporting non-findings | Skip "profiling wasn't done" or "tests not run" — focus on what the code reveals |
+| Skipping the linter/test suite when configured | If a linter exists, you must run it — its output is authoritative over generic style rules and "looked at the code" |
+| Using generic style rules when the project has its own linter | Defer to the configured linter (eslint/ruff/golangci-lint/etc.); the `style-checker` skill is the fallback, not the default |
+| Changing a signature/contract without checking for breaking changes | Step 2 is mandatory for every modified existing symbol — sweep every caller against the new contract |
+| Accepting a new helper without checking for existing equivalents | Step 3 — `find_symbol`/`grep` for similar utilities before treating a new helper as additive |
+| Treating convention drift as a style nit | Diverging from established codebase patterns (naming, error handling, module layout) is Medium, not Low |
+| Re-deriving style rules inline | Delegate to `style-checker` — it already encodes the language references |
