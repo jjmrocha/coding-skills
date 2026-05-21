@@ -21,6 +21,8 @@ REQUIREMENTS → DESIGN → PLAN → IMPLEMENTATION → TESTING → VALIDATION �
 
 Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
 
+**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate against the Plan-phase done-criteria above — tasks decomposed, dependencies explicit, riskiest work first, verification check per step. Surface any gaps to the user *before* entering Implementation. Do not start coding against an incomplete plan.
+
 **Before writing any code in the Implementation phase, load `test-driven-development` and `coding-discipline`.**
 
 Move to the next phase only when the current one's output is complete:

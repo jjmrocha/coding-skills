@@ -68,9 +68,14 @@ Don't inflate severity. Low stays Low.
 
 ## Coding Style
 <Summary of style findings; reference the style-checker report for full detail.>
+
+## Suggested Next Actions
+- **Critical / High** → re-enter `using-software-specialists` with the matching specialist (Security Engineer for auth/input/secrets, Backend Engineer for logic/idempotency, Database Designer for schema/query, Performance Engineer for hot-path, Refactoring Expert for structural debt). One fix loop per finding cluster.
+- **Medium** → ticket / batch into a planned cleanup, or address now if the cluster is cheap.
+- **Low** → optional inline fix, batch with the next touch of the file, or accept.
 ```
 
-Findings are severity-ordered, not lens-grouped. The lenses are the internal analysis framework; the user reads one list.
+Findings are severity-ordered, not lens-grouped. The lenses are the internal analysis framework; the user reads one list. The "Suggested Next Actions" block exists to close the audit → fix loop: each finding points back at the specialist who should own the remediation, so the user can dispatch targeted fixes through `using-software-specialists` without re-classifying. Do not invent new severities to fill the block — if there are no Critical/High findings, say so.
 
 ## Common Mistakes
 

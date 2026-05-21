@@ -11,7 +11,7 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 
 ## Steps
 
-1. **Explore context & conventions** — read existing architecture and prior decisions. For any capability that overlaps with what's already in the repo (pagination, auth, validation, error handling, persistence, logging, config), identify the libraries, patterns, and file/module layout in use. The design aligns with what exists unless divergence is explicitly stated and justified.
+1. **Explore context & conventions** — read existing architecture and prior decisions. For any capability that overlaps with what's already in the repo (pagination, auth, validation, error handling, persistence, logging, config), identify the libraries, patterns, and file/module layout in use. The design aligns with what exists unless divergence is explicitly stated and justified. **If the change modifies an existing module, run `analyze-code` on the affected files first** — inherited debt, coupling, and security smells in that module are design inputs, not post-implementation surprises.
 2. **Assess scope** — if the idea spans multiple independent systems, decompose first; each sub-project gets its own spec → plan → implementation cycle.
 3. **Ask clarifying questions** — one per message, Socratic style (see below).
 4. **Propose 2-3 approaches** — with trade-offs; lead with your recommendation and reasoning. For cross-domain work, load specialists from `using-software-specialists` (architect for system shape, security for trust boundaries, requirements-analyst for hidden assumptions) so trade-offs cover more than the happy path.
@@ -19,7 +19,7 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 6. **Probe non-functional requirements** — explicitly ask about performance targets, scalability, security posture, compliance, accessibility. NFRs skipped here become rework later.
 7. **Validate the design** — before the final summary, check: placeholders/TBDs (fix them), internal contradictions (architecture vs feature descriptions), scope creep beyond a single plan, ambiguous requirements (pick one interpretation and make it explicit), and conformance with existing repo conventions (any new pattern for an already-solved problem class needs explicit justification).
 8. **Final summary & approval** — present the validated design; revise until the user explicitly approves.
-9. **Spec only if asked** — do NOT write a spec file automatically. Save to disk only when the user explicitly requests it; then use [references/spec-template.md](references/spec-template.md) and save to `docs/specs/YYYY-MM-DD-<topic>.md` or per project convention.
+9. **Spec only if asked** — do NOT write a spec file automatically. Save to disk only when the user explicitly requests it; then use [references/spec-template.md](references/spec-template.md). Default location is `docs/specs/YYYY-MM-DD-<topic>.md` or per project convention. **For cross-repo work, save to a path outside the repo provided by the user** (e.g., `~/plans/YYYY-MM-DD-<topic>.md`) — the plan is portable, the repo is not the storage of record. If the user names a directory but not a filename, ask.
 10. **Hand off to planning** — pass the approved design to the `project-planner` specialist. Brainstorm ends at an approved design; planning begins after.
 
 ## Socratic Questioning
@@ -58,6 +58,17 @@ A: "Standalone."
 Q: "Architecture: CLI appends entries to a local JSON file, search by title/tag. Fit?"
 # → Approved → handoff to project-planner.
 ```
+
+## Revision Mode
+
+When invoked with an existing plan file (e.g., *"here's our plan at ~/plans/X.md, the auth section needs to change to OAuth"*), do NOT re-run the full Socratic loop from step 3. Instead:
+
+1. **Read the existing plan** before asking anything.
+2. **Identify the delta** — which sections does the requested change affect, and which are untouched?
+3. **Ask only about the deltas** — confirm the new intent, surface contradictions with untouched sections, probe NFRs only for the changed surface.
+4. **Re-validate the changed sections** (step 7 applies to the deltas), then update the plan file in place once the user approves.
+
+The skill's hard rule (no implementation before approval) still applies. The Socratic loop is a discovery tool, not a ritual — when the design exists, diff it; don't rediscover it.
 
 ## MCP Enhancements (optional)
 
