@@ -43,8 +43,8 @@ Don't inflate severity. Low stays Low.
 4. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells.
 5. **Quality lens** — assess complexity, duplication, test coverage.
 6. **Performance lens** — hot paths, algorithmic complexity, N+1, unnecessary allocations. Report what the code reveals; don't flag missing profiling as a defect.
-7. **Security lens** — apply `security-best-practices` for the language/framework; check auth, input trust, secrets.
-8. **Style lens** — **if the project has a linter/formatter configured (eslint, ruff, golangci-lint, rubocop, etc.), run it — it is authoritative over generic style rules.** Only fall back to the `style-checker` skill when no linter is configured. Map severities (most → Low, systemic breakage → Medium).
+7. **Security lens** — apply security best practices for the language/framework; check auth, input trust, secrets.
+8. **Style lens** — always run the `style-checker` skill. **If the project also has a linter/formatter configured (eslint, ruff, golangci-lint, rubocop, etc.), run it too — on any conflicting rule, the linter is authoritative.** Map severities (most → Low, systemic breakage → Medium).
 9. **Run configured tooling** — for every linter, formatter, or test suite the project ships (eslint, ruff, go vet, pytest, go test, mypy, tsc), **you must run it — "looked at the code" is not a substitute**. Fold failures into findings at their natural severity (failing security test → Critical; lint nit → Low). Tooling configured but currently red is itself a finding. No tooling configured at all is a Medium "CI hygiene" finding — don't silently skip.
 10. **Synthesize & deliver** — group, dedupe, rank by severity. Output one prioritized list, not lens-grouped.
 
@@ -85,8 +85,8 @@ Findings are severity-ordered, not lens-grouped. The lenses are the internal ana
 | Lens-grouped output | Output one severity-ordered list; lenses are internal scaffolding |
 | Inflating severity | Low stays Low; reserve Critical for real blast radius |
 | Reporting non-findings | Skip "profiling wasn't done" or "tests not run" — focus on what the code reveals |
-| Skipping the linter/test suite when configured | If a linter exists, you must run it — its output is authoritative over generic style rules and "looked at the code" |
-| Using generic style rules when the project has its own linter | Defer to the configured linter (eslint/ruff/golangci-lint/etc.); the `style-checker` skill is the fallback, not the default |
+| Skipping the linter/test suite when configured | If a linter exists, you must run it — its output is authoritative on conflicting rules and "looked at the code" is never a substitute |
+| Skipping `style-checker` because a linter is configured | Run both — `style-checker` always runs; linter wins only where rules conflict |
 | Changing a signature/contract without checking for breaking changes | Step 2 is mandatory for every modified existing symbol — sweep every caller against the new contract |
 | Accepting a new helper without checking for existing equivalents | Step 3 — `find_symbol`/`grep` for similar utilities before treating a new helper as additive |
 | Treating convention drift as a style nit | Diverging from established codebase patterns (naming, error handling, module layout) is Medium, not Low |
