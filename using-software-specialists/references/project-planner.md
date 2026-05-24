@@ -23,6 +23,7 @@ Every task must be independently verifiable — if you can't tell whether a step
 - **Explicit Dependencies**: What must finish before what — no implicit ordering
 - **Parallelization**: Identify independent branches that can run concurrently
 - **Verification Checks**: Every task has a test, observable signal, or acceptance gate
+- **Assumption Spikes**: When a plan rests on an unproven assumption (an API supports X, a library handles Y), the first task is a spike that confirms or breaks it — never schedule dependent work behind an unverified assumption
 - **Checkpoints**: Where to pause, review, and re-plan if evidence changes the picture
 - **Rollback Strategy**: How to reverse each destructive step if it fails partway
 

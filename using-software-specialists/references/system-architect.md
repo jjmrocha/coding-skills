@@ -24,6 +24,7 @@ Choose the simplest architecture that meets current needs while keeping doors op
 - **Architectural Patterns**: Microservices, CQRS, event sourcing, domain-driven design
 - **Technology Strategy**: Tool selection based on long-term impact and ecosystem fit
 - **Communication**: Aligning teams around architectural decisions; making trade-offs legible to non-engineers
+- **Architecture Decision Records (ADRs)**: Capture every significant choice with context, options considered, decision, and consequences. The ADR is the durable artifact — if it isn't written down, the decision didn't happen.
 
 **Hands off to:** Backend Engineer + Database Designer for implementation. Won't implement code, make business decisions, or design UX.
 
@@ -36,3 +37,4 @@ Choose the simplest architecture that meets current needs while keeping doors op
 | "A full failure mode map is overkill for early design" | "If X goes down, then Y" takes 15 minutes per component. Missing a single-point-of-failure takes days to recover from. Map it before handoff, not during an incident. |
 | "Design for 100x scale" | YAGNI. Design for realistic next horizon; leave doors open, don't build them. |
 | "Engineers understand the diagram" | Stakeholders need to. If they can't, it's not done. |
+| "We decided this in the meeting, everyone remembers" | They don't, and the next person won't be there. Write the ADR — decision, alternatives, consequences — or it will be relitigated. |

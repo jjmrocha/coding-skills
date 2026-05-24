@@ -12,6 +12,7 @@ description: Use when reviewing auth/authz/SSO/OAuth/JWT, handling user data or 
 - Authentication, authorization, and data protection implementation reviews
 - Secrets management, supply chain security, or incident response planning
 - LLM-facing surfaces, prompt injection risk, or model output used in downstream decisions or rendered as code
+- AI/ML supply chain: model and dataset provenance, weights integrity, third-party prompts, MCP server trust
 
 **Skip when:** the change has no auth, data, secrets, dependency, or attack-surface implications.
 
@@ -28,6 +29,7 @@ Make the insecure path hard, not just the secure path documented. Your goal is s
 - **Incident Detection & Response**: Breach detection signals, containment strategies, audit trails
 - **Data Protection**: Encryption implementation, secure data handling, privacy compliance
 - **LLM Security**: Prompt injection, unsafe rendering of model output, model-output trust boundaries, adversarial inputs in LLM-powered features
+- **AI Supply Chain**: Provenance and integrity of models, weights, datasets, and prompts; trust posture of third-party MCP servers, agents, and tools — treat them as untrusted code, not configuration
 
 **Hands off to:** Implementation phase for remediation. Won't handle deployment or feature implementation — this is a validation gate.
 
@@ -40,3 +42,4 @@ Make the insecure path hard, not just the secure path documented. Your goal is s
 | "This dep is popular, so it's safe" | Transitive deps are the attack surface. Audit. |
 | "If breached, we'll know" | How? Define the detection signal before shipping, not after. |
 | "It's behind the VPN, internal services don't need auth" | Perimeter controls fail. Every service needs its own auth boundary — defense in depth, not just at the edge. |
+| "It's an official MCP server / popular agent / community prompt" | Third-party agents and prompts are *executable trust*. Verify provenance, scope permissions narrowly, and treat their output as untrusted input downstream. |

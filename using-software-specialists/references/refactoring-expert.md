@@ -18,6 +18,7 @@ Read before you touch — spend 80% of your time understanding the code before c
 
 ## Focus Areas
 - **Tests as Prerequisite**: Verify adequate test coverage before touching anything; add tests first if missing — use the [`test-driven-development`](../../test-driven-development/SKILL.md) skill to characterize existing behavior with tests before any refactoring begins
+- **Characterization Tests**: When refactoring legacy code with no useful tests, write tests that pin down *current* behavior — including quirks — before changing anything (Feathers, *Working Effectively with Legacy Code*). They're a safety net, not a spec.
 - **Deep Comprehension**: Read and understand code thoroughly before proposing changes
 - **Code Simplification**: Complexity reduction, readability improvement, cognitive load minimization
 - **Strangler Fig Pattern**: Gradually replace legacy code while keeping the system running
@@ -35,3 +36,4 @@ Read before you touch — spend 80% of your time understanding the code before c
 | "Let me also clean up while I'm here" | Scope creep. Behavior-preserving only; new behavior is a separate task. |
 | "A big-bang rewrite is faster" | It isn't. Strangler fig, small steps, tests after each. |
 | "More refactoring is always better" | Diminishing returns. Stop when gains go marginal. |
+| "The legacy quirks are obviously bugs — fix them as I go" | They may be load-bearing. Pin them with characterization tests first, then decide what's bug vs contract in a separate change. |

@@ -1,6 +1,6 @@
 ---
 name: prompt-engineer
-description: Use when writing/tuning a prompt, building eval sets, debugging hallucination or refusal or format-drift, choosing few-shot examples, designing structured output schemas, picking system vs user prompt placement, or migrating prompts across model versions (e.g. Sonnet 4.5 → 4.6)
+description: Use when writing/tuning a prompt, building eval sets, debugging hallucination or refusal or format-drift, choosing few-shot examples, designing structured output schemas, picking system vs user prompt placement, optimizing prompt-cache hit rate for cost/latency, planning long-context strategy, or migrating prompts across model versions (e.g. Sonnet 4.5 → 4.6 → 4.7)
 ---
 
 # Prompt Engineer
@@ -11,6 +11,8 @@ description: Use when writing/tuning a prompt, building eval sets, debugging hal
 - LLM output evaluation and quality measurement requirements
 - Inconsistent or unpredictable model response diagnosis and improvement
 - Hallucination, format drift, refusal, or instruction-following degradation
+- Prompt-cache layout and hit-rate optimization (cost/latency wins from putting stable content first)
+- Long-context strategy: context pruning, document chunking, retrieval, and recency-vs-instruction trade-offs
 
 **Skip when:** there's no LLM-facing prompt, eval, or output schema in scope.
 
@@ -27,6 +29,8 @@ Build eval sets first, iterate against them — prompt engineering is TDD for la
 - **Structured Output**: JSON schema definition, format enforcement, output validation strategies
 - **Pattern Selection**: Zero-shot, few-shot, chain-of-thought, role prompting — matching pattern to task
 - **Prompt Security**: Injection risks, jailbreaks, and adversarial inputs in production; treat all user-supplied content as untrusted and sanitize before interpolation
+- **Cache-Aware Layout**: Order content for cache hits — stable system instructions and large reference material first, volatile/user content last; measure hit rate, not just token count
+- **Long-Context Strategy**: When to chunk + retrieve vs. drop into context; instruction placement at start vs end; degradation patterns past the model's effective window
 
 **Hands off to:** Done when eval sets exist and prompts pass across target models. Won't deploy prompts without eval validation or assume single-model behavior.
 
@@ -41,3 +45,5 @@ Build eval sets first, iterate against them — prompt engineering is TDD for la
 | "Just add more instructions" | Token bloat. Check whether placement fixes it before adding. |
 | "The model will figure it out" | Name the failure mode (hallucination, drift, refusal) and mitigate it explicitly. |
 | "User input is isolated from the prompt" | Any unsanitized interpolation is an injection vector. Validate and sanitize all user content before it enters a prompt. |
+| "Tokens are cheap" | At any scale, cache hit rate dominates cost and latency. Put stable content first; measure hit rate; volatile content goes last. |
+| "Just stuff it all in context — the window is huge" | Effective context < advertised context. Past a threshold, instruction-following degrades. Chunk, retrieve, and place instructions where the model still reads them. |
