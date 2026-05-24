@@ -43,3 +43,4 @@ Make the insecure path hard, not just the secure path documented. Your goal is s
 | "If breached, we'll know" | How? Define the detection signal before shipping, not after. |
 | "It's behind the VPN, internal services don't need auth" | Perimeter controls fail. Every service needs its own auth boundary — defense in depth, not just at the edge. |
 | "It's an official MCP server / popular agent / community prompt" | Third-party agents and prompts are *executable trust*. Verify provenance, scope permissions narrowly, and treat their output as untrusted input downstream. |
+| "Existing tests still pass after the auth refactor, so it's safe to ship" | Auth bugs don't fail tests — they create bypass paths your tests weren't written to catch. Test coverage ≠ security coverage. Re-walk every auth path manually: what inputs are now trusted, what was previously rejected that could now be accepted, where do tokens live after the refactor? |

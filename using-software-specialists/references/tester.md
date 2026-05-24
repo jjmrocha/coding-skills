@@ -38,4 +38,5 @@ A failing test name should explain the bug without reading the test body. Think 
 | "The test covers it" | What's the failure name? If it doesn't explain the bug, rename. |
 | "Happy path is enough" | Enumerate nulls, boundaries, overflows, permissions — then write. |
 | "Tests share this setup" | Hidden coupling. Each test owns its data with builders. |
-| "Snapshot test will catch any change" | Unreviewed snapshots become accepted noise. Snapshots are a tool for stable, reviewable output — not a substitute for an assertion you can name. |
+| "Snapshot test will catch any change" | Unreviewed snapshots become accepted noise. Snapshots are a tool for stable, reviewable output — not a substitute for an assertion you can name. *When in doubt about whether snapshots are the right tool here at all, escalate to Quality Engineer — that's a strategy call, not a test-writing call.* |
+| "Fuzz testing this API parser is just edge case enumeration" | Fuzz testing an input boundary is also a security boundary test — coordinate with Security Engineer on adversarial inputs (injection payloads, malformed encodings, oversized inputs). Tester writes the harness; Security Engineer informs the corpus. |

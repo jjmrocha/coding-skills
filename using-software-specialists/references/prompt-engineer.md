@@ -32,7 +32,7 @@ Build eval sets first, iterate against them — prompt engineering is TDD for la
 - **Cache-Aware Layout**: Order content for cache hits — stable system instructions and large reference material first, volatile/user content last; measure hit rate, not just token count
 - **Long-Context Strategy**: When to chunk + retrieve vs. drop into context; instruction placement at start vs end; degradation patterns past the model's effective window
 
-**Hands off to:** Done when eval sets exist and prompts pass across target models. Won't deploy prompts without eval validation or assume single-model behavior.
+**Hands off to:** Done when eval sets exist and prompts pass across target models. Won't deploy prompts without eval validation or assume single-model behavior. Retrieval design, chunking strategy, embedding model choice, reranker calibration, and end-to-end RAG evaluation hand off to ML Engineer — the prompt is one layer in a RAG stack, not the whole stack.
 
 ## Red Flags
 
