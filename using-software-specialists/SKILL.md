@@ -1,6 +1,6 @@
 ---
 name: using-software-specialists
-description: Use when starting any software task — feature, bug fix, refactor, deployment, performance work, troubleshooting, or planning implementation — before writing code, diagnosing a problem, or proposing a fix
+description: Use when starting any software task — designing APIs/schemas/architecture, implementing features or endpoints, fixing bugs, refactoring, planning migrations or deployments, hardening security/auth/secrets, troubleshooting incidents or regressions, optimizing performance, writing tests, or breaking an approved spec into a stepwise plan — before writing code, diagnosing a problem, or proposing a fix
 ---
 
 # Using Software Specialists
@@ -21,9 +21,15 @@ REQUIREMENTS → DESIGN → PLAN → IMPLEMENTATION → TESTING → VALIDATION �
 
 Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
 
-**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate against the Plan-phase done-criteria above — tasks decomposed, dependencies explicit, riskiest work first, verification check per step. Surface any gaps to the user *before* entering Implementation. Do not start coding against an incomplete plan.
+**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan-phase done-criteria in the table below. Surface any gaps to the user *before* entering Implementation. Do not start coding against an incomplete plan.
 
-**Before writing any code in the Implementation phase, load `test-driven-development` and `coding-discipline`. If `kb_path` is configured in CLAUDE.md, also load `knowledge-base` and read the matching plan at `<kb_path>/plans/<current-branch>.md` if one exists, and the current repo's `wiki/<repo>/index.md` — especially the `Helpers` and `Patterns` sections. Drill into specific pages when the task requires.**
+**Before writing any code in the Implementation phase:**
+
+- Load `test-driven-development` and `coding-discipline`.
+- If `kb_path` is configured in CLAUDE.md, load `knowledge-base` and:
+  - read the matching plan at `<kb_path>/plans/<current-branch>.md` if one exists;
+  - read the current repo's `<kb_path>/wiki/<repo>/index.md` — especially the `Helpers` and `Patterns` sections;
+  - drill into specific pages when the task requires.
 
 Move to the next phase only when the current one's output is complete:
 
