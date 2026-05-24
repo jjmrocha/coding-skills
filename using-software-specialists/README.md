@@ -17,14 +17,14 @@ with no cross-domain impact.
 | File | Purpose |
 |------|---------|
 | [SKILL.md](SKILL.md) | Phase model, task routing, symptom → specialist lookup, validation gate |
-| [references/](references/) | One file per specialist (16 total) — triggers, mindset, focus areas, red flags |
+| [references/](references/) | One file per specialist (17 total) — triggers, mindset, focus areas, red flags |
 
 ## Specialists
 
 Backend Engineer, Frontend Engineer, System Architect, Database Designer,
 Security Engineer, Quality Engineer, Tester, DevOps Engineer, Performance
 Engineer, Refactoring Expert, Troubleshooter, Requirements Analyst, Project
-Planner, Deep Research Agent, Technical Writer, Prompt Engineer.
+Planner, Deep Research Agent, Technical Writer, Prompt Engineer, ML Engineer.
 
 ## Credit & What's Adapted
 
@@ -59,8 +59,8 @@ what's borrowed and what's original.
   table, "Validate Before Done" checklist, Tester vs. Quality Engineer
   distinction. SuperClaude uses `@agent-*` invocations rather than a
   phase-routing skill — the orchestration layer here is new.
-* **3 specialists not in SuperClaude:** `prompt-engineer`, `tester`,
-  `database-designer`.
+* **4 specialists not in SuperClaude:** `prompt-engineer`, `tester`,
+  `database-designer`, `ml-engineer`.
 * **`Red Flags` table** at the bottom of each reference file
   (rationalization → reality).
 * **`Skip when:` line** under each `## Triggers` section.

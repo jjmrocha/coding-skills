@@ -7,7 +7,7 @@ description: Use when starting any software task — designing APIs/schemas/arch
 
 **Core principle:** Every software task touches multiple domains. A single generalist perspective misses vulnerabilities, accessibility gaps, and quality failures that specialist thinking catches. Each specialist asks a question the others don't — skipping one means that question never gets asked.
 
-**Skip when:** trivial one-line fix with no cross-domain impact, or you already applied the relevant specialist this session.
+**Skip when:** trivial change that touches no auth, security, payment, schema, or public API surface — *and* you've checked, not just assumed. Or you already applied the relevant specialist this session. A one-line null-check in `processPayment()` is not a skip; a one-line margin tweak on a static label probably is.
 
 ## How Specialists Work Together
 
@@ -65,7 +65,9 @@ Forward lookup by task domain. "Start with" = lead mindset. "Then add" = complem
 | Turning an approved spec into an execution plan | Project Planner | — | — |
 | Technical investigation, research, analysis | Deep Research Agent | — | — |
 | Documentation, user guides, API references | Technical Writer | — | — |
-| Prompt optimization, few-shot design, LLM eval | Prompt Engineer | — | — |
+| Prompt optimization, few-shot design, LLM eval, prompt-cache layout, long-context strategy | Prompt Engineer | — | Security Engineer |
+| LLM-powered feature, AI agent, RAG pipeline, AI-assisted action | Prompt Engineer | ML Engineer (if retrieval/embeddings), Backend Engineer | Security Engineer, Quality Engineer |
+| ML training, fine-tuning, model evaluation, retrieval/embedding design, fairness/bias audit | ML Engineer | Prompt Engineer (if LLM), Backend Engineer (if pipeline) | Security Engineer, Quality Engineer |
 
 **Minimum rule:** Security Engineer + Quality Engineer must appear in "Before done" for any task that touches APIs, user data, or production code.
 
@@ -91,6 +93,7 @@ When two specialists could both fire, this disambiguates. Each asks a question n
 | [Performance Engineer](references/performance-engineer.md) | "Where is time actually spent, and what does the production workload actually look like?" |
 | [Technical Writer](references/technical-writer.md) | "Who will maintain this, and what should we delete first?" |
 | [Prompt Engineer](references/prompt-engineer.md) | "Do we have an eval set, and does this prompt work across models?" |
+| [ML Engineer](references/ml-engineer.md) | "What's the baseline, and what does the held-out test set say about whether this model is actually better?" |
 
 ## Symptom → Specialist (Reverse Lookup)
 
@@ -112,9 +115,14 @@ When you don't know which domain you're in but can describe what you're *seeing*
 | CI failing, slow build, deploy stuck, rollback needed | DevOps Engineer (or Troubleshooter if "what changed?") |
 | Pipeline secrets, supply chain, signed artifacts, SBOM | DevOps Engineer + Security Engineer |
 | "Component boundaries", "monolith vs services", failure modes | System Architect |
-| Prompt injection, jailbreak, LLM output rendered as code or used in downstream decisions | Security Engineer + Prompt Engineer |
+| Prompt injection, jailbreak, LLM output rendered as code or used in downstream decisions; cross-tenant context bleed (AI response contains another user's data) | Security Engineer + Prompt Engineer |
+| Multi-model LLM fallback, swapping providers (Claude → GPT-4 → Gemini), prompt compatibility across model families | Prompt Engineer + System Architect |
+| Model bias, fairness audit, demographic disparate impact, regulated-decision ML compliance (FCRA, EU AI Act) | ML Engineer + Security Engineer |
 | Big-bang rewrite tempting, legacy code needs replacing without downtime | Refactoring Expert (strangler-fig) |
 | a11y, keyboard navigation, screen reader, WCAG | Frontend Engineer |
+| Page renders blank or broken layout for specific locale, RTL language, or non-English browser setting | Frontend Engineer |
+| Search, text processing, or UI doesn't support non-Latin script, CJK, or a new locale (i18n expansion) | Frontend Engineer + Backend Engineer (+ Database Designer if full-text indexing) |
+| Build times, CI cost, or test suite runtime scaling non-linearly with team size, service count, or repo growth | DevOps Engineer + Performance Engineer |
 
 If two rows fire, load both — they ask different questions.
 
@@ -154,5 +162,6 @@ If you catch yourself thinking any of these, stop and reload the right specialis
 | "Tests can be written after" / "Happy path tests are enough" | Load Tester during implementation; tests-after answer the wrong question, and edge case enumeration is the whole point |
 | "I know the fix, I'll just apply it" | Load Troubleshooter — diagnose root cause before patching symptoms |
 | "Too small to need architecture review" / "I'll deploy manually this once" | Small tasks ignoring boundaries create coupling debt; one-offs become the process |
+| "Existing tests still pass after the auth refactor, ship it" | Auth bugs don't fail tests — they create bypass paths your tests weren't written to catch. Test coverage ≠ security coverage. Auth refactors always require Security Engineer review regardless of test results. |
 
 **Cross-specialist handoff:** When a specialist spots an issue outside their domain, flag it explicitly for the relevant specialist (e.g., a backend engineer who spots suspicious auth patterns flags it for the security engineer). Don't silently ignore cross-domain concerns.
