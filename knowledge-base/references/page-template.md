@@ -1,6 +1,6 @@
 # Content Page Template
 
-Use this template for every page under `<kb_path>/wiki/<repo>/entities/`, `interfaces/`, `jobs/`, `dependencies/`, `events/`, `rules/`, or under `<kb_path>/plans/`. The skill's `index-templates.md` covers the special index pages instead.
+Use this template for every page under `<kb_path>/wiki/<repo>/entities/`, `interfaces/`, `jobs/`, `dependencies/`, `events/`, `rules/`, `helpers/`, `patterns/`, or under `<kb_path>/plans/`. The skill's `index-templates.md` covers the special index pages instead.
 
 ---
 
@@ -48,6 +48,7 @@ Run through this **before** saving any page:
 | `summary` | string | One or two sentences. Surfaced in the repo's `index.md`. |
 | `sources` | list of strings | At least one entry. See formats below. |
 | `last_updated` | date | `YYYY-MM-DD`. Lint flags pages older than 90 days as "needs review". |
+| `kind` | string | **Required on pages under `patterns/` only.** One of `convention`, `recipe`, or `template`. Lint check 7 enforces presence and enum. |
 
 ## Source value formats
 
@@ -70,4 +71,6 @@ Each subfolder has a conventional shape. The body content adapts; the frontmatte
 | `dependencies/` | URL/endpoint, auth method (API key, OAuth, mTLS), rate limits, owner team, what this repo uses it for. |
 | `events/` | Topic name, schema (payload fields + types), producer service `[[wiki-link]]`, consumer services `[[wiki-links]]`, ordering/delivery guarantees. |
 | `rules/` | The business rule in plain language, the entities/endpoints where it's enforced (linked), examples of valid and invalid states. |
+| `helpers/` | One file per category (e.g., `dates.md`). Body: a `## Helpers` table with columns `Helper`, `Signature`, `Use when` — one row per qualifying function. Optional `## Notes` for cross-cutting context (returns are timezone-aware, inputs are immutable, etc.). `sources:` lists the file(s) where the listed helpers live. Signature column is a hint; the agent always reads the actual code before using. |
+| `patterns/` | One file per pattern; `kind:` frontmatter required. Body: `## When to use` (1–3 sentences, symptoms/triggers), `## The pattern` (the rule for `convention`, numbered steps for `recipe`, a ≤30-line snippet for `template`), `## Exemplar` (pointer to the file(s) in `sources:`), `## Related` (linked helpers/patterns/rules). `sources:` cites canonical exemplar file(s). |
 | `plans/` | Goal, repos touched (frontmatter `repos: [...]`), entities/interfaces/events affected (linked), status (Draft / Active / Done / Abandoned). |

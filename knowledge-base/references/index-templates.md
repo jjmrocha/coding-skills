@@ -47,9 +47,17 @@ Lists every page in the repo, grouped by subfolder. Updated whenever a page is c
 
 ## Business rules
 - [[wiki/<repo>/rules/<name>]] — <one-line summary>
+
+## Helpers
+- [[wiki/<repo>/helpers/<category>]] — <one-line summary of what's in this category>
+
+## Patterns
+- [[wiki/<repo>/patterns/<name>]] *(convention | recipe | template)* — <one-line summary>
 ```
 
-Omit empty sections — if the repo has no jobs, drop the `## Jobs` heading entirely.
+Omit empty sections — if the repo has no jobs, drop the `## Jobs` heading entirely. Same applies to `## Helpers` and `## Patterns`.
+
+In the `## Patterns` list, render the `*(kind)*` marker using the page's `kind:` frontmatter value, so the agent can scan by intent without opening each page.
 
 ---
 

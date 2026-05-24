@@ -36,6 +36,7 @@ Checks:
     4. Concept-gap candidates (regex heuristic; expect false positives)
     5. [needs source] markers
     6. All in-tree sources dead — auto-delete (non-plan) or flag (plan)
+    7. Pattern `kind:` validity (pages under patterns/ must declare kind)
 """
 
 from __future__ import annotations
@@ -70,6 +71,7 @@ TYPE_TO_SUBFOLDER = {
     "rule": "rules",
 }
 AGING_DAYS = 90
+VALID_PATTERN_KINDS = {"convention", "recipe", "template"}
 
 
 @dataclass
@@ -373,6 +375,30 @@ def check_needs_source(pages: list[Page]) -> list[str]:
     return [p.rel_path for p in pages if NEEDS_SOURCE_RE.search(p.body)]
 
 
+def check_pattern_kind(pages: list[Page]) -> list[dict]:
+    """Flag pages under patterns/ that miss `kind:` or use an invalid value.
+
+    Patterns pages must declare `kind:` in frontmatter, set to one of
+    `convention`, `recipe`, or `template`. Index pages are skipped (a repo-level
+    `patterns/index.md` is not a pattern page itself, though the current
+    layout has no per-folder index pages).
+    """
+    out = []
+    for p in pages:
+        parts = p.rel_path.split("/")
+        if not (len(parts) >= 3 and parts[0] == "wiki" and parts[2] == "patterns"):
+            continue
+        if p.rel_path.endswith("/index.md"):
+            continue
+        kind = p.frontmatter.get("kind")
+        if kind is None:
+            out.append({"page": p.rel_path, "kind": None, "problem": "missing"})
+        elif str(kind).strip() not in VALID_PATTERN_KINDS:
+            out.append({"page": p.rel_path, "kind": str(kind),
+                        "problem": "invalid"})
+    return out
+
+
 def format_markdown(report: dict) -> str:
     """Render a lint report as a markdown document."""
     lines = []
@@ -399,6 +425,7 @@ def format_markdown(report: dict) -> str:
     lines.append(f"- Auto-delete candidates (non-plan): {s['autodelete']}")
     lines.append("- Plan pages with all sources dead (flag only): "
                  f"{s['plan_dead']}")
+    lines.append(f"- Pattern `kind:` issues: {s['pattern_kind']}")
     lines.append("")
 
     f = report["findings"]
@@ -488,6 +515,21 @@ def format_markdown(report: dict) -> str:
         for entry in f["plan_dead"]:
             lines.append("")
             lines.append(f"- `{entry['page']}`")
+    lines.append("")
+
+    lines.append("## 7. Pattern `kind:` issues")
+    if not f["pattern_kind"]:
+        lines.append("*(none)*")
+    else:
+        for entry in f["pattern_kind"]:
+            if entry["problem"] == "missing":
+                lines.append(f"- `{entry['page']}` — missing `kind:` "
+                             "(required on `patterns/` pages; one of "
+                             "`convention`, `recipe`, `template`)")
+            else:
+                lines.append(f"- `{entry['page']}` — invalid `kind:` "
+                             f"`{entry['kind']}` (must be one of "
+                             "`convention`, `recipe`, `template`)")
 
     return "\n".join(lines)
 
@@ -525,6 +567,7 @@ def main() -> int:
     orphans = check_orphans(pages)
     concept_gaps = check_concept_gaps(pages)
     needs_source = check_needs_source(pages)
+    pattern_kind = check_pattern_kind(pages)
 
     autodelete = [a for a in autodelete_all if not a["is_plan"]]
     plan_dead = [a for a in autodelete_all if a["is_plan"]]
@@ -542,6 +585,7 @@ def main() -> int:
             "needs_source": len(needs_source),
             "autodelete": len(autodelete),
             "plan_dead": len(plan_dead),
+            "pattern_kind": len(pattern_kind),
         },
         "findings": {
             "broken_sources": broken,
@@ -551,6 +595,7 @@ def main() -> int:
             "needs_source": needs_source,
             "autodelete": autodelete,
             "plan_dead": plan_dead,
+            "pattern_kind": pattern_kind,
         },
     }
 

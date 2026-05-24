@@ -1,6 +1,6 @@
 ---
 name: knowledge-base
-description: Use when reading from or writing to a configured knowledge base (KB / wiki) — looking up system surfaces (entities, tables, REST endpoints, Kafka events, cron jobs, external dependencies, business rules) or implementation plans by ticket/branch; ingesting docs; updating the KB after a code change touched a tracked surface; before brainstorming or analyzing code in a project with a configured kb_path; or auditing the KB for staleness.
+description: Use when reading from or writing to a configured knowledge base (KB / wiki) — looking up system surfaces (entities, tables, REST endpoints, Kafka events, cron jobs, external dependencies, business rules), reusable helpers, canonical patterns (conventions / recipes / templates), or implementation plans by ticket/branch; ingesting docs; updating the KB after a code change touched a tracked surface; before brainstorming, analyzing code, or producing code in a project with a configured kb_path; or auditing the KB for staleness.
 ---
 
 # Knowledge Base
@@ -79,11 +79,36 @@ If the user declines `git init`, there's no per-write audit trail — changes ar
       dependencies/                   external services this repo calls
       events/                         topics this repo produces or consumes
       rules/                          business rules (domain invariants, policies)
+      helpers/                        reusable functions, grouped by category
+      patterns/                       canonical shapes for recurring problems
 ```
 
-The five system subfolders (`entities`, `interfaces`, `jobs`, `dependencies`, `events`) plus `rules` are the **defaults**. Use them. Add another only if content genuinely doesn't fit; justify it in the repo's `index.md`.
+The six system subfolders (`entities`, `interfaces`, `jobs`, `dependencies`, `events`, `rules`) plus `helpers/` and `patterns/` are the **defaults** — eight in total. Use them. Add another only if content genuinely doesn't fit; justify it in the repo's `index.md`.
 
 The KB root has exactly two children today: `wiki/` and `plans/`. Other top-level buckets (e.g., `decisions/` for ADRs, `glossary/`, `runbooks/`) can be added later without conflicting with repo names.
+
+### `helpers/` and `patterns/` — internal-knowledge subfolders
+
+These two subfolders capture *internal* knowledge that the six system subfolders don't: what reusable functions live in the repo, and what canonical shapes the team uses for recurring problems. They follow the same `sources:` / `last_updated:` discipline as every other page.
+
+**`helpers/` — catalog of reusable functions.**
+
+- **Granularity:** one file per category. A category is a topic cluster (e.g., `helpers/dates.md`), not a module path. Every cross-cutting date helper lives in `dates.md` regardless of which source file holds it.
+- **Escape hatch:** a single large or non-trivial helper can have its own page (`helpers/<name>.md`). The category page links to it.
+- **Inclusion bar:** a function appears in `helpers/` if and only if (a) it is reusable across the repo — not specific to a single feature's internal use — and (b) it is not private (Python: not prefixed with `_`; analogous for other languages). Domain-specific helpers (e.g., `build_dcf_inputs` in a finance app) stay with their feature.
+- **`sources:`** lists the file(s) where the listed helpers are defined; usually one file per category.
+- **Page shape:** see [references/page-template.md](references/page-template.md).
+
+**`patterns/` — canonical shapes for recurring problems.**
+
+- **Granularity:** one file per pattern.
+- **Kinds:** every pattern page declares `kind:` in frontmatter, one of:
+  - `convention` — a standing decision about how to do something (e.g., "we use offset pagination, never cursor"). Carries the *rule* and the *why*.
+  - `recipe` — a step-by-step how-to for a recurring task (e.g., "how to add a new CLI command"). References the files touched.
+  - `template` — a canonical code snippet (e.g., "unit-test shape with fixtures"). Snippet ~30 lines max — beyond that, point to the exemplar.
+- **`sources:`** cites canonical exemplar file(s) — the place(s) the team treats as "the way."
+- **Page shape:** see [references/page-template.md](references/page-template.md).
+- **Creation channel:** pattern pages are created *only* via the **Ingest** workflow (when the user explicitly designates something as a pattern). They are **not** created autonomously by Update or by a specialist mid-implementation. Modifying an existing pattern page (e.g., the exemplar's signature changed) is a normal autonomous Update.
 
 ## Operating Modes
 
@@ -142,7 +167,7 @@ Run the lint script from inside the current repo's working tree:
 uv run scripts/lint.py <kb_path> --json
 ```
 
-The script walks the KB (both `wiki/` and `plans/`), parses frontmatter, runs all six checks, and emits a structured report. **Do not load pages into context to run lint manually** — the script's whole purpose is to keep the per-page bodies out of your context. Read the report (small) and act on the findings. The six checks:
+The script walks the KB (both `wiki/` and `plans/`), parses frontmatter, runs all seven checks, and emits a structured report. **Do not load pages into context to run lint manually** — the script's whole purpose is to keep the per-page bodies out of your context. Read the report (small) and act on the findings. The seven checks:
 
 1. **Broken `sources:` paths** — frontmatter source points to a file that no longer exists. Script flags renames (with the new path) and dead files separately; it does **not** auto-fix paths.
 2. **Aging pages** — `last_updated` older than 90 days. Flag as *"needs review"*, not *"definitely stale"*.
@@ -150,8 +175,9 @@ The script walks the KB (both `wiki/` and `plans/`), parses frontmatter, runs al
 4. **Concept-gap candidates** — regex heuristic; expect false positives. The script emits candidates; you triage by reading the flagged pages.
 5. **`[needs source]` markers** — claims still missing citations.
 6. **All-dead in-tree sources** — every `sources:` path is in the current working tree AND every one is truly dead (no surviving file, no rename detected). Non-plan pages in this state are **auto-delete candidates** per the [Delete protocol](#delete-protocol); plans are flagged, never deleted. Pages where sources were *renamed* are NOT auto-delete candidates — they show up under check 1 so you can update the source path.
+7. **Pattern `kind:` validity** — pages under `patterns/` must declare `kind:` in frontmatter, set to one of `convention | recipe | template`. Flag pages missing the field or using an unknown value.
 
-After running: surface findings 1, 2, 3, 5 to the user; triage check 4 by reading flagged pages; for check 6 candidates, verify each with `scripts/check-sources.py` before deleting (the Delete protocol details what each verdict means).
+After running: surface findings 1, 2, 3, 5, 7 to the user; triage check 4 by reading flagged pages; for check 6 candidates, verify each with `scripts/check-sources.py` before deleting (the Delete protocol details what each verdict means).
 
 ### Delete protocol
 
@@ -228,9 +254,10 @@ The skill is read by `brainstorm` and `analyze-code`. Both integrations are **ga
 
 | Skill | When it fires | What it does |
 |-------|---------------|--------------|
-| `brainstorm` | Step 1 (Explore context) | Reads the current repo's `wiki/<repo>/index.md` + relevant `wiki/<repo>/rules/` pages before the first Socratic question. |
+| `brainstorm` | Step 1 (Explore context) | Reads the current repo's `wiki/<repo>/index.md` — which now lists `Helpers` and `Patterns` alongside the existing sections — plus relevant `wiki/<repo>/rules/` pages before the first Socratic question. Drills into specific helper/pattern pages on demand as the design conversation reveals what's relevant. |
 | `brainstorm` | Step 9 (Save plan) | Default plan path becomes `<kb_path>/plans/<ticket-or-branch>.md`. Frontmatter records `repos: [...]` so cross-repo plans are findable from any participating repo. |
-| `analyze-code` | Step 1 (Frame) | Reads this repo's `wiki/<repo>/dependencies/`, `events/`, `rules/`, and the plan at `<kb_path>/plans/<current-branch>.md` if one exists. May follow cross-repo `[[wiki-links]]` if relevant. Wiki↔code disagreements become findings. |
+| `analyze-code` | Step 1 (Frame) | Reads this repo's `wiki/<repo>/dependencies/`, `events/`, `rules/`, and the plan at `<kb_path>/plans/<current-branch>.md` if one exists. Reads the `Helpers` and `Patterns` sections of `wiki/<repo>/index.md`; drills into specific pages on demand when the code under review suggests overlap. May follow cross-repo `[[wiki-links]]` if relevant. Wiki↔code disagreements become findings — including **"reinvents existing helper"** and **"violates documented pattern"**. |
+| `using-software-specialists` | Implementation phase | **Phase A (consult, mandatory before producing code):** specialist reads `wiki/<repo>/index.md` including the `Helpers` and `Patterns` sections, then drills into relevant pages. Uses existing helpers and follows canonical patterns instead of inventing divergent shapes. **Phase B (post-write, before declaring completion):** if any new function meets the helpers inclusion bar (reusable, non-private), the specialist updates `helpers/<category>.md` autonomously (existing Update workflow). Pattern *creation* is **not** in scope for the specialist — patterns are added only via Ingest. |
 
 ### Cross-references between pages (load-bearing for the integrations)
 
@@ -249,6 +276,8 @@ Three failure modes you'll encounter while honoring Core Principle #1. The middl
 | **Wiki silent on a real thing** | Code has a `refunds` table; wiki has no `wiki/<repo>/entities/refunds.md`. | Lint flags it; `analyze-code` may suggest `/knowledge-base update`. |
 | **Wiki claims something code doesn't reflect** | Wiki says `orders.status` includes `cancelled`; code has only `pending\|paid`. | **Surfaced as a finding** — often signals a bug (intent vs. implementation drift), not just stale docs. Answer the user from the code; flag the page for update. The user decides which side to fix. |
 | **Wiki agrees but is incomplete** | Wiki has `orders.total` is decimal; code confirms — but the implicit `>= 0` rule isn't documented. | Background context, no action required. User may invoke `/knowledge-base update` with the missing detail. |
+| **Reinvents an existing helper** | Code defines `parse_timestamp(s)` doing the same job as `helpers/dates.md::parse_iso`. | **Finding.** Suggest replacing the new function with the existing helper. Severity at least Medium — parallel implementations of an existing utility drift. |
+| **Violates a documented pattern** | Code adds a list endpoint with cursor pagination; `patterns/pagination.md` is a `convention` for offset-based. | **Finding.** Surface the convention and the divergence; leave the decision to the user. Severity depends on the kind: violating a `convention` is usually Medium; diverging from a `template` is usually Low; missing steps in a `recipe` is Medium if it skips a safety step. |
 
 ## What the Skill Does Not Do
 
@@ -286,3 +315,6 @@ Three failure modes you'll encounter while honoring Core Principle #1. The middl
 | Auto-deleting a plan page | Plans are never auto-deleted, even when their sources are dead. Flag only; the user decides. |
 | Trying to delete a page with cross-repo sources | The agent can't verify code in repos it isn't in. Flag, never auto-delete. |
 | Putting personal memory in the wiki | User preferences, session state, deadlines → `~/.claude` memory; not the wiki |
+| Listing a private or feature-internal function in `helpers/` | The bar is *reusable across the repo, non-private*. Feature-internal helpers stay with their feature. Private functions (Python `_`-prefixed, etc.) never appear. |
+| Creating a `patterns/<name>.md` page autonomously during implementation | Pattern *pages* are Ingest-only. The user decides what's canonical. Updating an *existing* pattern page when its exemplar drifts is fine — that's a normal Update. |
+| Writing a `patterns/` page without `kind:` in frontmatter, or using a value outside `convention` \| `recipe` \| `template` | `kind:` is required (lint check 7). Choose the right one or don't write the page. |

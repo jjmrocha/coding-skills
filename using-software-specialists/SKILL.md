@@ -23,7 +23,7 @@ Backend and Frontend implementation can run in parallel against an agreed API co
 
 **If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate against the Plan-phase done-criteria above — tasks decomposed, dependencies explicit, riskiest work first, verification check per step. Surface any gaps to the user *before* entering Implementation. Do not start coding against an incomplete plan.
 
-**Before writing any code in the Implementation phase, load `test-driven-development` and `coding-discipline`.**
+**Before writing any code in the Implementation phase, load `test-driven-development` and `coding-discipline`. If `kb_path` is configured in CLAUDE.md, also load `knowledge-base` and read the matching plan at `<kb_path>/plans/<current-branch>.md` if one exists, and the current repo's `wiki/<repo>/index.md` — especially the `Helpers` and `Patterns` sections. Drill into specific pages when the task requires.**
 
 Move to the next phase only when the current one's output is complete:
 
