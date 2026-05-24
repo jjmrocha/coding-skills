@@ -1,17 +1,22 @@
 # test-driven-development
 
-A Claude Code skill for strict test-first development. Enforces the Red→Green→Refactor cycle before any production code is written, ensuring every behavior is specified by a failing test before it is implemented.
+A Claude Code skill for strict test-first development. Enforces the
+Red→Green→Refactor cycle before any production code is written, ensuring
+every behavior is specified by a failing test before it is implemented.
 
 ## When to Use
 
-- Implementing any new feature or function
-- Fixing a bug (write a reproducing test before applying the fix)
-- Adding new behavior to existing code
-- Refactoring — characterize current behavior with tests before touching anything
+* Implementing any new feature or function
+* Fixing a bug (write a reproducing test before applying the fix)
+* Adding new behavior to existing code
+* Refactoring — characterize current behavior with tests before touching
+  anything
 
 **When NOT to use:**
-- Writing tests for already-completed code → the design forcing function is gone; load `/writing-unit-tests` instead
-- Exploratory spikes where the goal is learning, not shipping
+
+* Writing tests for already-completed code → the design forcing function is
+  gone; load `/writing-unit-tests` instead
+* Exploratory spikes where the goal is learning, not shipping
 
 ## How It Works
 
@@ -41,5 +46,8 @@ Repeat until the feature is complete.
 
 ## Related Skills
 
-- [writing-unit-tests](../writing-unit-tests/) — scenario selection, FIRST-U principles, and language-specific test patterns (referenced from within this skill)
-- [coding-discipline](../coding-discipline/) — scope creep and speculative complexity failure modes that apply during the GREEN phase
+* [writing-unit-tests](../writing-unit-tests/) — scenario selection,
+  FIRST-U principles, and language-specific test patterns (referenced from
+  within this skill)
+* [coding-discipline](../coding-discipline/) — scope creep and speculative
+  complexity failure modes that apply during the GREEN phase

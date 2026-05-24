@@ -1,0 +1,73 @@
+# Content Page Template
+
+Use this template for every page under `<kb_path>/wiki/<repo>/entities/`, `interfaces/`, `jobs/`, `dependencies/`, `events/`, `rules/`, or under `<kb_path>/plans/`. The skill's `index-templates.md` covers the special index pages instead.
+
+---
+
+```markdown
+---
+summary: One or two sentences describing what this page covers.
+sources:
+  - <path | url | session note>      # see "Source value formats" below
+last_updated: YYYY-MM-DD
+---
+
+# <Page Title>
+
+<Body content. Short paragraphs, clear headings.>
+
+Link related concepts inline using `[[wiki-links]]` (paths from the KB root):
+- `[[wiki/order-service/entities/orders]]` — page inside a repo.
+- `[[plans/proj-1234]]` — a plan.
+- `[[wiki/order-service]]` — repo's index.md (shorthand: a link to a repo with no further path resolves to its `index.md`).
+
+If a claim can't be sourced, mark it `[needs source]` inline.
+
+## Related pages
+- [[wiki/<repo>/<subfolder>/<page>]]
+- [[wiki/<repo>/<subfolder>/<page>]]
+```
+
+---
+
+## Self-check before writing
+
+Run through this **before** saving any page:
+
+- [ ] Every factual claim has a corresponding entry in `sources:` OR an inline `[needs source]` marker.
+- [ ] `[[wiki-links]]` resolve to files that exist (or will exist by the end of this write).
+- [ ] `last_updated` is today's date.
+- [ ] The page is also linked from the repo's `wiki/<repo>/index.md` (update both in the same write).
+
+---
+
+## Required frontmatter fields
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `summary` | string | One or two sentences. Surfaced in the repo's `index.md`. |
+| `sources` | list of strings | At least one entry. See formats below. |
+| `last_updated` | date | `YYYY-MM-DD`. Lint flags pages older than 90 days as "needs review". |
+
+## Source value formats
+
+| Source type | Example value |
+|---|---|
+| Live code file | `src/orders/models.py` (relative to the repo root) |
+| External doc | `https://confluence.company.com/x/abc123` |
+| Session learning | `session 2026-05-22 — user described order cancellation flow` |
+| Another wiki page | `[[wiki/order-service/events/order-created]]` |
+
+## Subfolder-specific body shape
+
+Each subfolder has a conventional shape. The body content adapts; the frontmatter stays the same.
+
+| Subfolder | What to document in the body |
+|---|---|
+| `entities/` | Table name, columns + types, primary key, foreign keys, constraints, indexes. List enum values if any. |
+| `interfaces/` | Method, full path, request shape, response shape, error codes, auth requirement. List which other service(s) call it. |
+| `jobs/` | Schedule (cron expression), trigger condition, what it does, dependencies (DB/services it touches), failure behavior. |
+| `dependencies/` | URL/endpoint, auth method (API key, OAuth, mTLS), rate limits, owner team, what this repo uses it for. |
+| `events/` | Topic name, schema (payload fields + types), producer service `[[wiki-link]]`, consumer services `[[wiki-links]]`, ordering/delivery guarantees. |
+| `rules/` | The business rule in plain language, the entities/endpoints where it's enforced (linked), examples of valid and invalid states. |
+| `plans/` | Goal, repos touched (frontmatter `repos: [...]`), entities/interfaces/events affected (linked), status (Draft / Active / Done / Abandoned). |
