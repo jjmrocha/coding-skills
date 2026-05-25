@@ -39,7 +39,15 @@ import yaml
 
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
-    """Split YAML frontmatter from the body. Returns ({}, text) if absent."""
+    """Split YAML frontmatter from the body. Returns ({}, text) if absent.
+
+    Normalizes BOM and CRLF before parsing so pages saved on Windows or pasted
+    from a browser don't silently bypass every check by being treated as
+    bodyless.
+    """
+    if text.startswith("﻿"):
+        text = text[1:]
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     if not text.startswith("---\n"):
         return {}, text
     try:
@@ -121,13 +129,17 @@ def get_current_repo_name(repo_root: Path | None) -> str | None:
     return repo_root.name
 
 
-def _build_rename_index(repo_root: Path) -> dict[str, str]:
+def _build_rename_index(repo_root: Path) -> dict[str, str] | None:
     """Map old-path → new-path for every rename in the repo's history.
+
+    Returns None when git can't be invoked or exits non-zero — the caller must
+    treat that as "rename detection unavailable" rather than "no renames found",
+    because the latter would silently flip `renamed` → `dead` and feed the
+    autonomous-delete path with bad data.
 
     The pathspec form of `git log` doesn't work: git's path filter runs after
     rename detection, so filtering by the old name returns nothing.
     """
-    index: dict[str, str] = {}
     try:
         result = subprocess.run(
             ["git", "log", "--all", "-M", "--diff-filter=R", "--name-status",
@@ -135,7 +147,10 @@ def _build_rename_index(repo_root: Path) -> dict[str, str]:
             cwd=repo_root, capture_output=True, text=True, timeout=30,
         )
     except (subprocess.SubprocessError, FileNotFoundError):
-        return index
+        return None
+    if result.returncode != 0:
+        return None
+    index: dict[str, str] = {}
     for line in result.stdout.splitlines():
         line = line.strip()
         if not line.startswith("R"):
@@ -149,12 +164,23 @@ def _build_rename_index(repo_root: Path) -> dict[str, str]:
 def check_path_alive(
     repo_root: Path,
     path: str,
-    rename_index: dict[str, str],
+    rename_index: dict[str, str] | None,
 ) -> tuple[str, str | None]:
-    """Return (status, renamed_to). Status: alive, dead, or renamed."""
-    abs_path = repo_root / path
+    """Return (status, renamed_to). Status: alive, dead, renamed, escape, unknown.
+
+    `escape` means the source resolves outside `repo_root` (relative ascent or
+    symlink); never autodeleted. `unknown` means rename detection failed and
+    the file doesn't currently exist — we can't tell dead from renamed.
+    """
+    try:
+        abs_path = (repo_root / path).resolve()
+        abs_path.relative_to(repo_root.resolve())
+    except ValueError:
+        return ("escape", None)
     if abs_path.exists():
         return ("alive", None)
+    if rename_index is None:
+        return ("unknown", None)
     new_path = rename_index.get(path)
     if new_path:
         return ("renamed", new_path)
@@ -187,6 +213,18 @@ def determine_verdict(
     if not path_sources:
         return ("flag",
                 "only external (URL or wiki) sources — can't auto-verify")
+
+    escape = [s for s in path_sources if s["status"] == "escape"]
+    if escape:
+        return ("flag",
+                f"{len(escape)} source path(s) resolve outside the repo root "
+                "(`..` or symlink escape) — refusing to verify")
+
+    unknown = [s for s in path_sources if s["status"] == "unknown"]
+    if unknown:
+        return ("flag",
+                f"{len(unknown)} source path(s) can't be verified — git rename "
+                "detection unavailable (subprocess failed or non-zero exit)")
 
     alive = [s for s in path_sources if s["status"] == "alive"]
     dead = [s for s in path_sources if s["status"] == "dead"]
@@ -294,6 +332,8 @@ def format_human(result: dict) -> str:
             "renamed": "[RENAMED] ",
             "external": "[EXTERNAL]",
             "not-checked": "[SKIP]    ",
+            "escape": "[ESCAPE]  ",
+            "unknown": "[UNKNOWN] ",
         }
         for s in result["sources"]:
             line = f"  {marker.get(s['status'], '[?]')} {s['source']}"

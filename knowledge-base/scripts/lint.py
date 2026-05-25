@@ -85,7 +85,15 @@ class Page:
 
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
-    """Split YAML frontmatter from the body. Returns ({}, text) if absent."""
+    """Split YAML frontmatter from the body. Returns ({}, text) if absent.
+
+    Normalizes BOM and CRLF before parsing so pages saved on Windows or pasted
+    from a browser don't silently bypass every check by being treated as
+    bodyless.
+    """
+    if text.startswith("﻿"):
+        text = text[1:]
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     if not text.startswith("---\n"):
         return {}, text
     try:
@@ -169,16 +177,21 @@ def get_current_repo_name(repo_root: Path | None) -> str | None:
 
 
 _RENAME_CACHE: dict[str, str] | None = None
+_RENAME_CACHE_FAILED = False
 
 
-def _build_rename_index(repo_root: Path) -> dict[str, str]:
+def _build_rename_index(repo_root: Path) -> dict[str, str] | None:
     """Map old-path → new-path for every rename in the repo's history.
+
+    Returns None when git can't be invoked or exits non-zero — the caller must
+    treat that as "rename detection unavailable" rather than "no renames found",
+    because the latter would silently flip `renamed` → `dead` and feed the
+    autonomous-delete path with bad data.
 
     Scanned once per process; subsequent lookups are O(1). The pathspec form
     of `git log` doesn't work for this — git's path filter runs after rename
     detection, so filtering by the old name returns nothing.
     """
-    index: dict[str, str] = {}
     try:
         result = subprocess.run(
             ["git", "log", "--all", "-M", "--diff-filter=R", "--name-status",
@@ -186,7 +199,10 @@ def _build_rename_index(repo_root: Path) -> dict[str, str]:
             cwd=repo_root, capture_output=True, text=True, timeout=30,
         )
     except (subprocess.SubprocessError, FileNotFoundError):
-        return index
+        return None
+    if result.returncode != 0:
+        return None
+    index: dict[str, str] = {}
     for line in result.stdout.splitlines():
         line = line.strip()
         if not line.startswith("R"):
@@ -199,14 +215,31 @@ def _build_rename_index(repo_root: Path) -> dict[str, str]:
 
 
 def check_path_alive(repo_root: Path, path: str) -> tuple[str, str | None]:
-    """Return (status, renamed_to). status ∈ {alive, dead, renamed}."""
-    global _RENAME_CACHE
-    abs_path = repo_root / path
+    """Return (status, renamed_to).
+
+    status ∈ {alive, dead, renamed, escape, unknown}.
+    - `escape`: source resolves outside repo_root (`..` or symlink); never
+      autodeleted.
+    - `unknown`: rename detection failed; we can't distinguish dead from
+      renamed, so the page must not be autodeleted.
+    """
+    global _RENAME_CACHE, _RENAME_CACHE_FAILED
+    try:
+        abs_path = (repo_root / path).resolve()
+        abs_path.relative_to(repo_root.resolve())
+    except ValueError:
+        return ("escape", None)
     if abs_path.exists():
         return ("alive", None)
-    if _RENAME_CACHE is None:
-        _RENAME_CACHE = _build_rename_index(repo_root)
-    new_path = _RENAME_CACHE.get(path)
+    if _RENAME_CACHE is None and not _RENAME_CACHE_FAILED:
+        result = _build_rename_index(repo_root)
+        if result is None:
+            _RENAME_CACHE_FAILED = True
+        else:
+            _RENAME_CACHE = result
+    if _RENAME_CACHE_FAILED:
+        return ("unknown", None)
+    new_path = _RENAME_CACHE.get(path) if _RENAME_CACHE else None
     if new_path:
         return ("renamed", new_path)
     return ("dead", None)
@@ -231,8 +264,21 @@ def check_broken_and_autodelete(
     autodelete: list[dict] = []
 
     for page in pages:
-        sources = page.frontmatter.get("sources", [])
-        if not isinstance(sources, list) or not sources:
+        raw_sources = page.frontmatter.get("sources")
+        if raw_sources is None:
+            continue
+        if not isinstance(raw_sources, list):
+            broken.append({
+                "page": page.rel_path,
+                "sources": [{
+                    "source": str(raw_sources)[:80],
+                    "status": "malformed",
+                    "renamed_to": None,
+                }],
+            })
+            continue
+        sources = raw_sources
+        if not sources:
             continue
 
         in_scope = current_repo_root is not None and (
@@ -438,10 +484,23 @@ def format_markdown(report: dict) -> str:
             lines.append("")
             lines.append(f"- `{entry['page']}`")
             for s2 in entry["sources"]:
-                if s2["status"] == "renamed":
+                status = s2["status"]
+                if status == "renamed":
                     lines.append(
                         f"  - renamed: `{s2['source']}` → "
                         f"`{s2['renamed_to']}`")
+                elif status == "escape":
+                    lines.append(
+                        f"  - escape: `{s2['source']}` "
+                        "(resolves outside repo root)")
+                elif status == "unknown":
+                    lines.append(
+                        f"  - unverifiable: `{s2['source']}` "
+                        "(git rename detection failed)")
+                elif status == "malformed":
+                    lines.append(
+                        f"  - malformed: `{s2['source']}` "
+                        "(not a YAML list)")
                 else:
                     lines.append(f"  - dead: `{s2['source']}`")
     lines.append("")

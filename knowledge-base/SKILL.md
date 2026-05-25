@@ -123,6 +123,18 @@ Mode is determined by the user's verb. Four modes:
 | **Update** | *"update the wiki with what we just changed"*, *"we added the order.cancelled event, update the KB"* | Write directly; summarize after. Deletes follow the [Delete protocol](#delete-protocol). |
 | **Lint** | *"lint the wiki"*, *"audit the KB"*, *"check for stale wiki pages"* | Flag-only, **except** auto-deletes non-plan pages whose in-tree `sources:` are all dead. |
 
+### Write lock (Ingest and Update only)
+
+Multi-file writes — page + repo index + `wiki/`/`plans/` index + cross-link updates — aren't atomic. A second agent session writing in parallel, or a crash mid-Ingest, can leave indexes out of sync with pages. Before any Ingest or Update, take the advisory lock; release on summary success:
+
+```bash
+uv run scripts/kb-lock.py acquire <kb_path>   # exit 1 if another writer holds it
+# ... do the writes, then ...
+uv run scripts/kb-lock.py release <kb_path>
+```
+
+If `acquire` returns non-zero, the lock is held — stop, surface the holder's PID and acquired-at timestamp to the user, and don't write. Stale locks (older than 1 hour) reclaim automatically, so a crashed prior session doesn't deadlock the KB. Query and Lint don't need the lock — they're read-only (lint's autonomous delete is the one exception and acquires the lock around the delete itself).
+
 ### Query workflow
 
 1. Read the appropriate index for the question: `wiki/index.md` (for system/architecture questions) or `plans/index.md` (for project/feature questions). The KB has no overarching root index — these two are parallel entry points.
@@ -134,6 +146,8 @@ Mode is determined by the user's verb. Four modes:
 7. If neither the wiki nor the code has the answer, say so explicitly. Offer to add it once the user clarifies.
 
 ### Ingest workflow
+
+**Acquire the write lock first** (see [Write lock](#write-lock-ingest-and-update-only)); release on summary success. If acquire fails, stop and report the holder to the user.
 
 1. **Enumerate the full source set, then read every file in it.** The "source" is whatever the user named — a file, a URL, pasted text, a directory, a codebase, a doc tree. If it resolves to *more than one file*, list **every** file in scope first (e.g., `git ls-files`, `find <dir> -type f`, archive listing), then read each one. **No sampling, no representative-files shortcut, no "the README covers it."** Skipping files = missing surfaces. The only files you may exclude are ones the user explicitly named as out of scope, or boilerplate that contains no system surface (lockfiles, generated code, vendored deps, binary assets) — and even then, *announce* the exclusion in the summary so the user can correct you.
 2. Identify which repo and which subfolder(s) the content belongs to (under `wiki/<repo>/`), or whether it's a plan (`plans/`). One source file may touch multiple pages; one page may aggregate facts from many source files. **Ask the user only when the source is genuinely ambiguous** — contradictory, partial, or unclear which repo it belongs to. Don't ask "which subfolder?" for clean sources; pick the best fit and surface the choice in the summary.
@@ -152,6 +166,8 @@ Mode is determined by the user's verb. Four modes:
 **Coverage rule (load-bearing).** Before writing the summary, cross-check: does the number of source files you read match the number of files in scope? If not, you ingested partially — go back to step 1 and read the rest. Reporting "Wrote N pages" without "Ingested M/M files" is incomplete and forbidden; the user can't tell whether you covered the source or skipped half of it.
 
 ### Update workflow
+
+**Acquire the write lock first** (see [Write lock](#write-lock-ingest-and-update-only)); release on summary success. If acquire fails, stop and report the holder to the user.
 
 1. Identify pages affected by the change the user is describing.
 2. Write the changes directly. Add `[[wiki-links]]` to related pages; set `last_updated:` in frontmatter.
@@ -215,6 +231,8 @@ The auto-delete conditions in plain English: **all** of these must hold for `saf
 - The page is **not** under `plans/`.
 
 All other deletions — page obsolete for reasons unrelated to `sources:` liveness, merging two pages, restructuring — require explicit user approval. Before deleting, show what's about to be deleted and which inbound `[[wiki-links]]` will break.
+
+Autonomous deletes are writes — acquire the [write lock](#write-lock-ingest-and-update-only) around the delete + index updates and release on summary success. Approved deletes follow the same rule.
 
 After any delete (autonomous or approved): remove the entry from the repo's `index.md` and the master `index.md`. Include the delete in the post-action summary:
 
