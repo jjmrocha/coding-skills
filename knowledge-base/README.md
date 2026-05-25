@@ -101,8 +101,13 @@ colliding with repo names.
 | [SKILL.md](SKILL.md) | Core skill — operating modes, page format, trust model, integration with other skills |
 | [references/page-template.md](references/page-template.md) | Page format and per-subfolder body shape |
 | [references/index-templates.md](references/index-templates.md) | Templates for the three special files (`wiki/index.md`, `wiki/<repo>/index.md`, `plans/index.md`) |
-| [scripts/lint.py](scripts/lint.py) | Lint script — runs the six checks against the KB and emits a JSON/markdown report. Keeps page bodies out of the agent's context. Run: `uv run scripts/lint.py <kb_path>` |
+| [references/helpers-and-patterns.md](references/helpers-and-patterns.md) | Inclusion bar for `helpers/` and creation channel for `patterns/` |
+| [references/integrations.md](references/integrations.md) | How `brainstorm`, `analyze-code`, and `using-software-specialists` consult the KB |
+| [references/common-pitfalls.md](references/common-pitfalls.md) | Extended notes on the headline mistakes (YAML quoting, coverage rule, etc.) |
+| [references/test-scenarios.md](references/test-scenarios.md) | Regression suite for validating the skill after edits |
+| [scripts/lint.py](scripts/lint.py) | Lint script — runs the seven checks against the KB and emits a JSON/markdown report. Keeps page bodies out of the agent's context. Run: `uv run scripts/lint.py <kb_path>` |
 | [scripts/check-sources.py](scripts/check-sources.py) | Source-liveness check for a single page — returns a verdict the Delete protocol acts on. Run: `uv run scripts/check-sources.py <page-path>` |
+| [scripts/kb-lock.py](scripts/kb-lock.py) | Advisory write lock for multi-file Ingest/Update operations. Run: `uv run scripts/kb-lock.py acquire <kb_path>` |
 
 Scripts use [`uv`](https://docs.astral.sh/uv/) with inline PEP 723
 dependency metadata — no install step needed beyond having `uv` available.
