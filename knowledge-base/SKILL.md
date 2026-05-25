@@ -110,7 +110,7 @@ These two subfolders capture *internal* knowledge that the six system subfolders
   - `template` — a canonical code snippet (e.g., "unit-test shape with fixtures"). Snippet ~30 lines max — beyond that, point to the exemplar.
 - **`sources:`** cites canonical exemplar file(s) — the place(s) the team treats as "the way."
 - **Page shape:** see [references/page-template.md](references/page-template.md).
-- **Creation channel:** pattern pages are created *only* via the **Ingest** workflow (when the user explicitly designates something as a pattern). They are **not** created autonomously by Update or by a specialist mid-implementation. Modifying an existing pattern page (e.g., the exemplar's signature changed) is a normal autonomous Update.
+- **Creation channel:** pattern pages are created *only* via the **Ingest** or **Update** workflow. They are **not** created autonomously by a specialist mid-implementation. Modifying an existing pattern page (e.g., the exemplar's signature changed) is a normal autonomous Update.
 
 ## Operating Modes
 
@@ -135,16 +135,21 @@ Mode is determined by the user's verb. Four modes:
 
 ### Ingest workflow
 
-1. Read the full source (file path, URL, or pasted text — the user names the source).
-2. Identify which repo and which subfolder(s) the content belongs to (under `wiki/<repo>/`), or whether it's a plan (`plans/`). One source may touch multiple pages. **Ask the user only when the source is genuinely ambiguous** — contradictory, partial, or unclear which repo it belongs to. Don't ask "which subfolder?" for clean sources; pick the best fit and surface the choice in the summary.
-3. For each page: create or update; add `[[wiki-links]]` to related pages; set `sources:` and `last_updated:` in frontmatter.
+1. **Enumerate the full source set, then read every file in it.** The "source" is whatever the user named — a file, a URL, pasted text, a directory, a codebase, a doc tree. If it resolves to *more than one file*, list **every** file in scope first (e.g., `git ls-files`, `find <dir> -type f`, archive listing), then read each one. **No sampling, no representative-files shortcut, no "the README covers it."** Skipping files = missing surfaces. The only files you may exclude are ones the user explicitly named as out of scope, or boilerplate that contains no system surface (lockfiles, generated code, vendored deps, binary assets) — and even then, *announce* the exclusion in the summary so the user can correct you.
+2. Identify which repo and which subfolder(s) the content belongs to (under `wiki/<repo>/`), or whether it's a plan (`plans/`). One source file may touch multiple pages; one page may aggregate facts from many source files. **Ask the user only when the source is genuinely ambiguous** — contradictory, partial, or unclear which repo it belongs to. Don't ask "which subfolder?" for clean sources; pick the best fit and surface the choice in the summary.
+3. For each page: create or update; add `[[wiki-links]]` to related pages; set `sources:` (listing **every** source file that contributed, not just the first) and `last_updated:` in frontmatter.
 4. Update the repo's `wiki/<repo>/index.md` and the wiki's `wiki/index.md` if a new repo or new top-level page was added.
-5. Summarize what was written — one line per page, scannable:
+5. Summarize what was written — one line per page, scannable, and lead with the **coverage line** so the user can spot under-ingestion at a glance:
    ```
-   Wrote (from confluence.company.com/x/abc):
+   Ingested 17/17 files from docs/architecture/ (0 excluded).
+   Wrote:
      + wiki/order-service/dependencies/sendgrid.md   email provider, REST API, owner: comms team
-     ~ wiki/order-service/index.md                   linked new page
+     + wiki/order-service/events/order-created.md    schema, producers, consumers
+     ~ wiki/order-service/index.md                   linked new pages
    ```
+   If you excluded files, list them and the reason: `Excluded: docs/architecture/legacy-2018.md (user said "current docs only")`.
+
+**Coverage rule (load-bearing).** Before writing the summary, cross-check: does the number of source files you read match the number of files in scope? If not, you ingested partially — go back to step 1 and read the rest. Reporting "Wrote N pages" without "Ingested M/M files" is incomplete and forbidden; the user can't tell whether you covered the source or skipped half of it.
 
 ### Update workflow
 
@@ -234,6 +239,8 @@ Path from the **KB root**, no extension.
 
 Wiki-links must resolve to existing files. Lint mode flags broken links.
 
+**Exception for `wiki/index.md`'s repo list.** The `## Repos` section in `wiki/index.md` uses **standard markdown links with an explicit `index.md` target** — `[order-service](order-service/index.md)`, not `[[wiki/order-service]]`. Reason: `wiki/index.md` is the wiki's entry point, browsed by humans in plain markdown viewers where `[[wiki-link]]` text is not clickable. Everywhere else (body cross-references, related-pages lists, producer/consumer links), keep the `[[wiki-link]]` form. See [references/index-templates.md](references/index-templates.md) for the template.
+
 ### Citation rules
 
 Wiki pages cite their provenance in the `sources:` frontmatter list — never inline in the body. Source values are free-form strings (live code file, external URL, session note, or another wiki page); see [references/page-template.md](references/page-template.md) for formats. If a claim can't be sourced, mark it `[needs source]` inline in the body. Lint mode counts these.
@@ -278,7 +285,7 @@ Three failure modes you'll encounter while honoring Core Principle #1. The middl
 | **Wiki silent on a real thing** | Code has a `refunds` table; wiki has no `wiki/<repo>/entities/refunds.md`. | Lint flags it; `analyze-code` may suggest `/knowledge-base update`. |
 | **Wiki claims something code doesn't reflect** | Wiki says `orders.status` includes `cancelled`; code has only `pending\|paid`. | **Surfaced as a finding** — often signals a bug (intent vs. implementation drift), not just stale docs. Answer the user from the code; flag the page for update. The user decides which side to fix. |
 | **Wiki agrees but is incomplete** | Wiki has `orders.total` is decimal; code confirms — but the implicit `>= 0` rule isn't documented. | Background context, no action required. User may invoke `/knowledge-base update` with the missing detail. |
-| **Reinvents an existing helper** | Code defines `parse_timestamp(s)` doing the same job as `helpers/dates.md::parse_iso`. | **Finding.** Suggest replacing the new function with the existing helper. Severity at least Medium — parallel implementations of an existing utility drift. |
+| **Reinvents an existing helper** | Code defines `parse_timestamp(s)` doing the same job as `parse_iso` in [[wiki/<repo>/helpers/dates]]. | **Finding.** Suggest replacing the new function with the existing helper. Severity at least Medium — parallel implementations of an existing utility drift. |
 | **Violates a documented pattern** | Code adds a list endpoint with cursor pagination; `patterns/pagination.md` is a `convention` for offset-based. | **Finding.** Surface the convention and the divergence; leave the decision to the user. Severity depends on the kind: violating a `convention` is usually Medium; diverging from a `template` is usually Low; missing steps in a `recipe` is Medium if it skips a safety step. |
 
 ## What the Skill Does Not Do
@@ -305,6 +312,9 @@ Three failure modes you'll encounter while honoring Core Principle #1. The middl
 | Mistake | Fix |
 |---------|-----|
 | Inventing a `kb_path` default | The skill refuses if unconfigured — say so, ask the user to set it in CLAUDE.md |
+| Leaving a frontmatter string value unquoted when it contains anything beyond letters, digits, spaces, hyphens, underscores, or dots | **Wrap it in double quotes.** That's the universal fix — `summary: "Path: foo"`, `summary: "parse_iso (in helpers/dates.md)"`, `summary: "yes — the cancellable window"`. Unquoted, YAML treats reserved indicators (`:` followed by space, `::`, leading `#`, `&`, `*`, `!`, `|`, `>`, `{` `}` `[` `]`, `,`, `?`, `%`, `@`, `` ` ``) as syntax — frontmatter breaks. Worse, unquoted bareword values that look like booleans or numbers get **silently coerced** (`summary: no` → boolean `false`; `summary: 1.0` → float `1.0`), which lint won't catch because the YAML is "valid," just wrong. **Default: quote any non-trivial string.** Filenames are different — they're not YAML, but they ride the same risk surface in shells and tools; stick to lowercase letters, digits, and hyphens, never `:` / `::` / other punctuation. Also avoid programming-language shorthands like `path::symbol` (Rust/C++) — say it in English: *"`parse_iso` in `helpers/dates.md`"*. |
+| Ingesting from a multi-file source by reading only a sample (the README, a few "representative" files, the top of the tree) | Multi-file sources must be enumerated and read **in full**. List every file first, then read each. Skipping = missing surfaces. The Ingest summary's coverage line (`Ingested M/M files`) is mandatory; partial coverage must be reported as such, not hidden. |
+| Listing only the first file under `sources:` when a page aggregates facts from several files | `sources:` must list **every** file that contributed to the page. One-source-per-page is a rule of thumb for *content* pages, not a cap — pages that legitimately span files (helpers categories, rules with multiple enforcement points) need every contributing file cited. |
 | Answering a *"quick lookup"* from the wiki without opening the cited code | There is no quick-lookup exemption. The wiki is a finding aid; the answer comes from code. Read the `sources:` files before replying. |
 | Treating a wiki page as authoritative because `last_updated` is recent | `last_updated` records when the wiki was edited, not when the code was. The code can have moved the same day. Open the cited files. |
 | Citing only the wiki in your reply (*"source: orders.md"*) when you didn't read the code | Cite the code file you read this turn alongside the wiki page that pointed you there. If you didn't read the code, don't reply yet — go read it. |

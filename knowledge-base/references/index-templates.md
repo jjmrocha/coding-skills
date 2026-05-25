@@ -14,10 +14,12 @@ Lists every repo under `wiki/`. Updated when a new repo folder is created. Activ
 # Wiki
 
 ## Repos
-- [[wiki/order-service]] — Order placement, cancellation, fulfillment lifecycle.
-- [[wiki/user-service]] — User accounts, authentication, profiles.
-- [[wiki/email-service]] — Outbound email via SendGrid.
+- [order-service](order-service/index.md) — Order placement, cancellation, fulfillment lifecycle.
+- [user-service](user-service/index.md) — User accounts, authentication, profiles.
+- [email-service](email-service/index.md) — Outbound email via SendGrid.
 ```
+
+**Repo links use standard markdown with an explicit `index.md` target**, not the `[[wiki/<repo>]]` shorthand. Reason: `wiki/index.md` is the wiki's entry point — readers (and the user) browse it in plain markdown viewers, where `[[wiki-link]]` text is not clickable. The explicit `[<repo>](<repo>/index.md)` form is clickable everywhere and still resolves to the same target the shorthand would. Body text inside other pages can continue to use `[[wiki-links]]` for cross-references (that content is agent-consumed, not browsed).
 
 ---
 
