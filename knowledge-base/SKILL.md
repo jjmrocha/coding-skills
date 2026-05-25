@@ -58,7 +58,9 @@ kb_path: /Users/you/.kb/work    # required — absolute path. No default.
 **First-use bootstrap.** When `kb_path` exists but is empty (or no folder exists for the current repo under `wiki/`), ask authorization before creating anything:
 
 - *"`<kb_path>` doesn't exist. Create it with the canonical layout (`wiki/index.md`, `plans/index.md`)? Initialize it as a git repo for change history (recommended)?"*
-- *"No folder for `<repo-name>` under `wiki/`. Create the canonical layout (`wiki/<repo>/index.md` + subfolders `entities/`, `interfaces/`, `jobs/`, `dependencies/`, `events/`, `rules/`)?"*
+- *"No folder for `<repo-name>` under `wiki/`. Create the canonical layout (`wiki/<repo>/index.md` + the eight default subfolders `entities/`, `interfaces/`, `jobs/`, `dependencies/`, `events/`, `rules/`, `helpers/`, `patterns/`)?"*
+
+All eight default subfolders are created at bootstrap (empty if no content yet) — including `helpers/` and `patterns/` — so downstream skills (`brainstorm`, `analyze-code`, `using-software-specialists`) always find the expected layout. The repo's `index.md` always renders the `## Helpers` and `## Patterns` headings (with an explicit *"(none yet)"* placeholder when empty) so consulting agents can distinguish *"none documented yet"* from *"forgot to look."*
 
 If the user declines `git init`, there's no per-write audit trail — changes are visible only in `last_updated` frontmatter and the agent's post-write summary in the current session.
 

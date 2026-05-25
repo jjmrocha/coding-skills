@@ -3,7 +3,8 @@
 A Claude Code skill for a user-curated, agent-maintained project knowledge
 base (KB). The KB holds two kinds of content: a **wiki** of per-repo system
 surfaces (entities, interfaces, jobs, dependencies, events, business rules)
-and **plans** for implementation work (often spanning repos). Queryable on
+plus internal-knowledge subfolders (`helpers/`, `patterns/`), and **plans**
+for implementation work (often spanning repos). Queryable on
 its own; consulted by `brainstorm` and `analyze-code` when a `kb_path` is
 configured. Inspired by Andrej Karpathy's LLM Wiki pattern.
 
@@ -76,6 +77,7 @@ dead in-tree.
     <repo-name>/                      one per repo, name auto-detected from git
       index.md                        repo TOC
       entities/ interfaces/ jobs/ dependencies/ events/ rules/
+      helpers/ patterns/              internal-knowledge subfolders
 ```
 
 There is no KB-root `index.md` — `wiki/index.md` and `plans/index.md` are

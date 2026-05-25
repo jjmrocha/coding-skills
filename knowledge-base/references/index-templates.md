@@ -55,7 +55,17 @@ Lists every page in the repo, grouped by subfolder. Updated whenever a page is c
 - [[wiki/<repo>/patterns/<name>]] *(convention | recipe | template)* — <one-line summary>
 ```
 
-Omit empty sections — if the repo has no jobs, drop the `## Jobs` heading entirely. Same applies to `## Helpers` and `## Patterns`.
+Omit the six system sections (`Entities`, `Interfaces`, `Jobs`, `Dependencies`, `Events`, `Business rules`) when their subfolder is empty — drop the heading entirely.
+
+**`## Helpers` and `## Patterns` are exceptions: always render the heading, even when empty.** When the corresponding subfolder has no pages yet, render it as `*(none yet)*` under the heading. This is load-bearing: `brainstorm`, `analyze-code`, and the specialists in `using-software-specialists` consult these two sections by name before producing code, and an absent heading is indistinguishable from "I forgot to look." Examples:
+
+```markdown
+## Helpers
+*(none yet)*
+
+## Patterns
+*(none yet)*
+```
 
 In the `## Patterns` list, render the `*(kind)*` marker using the page's `kind:` frontmatter value, so the agent can scan by intent without opening each page.
 
