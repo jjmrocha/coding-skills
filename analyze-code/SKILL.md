@@ -7,6 +7,26 @@ description: Use when auditing existing code — legacy or inherited code review
 
 Multi-lens audit of existing code. Applies five specialist perspectives and produces a prioritized findings report — a deep review, not a gate decision.
 
+## What Makes Good Code?
+
+1. Readable and Self-Explanatory
+* **Clear Naming:** Variables and functions should use descriptive names (e.g., `customerRecord` instead of `x`).
+* **Minimal Comments:** Code should be intuitive enough that it explains what it does on its own. Comments should only be used to explain the *why* behind complex or counter-intuitive logic.
+* **No "Clever" Tricks:** Straightforward, simple logic is always better than heavily condensed, unreadable one-liners.
+
+2. Maintainable and Modular
+* **Single Responsibility Principle (SRP):** Functions and classes should do one thing, and do it well.
+* **DRY (Don't Repeat Yourself):** Avoid duplicating logic so that future updates only require changes in one place.
+* **Separation of Concerns:** Keep core business logic separate from input/output operations.
+
+3. Testable and Reliable
+* **Automated Testing:** Good code is written in a way that allows automated unit tests to verify that every component functions correctly.
+* **Error Handling:** It anticipates edge cases and fails gracefully rather than crashing unexpectedly.
+
+4. Efficient (Within Reason)
+* It runs fast enough to deliver a smooth user experience without wasting computing power. However, optimization should never come at the cost of readability unless absolutely necessary.
+
+
 ## When NOT to Use
 
 - Writing new code → `using-software-specialists`
