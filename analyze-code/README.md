@@ -20,19 +20,9 @@ gate decision.
 
 ## How It Works
 
-The skill runs five lenses in sequence, then synthesizes findings into a
-single ranked report:
+The skill runs a scope-and-boundary frame, five lenses (Architecture, Quality, Performance, Security, Style) and the project's configured tooling, then synthesizes findings into a ranked report split into **System-level** and **Code-level** sections. See [SKILL.md](SKILL.md) for the full workflow and [references.md](references.md) for heavy reference (scanner-per-file-type matrix, tooling discovery paths, skip-path patterns, specialist routing).
 
-| Lens | Question it asks |
-|------|-----------------|
-| **Architecture** | Where are coupling hotspots, and what breaks when each component fails? |
-| **Quality** | What's hard to change, untested, or overly complex? |
-| **Performance** | Where is time actually spent, and what fails under realistic load? |
-| **Security** | What inputs are trusted, what auth is assumed, where's the insecure default? |
-| **Coding Style** | Does the code follow the language's style guide for formatting and naming? (delegates to the `/style-checker` skill) |
-
-The final report leads with a summary and top priority actions, with
-findings in a single severity-ordered list (not grouped by lens).
+Each finding carries severity, confidence (Suspected/Confirmed), scope tag (system/code), file:line, evidence snippet, impact, action, and a routing specialist for the audit → fix loop.
 
 ## Usage
 
@@ -46,4 +36,5 @@ findings in a single severity-ordered list (not grouped by lens).
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Core skill — lenses, severity scale, workflow, report template |
+| [SKILL.md](SKILL.md) | Core skill — lenses, severity scale, workflow, report template, false-positive markers, findings cap, good-vs-bad example |
+| [references.md](references.md) | Tooling discovery paths, per file-type scanner matrix, skip-path patterns, specialist routing |
