@@ -21,7 +21,7 @@ Write one test for the next behavior. Use the API you wish existed.
 
 **Gate:** Run it. It must fail for the *right* reason (function doesn't exist, assertion on expected behavior) — not a syntax error. If it passes, you're testing existing behavior; rewrite.
 
-See `writing-unit-tests` for scenario selection and test structure.
+Load `writing-unit-tests` for scenario selection and test structure.
 
 ### GREEN — Write minimum code to pass
 

@@ -16,7 +16,8 @@ with no cross-domain impact.
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Phase model, task routing, symptom → specialist lookup, validation gate |
+| [SKILL.md](SKILL.md) | Phase model, task routing, anti-patterns, validation gate |
+| [references/specialist-questions.md](references/specialist-questions.md) | The one disambiguating question each specialist asks — load when unsure which to invoke |
 | [references/](references/) | One file per specialist (17 total) — triggers, mindset, focus areas, red flags |
 
 ## Specialists
@@ -54,11 +55,11 @@ what's borrowed and what's original.
 
 * **The entire [SKILL.md](SKILL.md)**: phase model (Requirements → Design →
   Plan → Implementation → Testing → Validation → Documentation),
-  transition signals, Task Routing table, Symptom → Specialist reverse
-  lookup, "The Question Each Specialist Asks" disambiguation, Anti-Patterns
-  table, "Validate Before Done" checklist, Tester vs. Quality Engineer
-  distinction. SuperClaude uses `@agent-*` invocations rather than a
-  phase-routing skill — the orchestration layer here is new.
+  transition signals, Task Routing table, "The Question Each Specialist Asks"
+  disambiguation (in [references/specialist-questions.md](references/specialist-questions.md)),
+  Anti-Patterns table, "Validate Before Done" checklist, Tester vs. Quality
+  Engineer distinction. SuperClaude uses `@agent-*` invocations rather than
+  a phase-routing skill — the orchestration layer here is new.
 * **4 specialists not in SuperClaude:** `prompt-engineer`, `tester`,
   `database-designer`, `ml-engineer`.
 * **`Red Flags` table** at the bottom of each reference file

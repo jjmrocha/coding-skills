@@ -1,30 +1,13 @@
 ---
 name: analyze-code
-description: Use when auditing existing code — legacy or inherited code reviews, pre-PR self-review of changed modules, module health checks, or tech-debt assessment before a large change
+description: Use when auditing existing code — "review my changes", "check this PR", "look at the diff", legacy reviews, pre-PR self-review, module health checks, or tech-debt assessment before a large change.
 ---
 
 # Analyze Code
 
 Multi-lens audit of existing code. Applies five specialist perspectives and produces a prioritized findings report — a deep review, not a gate decision.
 
-## What Makes Good Code?
-
-1. Readable and Self-Explanatory
-* **Clear Naming:** Variables and functions should use descriptive names (e.g., `customerRecord` instead of `x`).
-* **Minimal Comments:** Code should be intuitive enough that it explains what it does on its own. Comments should only be used to explain the *why* behind complex or counter-intuitive logic.
-* **No "Clever" Tricks:** Straightforward, simple logic is always better than heavily condensed, unreadable one-liners.
-
-2. Maintainable and Modular
-* **Single Responsibility Principle (SRP):** Functions and classes should do one thing, and do it well.
-* **DRY (Don't Repeat Yourself):** Avoid duplicating logic so that future updates only require changes in one place.
-* **Separation of Concerns:** Keep core business logic separate from input/output operations.
-
-3. Testable and Reliable
-* **Automated Testing:** Good code is written in a way that allows automated unit tests to verify that every component functions correctly.
-* **Error Handling:** It anticipates edge cases and fails gracefully rather than crashing unexpectedly.
-
-4. Efficient (Within Reason)
-* It runs fast enough to deliver a smooth user experience without wasting computing power. However, optimization should never come at the cost of readability unless absolutely necessary.
+**If the conversation was compacted, re-invoke this skill before continuing.**
 
 ## When NOT to Use
 
@@ -41,7 +24,7 @@ Multi-lens audit of existing code. Applies five specialist perspectives and prod
 | **Security** | Input trust, auth, supply-chain (lockfiles, pinned base images, vuln scanners), secrets (env hygiene, KMS/Vault refs, log/layer leakage), license/SBOM | `security-engineer` |
 | **Style** | Language style guide and formatting | `style-checker` skill |
 
-Apply **all five** — single-lens audits miss cross-cutting issues. Adopting each lens's question directly is equivalent to invoking `using-software-specialists`; don't reflexively invoke it five times. Delegate the style lens to the `style-checker` skill.
+Apply **all five** — single-lens audits miss cross-cutting issues. Load specialists for Critical/High findings via `using-software-specialists`; lens questions alone aren't enough at that severity. Delegate the style lens to the `style-checker` skill.
 
 ## Severity Scale
 
@@ -57,15 +40,15 @@ Don't inflate severity. Low stays Low. Reserve Critical for real blast radius.
 ## Workflow
 
 1. **Scope & Boundary Frame** — pin down what's being audited and what surfaces it touches.
-   - **Scope:** PR mode = `git diff origin/main...HEAD` (or against the explicit base); module/repo mode = the path the user passed. Record the resolved scope in the report header.
-   - **Skip rules:** auto-generated, vendored, build-output, migration, and minified content (see [references.md](references.md)). Skip means "don't analyze the contents" — file presence is still a signal.
-   - **Public surface:** identify exports / `__all__` / package boundaries / OpenAPI specs / declared API entry points. Public-API breaks are Critical/High in Step 2.
-   - **Deploy surface:** identify Dockerfiles, IaC files, CI workflows, message-bus producers/consumers, REST routes. These feed Architecture and Security lenses, not a separate pass.
-   - **KB pull (if `kb_path` configured):** load `knowledge-base` and read the current repo's `wiki/<repo>/index.md`, the matching plan at `<kb_path>/plans/<current-branch>.md`, and any `decisions/` (ADRs) tagged to this module. Follow cross-repo `[[wiki-links]]` only when judged relevant. **Wiki ↔ code disagreements are findings** at Medium or higher. Two specific finding types: **"reinvents existing helper"** (semantically equivalent to one in `helpers/`) and **"violates documented pattern"** (diverges from `patterns/<name>.md`; `convention` violation usually Medium, `template` divergence Low, `recipe` step-skipping Medium when it skips a safety step). **ADR contradictions** are at least Medium and tagged `scope: system`.
+   - **Scope:** PR mode = `git diff origin/main...HEAD`; module/repo mode = the path the user passed. Record in the report header.
+   - **Skip rules:** auto-generated, vendored, build-output, migration, minified — see [references.md](references.md). File presence is still a signal.
+   - **Public surface:** exports / `__all__` / package boundaries / OpenAPI specs. Public-API breaks are Critical/High in Step 2.
+   - **Deploy surface:** Dockerfiles, IaC, CI workflows, message-bus producers/consumers, REST routes. Feeds Architecture and Security lenses.
+   - **If `kb_path` configured:** load `knowledge-base` first. Wiki↔code disagreements are findings per `knowledge-base` Integration rules.
 
 2. **Breaking-change scan** (modified code only) — for each changed signature, return type, raised error, side effect, or invariant on an existing symbol, list every caller via `find_referencing_symbols` or `grep`, verify the new contract holds at each call site, and report any caller that breaks as a finding. Public-API breaks are Critical/High; a single internal caller is Medium. Skip on greenfield.
 
-3. **Convention & duplication scan** (new or modified code only) — verify changes follow existing codebase patterns: helper utilities, error-handling style, module layout, naming. For each new helper, type, or pattern introduced, search the codebase with `find_symbol`/`grep` for an existing equivalent before accepting it. Parallel implementation of an existing utility is **High**; convention drift (naming, error style) is usually **Medium**; minor inconsistency is **Low**. Skip on greenfield.
+3. **Convention & duplication scan** (new or modified code only) — apply `coding-discipline` Parallel-Solution test: for each new helper, type, or pattern, `find_symbol`/`grep` for an existing equivalent first. Parallel implementation = **High**; convention drift = **Medium**; minor inconsistency = **Low**. Skip on greenfield.
 
 4. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells. Includes runtime resilience (graceful shutdown, signal handling, healthchecks, retry/backoff) and cross-service consistency for surfaces discovered in Step 1.
 
@@ -75,7 +58,7 @@ Don't inflate severity. Low stays Low. Reserve Critical for real blast radius.
 
 7. **Security lens** — input trust, auth, secrets. Includes supply-chain (lockfile presence/drift, pinned base images, abandoned deps) and license/SBOM hygiene. Hardcoded secrets are Critical; missing rotation/Vault reference where one is expected is High.
 
-8. **Style lens** — always run `style-checker`. **If the project also has a linter/formatter configured (eslint, ruff, golangci-lint, rubocop, etc.), run it too — on any conflicting rule, the linter is authoritative.** Map severities (most → Low, systemic breakage → Medium).
+8. **Style lens** — load `style-checker`. It owns linter discovery, severity mapping, and conflict-resolution rules.
 
 9. **Run configured tooling** — for every linter, formatter, scanner, or test suite the project ships, **you must run it — "looked at the code" is not a substitute**.
    - **Discovery path:** `.github/workflows` → `Makefile` → `package.json` scripts → `pyproject.toml` → `tox.ini` → `.pre-commit-config.yaml`. See [references.md](references.md) for the full ordering.
@@ -171,11 +154,8 @@ The bad form is unusable: no file:line, no confidence, no scope, no evidence, no
 | Applying one lens only | All five — cross-cutting issues hide between lenses |
 | Lens-grouped output | Two sections (System / Code), each severity-ordered |
 | Inflating severity | Reserve Critical for real blast radius |
+| **Deflating severity to avoid rework** | Critical stays Critical even when the fix is expensive — that's why it's Critical |
 | Reporting non-findings | Skip "profiling wasn't done" — focus on what the code reveals |
-| Skipping the linter/test suite when configured | Step 9 is mandatory; "looked at the code" is never a substitute |
-| Skipping `style-checker` because a linter is configured | Run both — linter wins only where rules conflict |
-| Changing a signature without checking callers | Step 2 sweeps every caller against the new contract |
-| Accepting a new helper without checking for equivalents | Step 3 — `find_symbol`/`grep` before treating it as additive |
 | Treating convention drift as a style nit | Convention drift is Medium, not Low |
 | Findings without file:line / evidence / specialist | Use the schema; ship the bad-finding form and the audit is wasted |
 | Honoring an undocumented `nolint` | Suppression without a stated reason stays at original severity |

@@ -18,7 +18,7 @@ focused instructions for a specific domain.
 | [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, security, and style. Produces a prioritized findings report — a deep review, not a gate decision. |
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
-| [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules) and implementation plans. Queryable on its own; consulted by `brainstorm` and `analyze-code` when a `kb_path` is configured. |
+| [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules) and implementation plans. Queryable on its own; consulted by `brainstorm`, `using-software-specialists`, and `analyze-code` when a `kb_path` is configured. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
 | [test-driven-development](test-driven-development/) | Enforces the Red→Green→Refactor cycle before any production code is written. Covers the full TDD workflow: writing a failing test first, minimal implementation, and safe refactoring with a green suite. |
 | [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
@@ -89,9 +89,11 @@ the project has no configured linter.
 
 `/knowledge-base` sits underneath the loop as a shared substrate when
 `kb_path` is configured in CLAUDE.md: `brainstorm` reads the wiki for
-system context and writes the approved plan into it; `analyze-code` reads it
-during Frame and surfaces wiki↔code disagreements as findings. The user
-invokes `/knowledge-base` directly to query, ingest, update, or lint.
+system context and writes the approved plan into it; `using-software-specialists`
+loads it during Implementation to read the matching plan and the repo's
+`Helpers` / `Patterns`; `analyze-code` reads it during Frame and surfaces
+wiki↔code disagreements as findings. The user invokes `/knowledge-base`
+directly to query, ingest, update, or lint.
 
 ```
             ┌─────────────┐

@@ -5,13 +5,6 @@ description: Use when an approved spec, design, or PRD needs to become a stepwis
 
 # Project Planner
 
-## Triggers
-- Approved spec or design needs to be turned into an execution plan
-- Multi-step implementation work requiring ordering and dependencies
-- Work spanning multiple components, services, or teams
-- Need for checkpoints, milestones, or phased delivery
-- Handoff from brainstorming or requirements to implementation
-
 **Skip when:** the work is a single obvious step, or the spec is still vague — send missing requirements back to requirements-analyst first.
 
 ## Behavioral Mindset

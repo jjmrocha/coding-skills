@@ -1,6 +1,6 @@
 ---
 name: knowledge-base
-description: Use when reading from or writing to a configured knowledge base (KB / wiki) — looking up system surfaces (entities, tables, REST endpoints, Kafka events, cron jobs, external dependencies, business rules), reusable helpers, canonical patterns (conventions / recipes / templates), or implementation plans by ticket/branch; ingesting docs; updating the KB after a code change touched a tracked surface; before brainstorming, analyzing code, or producing code in a project with a configured kb_path; or auditing the KB for staleness.
+description: Use when reading or writing a configured KB (wiki / plans) — system surfaces, helpers, patterns, plans — or ingesting docs, updating after code changes, or auditing for staleness. Requires kb_path in CLAUDE.md.
 ---
 
 # Knowledge Base
@@ -12,9 +12,9 @@ A user-curated, agent-maintained KB. Two top-level buckets:
 
 ## Core Principles (load-bearing)
 
-1. **Code is truth. Wiki is a finding aid.** Every wiki claim that ends up in your reply must be backed by code you read **this turn** — not by the wiki page alone. No *"quick lookup"* exemption; no *"the wiki is recent enough"* exemption. `last_updated` records when the wiki was edited, not when the code was.
-2. **Writes are autonomous; deletes require approval** — with one exception (see [Delete protocol](#delete-protocol)). Wrong writes self-correct when the next reader follows the pointer to code; deletes are invisible to future readers.
-3. **Multi-file sources must be read in full.** No sampling, no "the README covers it." Skipping files = missing surfaces.
+1. **Code is truth; wiki is a finding aid.** Every wiki claim in your reply must be backed by code you read this turn. No "quick lookup" exemption.
+2. **Writes autonomous; deletes require approval** (one exception — see [Delete protocol](#delete-protocol)). Wrong writes self-correct on the next read; deletes don't.
+3. **Multi-file sources read in full.** No sampling.
 
 ## When NOT to Use
 
@@ -151,31 +151,19 @@ YAML frontmatter (`summary`, `sources` ≥1 entry, `last_updated: YYYY-MM-DD`, `
 
 ## Integration with Other Skills
 
-When `kb_path` is configured, `brainstorm`, `analyze-code`, and `using-software-specialists` consult the KB. They read the repo's `wiki/<repo>/index.md` — including the `Helpers` and `Patterns` sections — before producing code, then drill into specific pages on demand. `using-software-specialists` Phase B autonomously updates `helpers/<category>.md` when a new function meets the inclusion bar. Pattern *creation* is Ingest-only. Full integration matrix: [references/integrations.md](references/integrations.md).
+When `kb_path` is configured, `brainstorm`, `analyze-code`, and `using-software-specialists` load this skill and read the repo's `wiki/<repo>/index.md` (including `Helpers` and `Patterns`) plus the matching `plans/<branch-or-ticket>.md` before producing code or findings. They are **read-only consumers**. Helper and pattern *creation* happens only through Ingest (explicit user request) or Update (after a code change you just made). Full integration matrix: [references/integrations.md](references/integrations.md).
 
 ## Wiki ↔ Code Disagreements
 
-| Failure mode | Action |
-|---|---|
-| Wiki claims something code doesn't reflect | **Surface as a finding.** Often signals a bug, not just stale docs. Answer from code; flag the page. |
-| Wiki silent on a real thing | Lint flags it; suggest `/knowledge-base update`. |
-| Reinvents an existing helper | Finding. Suggest replacing with the documented helper. |
-| Violates a documented `patterns/` convention | Finding. Surface convention + divergence; user decides. |
+Any divergence — silent claim, reinvented helper, violated `patterns/` convention — is a **finding**, not a silent reconciliation. Answer from code, flag the page, suggest `/knowledge-base update`. Severity routing for `analyze-code` consumers: [references/integrations.md](references/integrations.md).
 
 ## Common Mistakes
 
 | Mistake | Fix |
 |---|---|
-| Inventing a `kb_path` default | Refuse; ask user to set it in CLAUDE.md. |
-| Answering a *"quick lookup"* from the wiki without opening cited code | No exemption. Read `sources:` files before replying. |
-| Citing only the wiki in your reply | Cite both: code file read this turn + wiki page that pointed you there. |
-| Ingesting from a multi-file source by reading only a sample | Enumerate, then read every file. Coverage line (`Ingested M/M`) is mandatory. |
-| Listing only the first contributing file under `sources:` | List **every** file that contributed. |
-| Auto-deleting a page because user said *"delete"* | Only `safe-to-delete` verdict is autonomous. Merges, restructures, "obsolete" reasons need approval. |
-| Auto-deleting when sources were renamed | Renames → update path, not delete. |
-| Auto-deleting a plan page | Plans are never auto-deleted. |
-| Inline `(source: ...)` in page body instead of `sources:` frontmatter | Provenance belongs in frontmatter so lint can audit it. |
-| Unquoted YAML string with `:`, `#`, leading `&`/`*`/`!`/`>` etc. | Quote it: `summary: "..."`. Also quote bareword values that look like booleans (`yes`, `no`) or numbers — YAML coerces them silently. |
-| Asking for diff approval before every write | Write directly; summarize after. Approval theater rubber-stamps at scale. |
+| Inventing a `kb_path` default | Refuse; ask user to set it in CLAUDE.md |
+| Citing only the wiki in your reply | Cite both: code file read this turn + wiki page that pointed you there |
+| Listing only the first contributing file under `sources:` | List **every** file that contributed |
+| Inline `(source: ...)` in page body instead of `sources:` frontmatter | Provenance belongs in frontmatter so lint can audit it |
 
-More edge cases and the full YAML-pitfalls writeup: [references/common-pitfalls.md](references/common-pitfalls.md).
+YAML quoting, "quick lookup" temptation, multi-file ingest coverage, delete-protocol bypasses, approval theater, and other edge cases: [references/common-pitfalls.md](references/common-pitfalls.md).

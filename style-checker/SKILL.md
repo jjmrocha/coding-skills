@@ -11,6 +11,8 @@ Reviews code against Google's official style guidelines for **formatting and nam
 
 ## Workflow
 
+**When invoked from `analyze-code`:** return a flat findings list (severity + file:line + rule). Skip the full report template in Step 4 — the outer audit owns the report shape.
+
 ### Step 1: Identify languages and load references
 
 Scan the repo (or the path the user provided) and, for each supported language present, load its reference file **before** scanning code.

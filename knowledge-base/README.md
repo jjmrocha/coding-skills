@@ -5,8 +5,9 @@ base (KB). The KB holds two kinds of content: a **wiki** of per-repo system
 surfaces (entities, interfaces, jobs, dependencies, events, business rules)
 plus internal-knowledge subfolders (`helpers/`, `patterns/`), and **plans**
 for implementation work (often spanning repos). Queryable on
-its own; consulted by `brainstorm` and `analyze-code` when a `kb_path` is
-configured. Inspired by Andrej Karpathy's LLM Wiki pattern.
+its own; consulted by `brainstorm`, `using-software-specialists`, and
+`analyze-code` when a `kb_path` is configured. Inspired by Andrej Karpathy's
+LLM Wiki pattern.
 
 **The wiki is a finding aid, not a source of truth.** Pages exist to point
 an agent at the code that implements a surface and to carry the *why*

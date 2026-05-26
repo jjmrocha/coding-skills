@@ -1,13 +1,21 @@
 ---
 name: using-software-specialists
-description: Use when starting any software task — designing APIs/schemas/architecture, implementing features or endpoints, fixing bugs, refactoring, planning migrations or deployments, hardening security/auth/secrets, troubleshooting incidents or regressions, optimizing performance, writing tests, or breaking an approved spec into a stepwise plan — before writing code, diagnosing a problem, or proposing a fix
+description: Use when starting any non-trivial software task — feature, bugfix, refactor, migration, security/auth work, performance work, or turning a spec into a plan — before writing code, diagnosing, or proposing a fix.
 ---
 
 # Using Software Specialists
 
-**Core principle:** Every software task touches multiple domains. A single generalist perspective misses vulnerabilities, accessibility gaps, and quality failures that specialist thinking catches. Each specialist asks a question the others don't — skipping one means that question never gets asked.
+**Core principle:** Every software task touches multiple domains. Each specialist asks a question the others don't — skipping one means that question never gets asked.
 
-**Skip when:** trivial change that touches no auth, security, payment, schema, or public API surface — *and* you've checked, not just assumed. Or you already applied the relevant specialist this session. A one-line null-check in `processPayment()` is not a skip; a one-line margin tweak on a static label probably is.
+**If the conversation was compacted, re-invoke this skill before continuing.**
+
+## When NOT to Use
+
+| Don't load when... | Instead... |
+|---|---|
+| Pure copy/paste, rename, typo, comment-only change | Just do it |
+| Single-line edit you already verified touches no auth, payment, schema, or public API | Just do it |
+| The relevant specialist was already applied this session for the same surface | Reuse the prior framing |
 
 ## How Specialists Work Together
 
@@ -21,15 +29,9 @@ REQUIREMENTS → DESIGN → PLAN → IMPLEMENTATION → TESTING → VALIDATION �
 
 Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
 
-**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan-phase done-criteria in the table below. Surface any gaps to the user *before* entering Implementation. Do not start coding against an incomplete plan.
+**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan row's done-criteria below. Stop and surface gaps if **any** of these are missing: testable acceptance criteria, explicit scope exclusions, listed NFRs, decomposed steps with dependencies, riskiest work first, verification per step. Do not start coding against an incomplete plan.
 
-**Before writing any code in the Implementation phase:**
-
-- Load `test-driven-development` and `coding-discipline`.
-- If `kb_path` is configured in CLAUDE.md, load `knowledge-base` and:
-  - read the matching plan at `<kb_path>/plans/<current-branch>.md` if one exists;
-  - read the current repo's `<kb_path>/wiki/<repo>/index.md` — especially the `Helpers` and `Patterns` sections;
-  - drill into specific pages when the task requires.
+**Implementation:** load `coding-discipline` and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
 
 Move to the next phase only when the current one's output is complete:
 
@@ -73,58 +75,7 @@ Forward lookup by task domain. "Start with" = lead mindset. "Then add" = complem
 
 ## The Question Each Specialist Asks
 
-When two specialists could both fire, this disambiguates. Each asks a question no one else does — that's their unique value.
-
-| Specialist | The question only they ask |
-|-----------|--------------------------|
-| [Requirements Analyst](references/requirements-analyst.md) | "What are we assuming, and what are we explicitly NOT building?" |
-| [Project Planner](references/project-planner.md) | "What's the minimal decomposition where each step is independently verifiable, and is the riskiest work scheduled first?" |
-| [Deep Research Agent](references/deep-research-agent.md) | "Is this source reliable, and do we have enough evidence to act?" |
-| [System Architect](references/system-architect.md) | "What is the simplest architecture that works, and what fails when each component goes down?" |
-| [Backend Engineer](references/backend-engineer.md) | "What if this request is duplicated? What fails when retried?" |
-| [Database Designer](references/database-designer.md) | "What queries will this serve, and what happens at 100M rows?" |
-| [Frontend Engineer](references/frontend-engineer.md) | "What does the user see when this fails? Where does this state live?" |
-| [Tester](references/tester.md) | "What are all the edge cases, and does each test name explain the bug if it fails?" |
-| [Quality Engineer](references/quality-engineer.md) | "Are we testing at the right level? Is this design even testable?" |
-| [DevOps Engineer](references/devops-engineer.md) | "What's the blast radius if this deploy fails, and how fast can we roll back?" |
-| [Security Engineer](references/security-engineer.md) | "What's the insecure default here, and how do we make the safe path the easy path?" |
-| [Refactoring Expert](references/refactoring-expert.md) | "Do we have tests first, and when do we stop?" |
-| [Troubleshooter](references/troubleshooter.md) | "What changed between when it worked and when it broke?" |
-| [Performance Engineer](references/performance-engineer.md) | "Where is time actually spent, and what does the production workload actually look like?" |
-| [Technical Writer](references/technical-writer.md) | "Who will maintain this, and what should we delete first?" |
-| [Prompt Engineer](references/prompt-engineer.md) | "Do we have an eval set, and does this prompt work across models?" |
-| [ML Engineer](references/ml-engineer.md) | "What's the baseline, and what does the held-out test set say about whether this model is actually better?" |
-
-## Symptom → Specialist (Reverse Lookup)
-
-When you don't know which domain you're in but can describe what you're *seeing*, scan this first.
-
-| If you're seeing / hearing... | Start here |
-|------------------------------|-----------|
-| "It worked yesterday", regression, sudden break, mystery error | Troubleshooter |
-| Slow, latency spike, p99 climbing, OOM, CPU pegged, missed SLO | Performance Engineer |
-| Slow page load, bad LCP/CLS/INP, large bundle, jank | Frontend Engineer + Performance Engineer |
-| Slow query, lock contention, table scan, N+1 | Database Designer + Performance Engineer |
-| Flaky test, test passes locally fails in CI, intermittent | Quality Engineer |
-| "Add a test for this function" | Tester |
-| Untestable design, can't isolate, too many mocks needed | Quality Engineer (push back on design) |
-| Auth, login, token, session, cookie, CORS, CSRF, OAuth, JWT | Security Engineer |
-| PII, GDPR, SOC2, encryption-at-rest/in-transit, audit log | Security Engineer |
-| "Can someone retry this safely?", duplicate request, webhook idempotency | Backend Engineer |
-| Schema change, migration, ALTER TABLE, index, foreign key | Database Designer |
-| CI failing, slow build, deploy stuck, rollback needed | DevOps Engineer (or Troubleshooter if "what changed?") |
-| Pipeline secrets, supply chain, signed artifacts, SBOM | DevOps Engineer + Security Engineer |
-| "Component boundaries", "monolith vs services", failure modes | System Architect |
-| Prompt injection, jailbreak, LLM output rendered as code or used in downstream decisions; cross-tenant context bleed (AI response contains another user's data) | Security Engineer + Prompt Engineer |
-| Multi-model LLM fallback, swapping providers (Claude → GPT-4 → Gemini), prompt compatibility across model families | Prompt Engineer + System Architect |
-| Model bias, fairness audit, demographic disparate impact, regulated-decision ML compliance (FCRA, EU AI Act) | ML Engineer + Security Engineer |
-| Big-bang rewrite tempting, legacy code needs replacing without downtime | Refactoring Expert (strangler-fig) |
-| a11y, keyboard navigation, screen reader, WCAG | Frontend Engineer |
-| Page renders blank or broken layout for specific locale, RTL language, or non-English browser setting | Frontend Engineer |
-| Search, text processing, or UI doesn't support non-Latin script, CJK, or a new locale (i18n expansion) | Frontend Engineer + Backend Engineer (+ Database Designer if full-text indexing) |
-| Build times, CI cost, or test suite runtime scaling non-linearly with team size, service count, or repo growth | DevOps Engineer + Performance Engineer |
-
-If two rows fire, load both — they ask different questions.
+When two specialists could both fire, each asks a unique disambiguating question — see [references/specialist-questions.md](references/specialist-questions.md). Load it before invoking a specialist whose role you're unsure of.
 
 ### Tester vs Quality Engineer
 
@@ -149,19 +100,13 @@ Before marking any task complete, answer each item that applies. Security and QA
 
 ## Anti-Patterns
 
-If you catch yourself thinking any of these, stop and reload the right specialist.
+Routing rationalizations only — process discipline lives in `coding-discipline`.
 
 | If you think... | Reality |
 |---|---|
-| "Load all specialists up front" / "I'll load the specialist after writing the code" | Load per phase, before the first line — retrofitting is harder |
-| "I don't need `coding-discipline`, I know what I'm doing" | Silent assumptions, scope creep, and hallucination happen on familiar code too — load before composing any diff |
 | "The 'Start with' specialist is enough" / "The validate step is optional" | "Then add" and "Before done" columns are non-negotiable gates |
 | "Tester and Quality Engineer are the same" | Tester writes good tests; QE validates the testing *strategy* |
-| "I'll add validation later" / "It's internal, no security concerns" | Security belongs in design, not after. Internal APIs have auth gaps, injection, and trust-boundary risks. |
-| "I'm already handling basic security (prepared statements, validation)" | Basic hygiene ≠ Security Engineer gate. Authz checks, rate limiting, and data exposure require systematic review — not a mental note. |
-| "Tests can be written after" / "Happy path tests are enough" | Load Tester during implementation; tests-after answer the wrong question, and edge case enumeration is the whole point |
-| "I know the fix, I'll just apply it" | Load Troubleshooter — diagnose root cause before patching symptoms |
-| "Too small to need architecture review" / "I'll deploy manually this once" | Small tasks ignoring boundaries create coupling debt; one-offs become the process |
-| "Existing tests still pass after the auth refactor, ship it" | Auth bugs don't fail tests — they create bypass paths your tests weren't written to catch. Test coverage ≠ security coverage. Auth refactors always require Security Engineer review regardless of test results. |
+| "I'll add validation later" / "It's internal, no security concerns" | Security belongs in design. Internal APIs have auth gaps, injection, and trust-boundary risks. |
+| "Existing tests still pass after the auth refactor, ship it" | Auth bugs don't fail tests — they create bypass paths your tests weren't written to catch. Auth refactors always require Security Engineer review regardless of test results. |
 
-**Cross-specialist handoff:** When a specialist spots an issue outside their domain, flag it explicitly for the relevant specialist (e.g., a backend engineer who spots suspicious auth patterns flags it for the security engineer). Don't silently ignore cross-domain concerns.
+**Cross-specialist handoff:** When a specialist spots an issue outside their domain, flag it explicitly for the relevant specialist. Don't silently ignore cross-domain concerns.
