@@ -19,6 +19,7 @@ focused instructions for a specific domain.
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
 | [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules) and implementation plans. Queryable on its own; consulted by `brainstorm`, `using-software-specialists`, and `analyze-code` when a `kb_path` is configured. |
+| [research](research/) | Front door for answer-seeking work — when you have a question, not a goal. Answers questions about *your own codebase* (endpoints, event payloads, "what happens when X?", "how do I run X?") via serena + the KB, and about the *wider world* (best practice, library choice, fact-checking) via official docs + web. Brings a sourced, cited answer instead of interrogating you; effort scales from a one-line lookup to a full traced investigation. The inverse of `brainstorm`. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
 | [test-driven-development](test-driven-development/) | Enforces the Red→Green→Refactor cycle before any production code is written. Covers the full TDD workflow: writing a failing test first, minimal implementation, and safe refactoring with a green suite. |
 | [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
@@ -29,7 +30,7 @@ focused instructions for a specific domain.
 Copy the skill directories you want into your Claude Code skills folder:
 
 ```bash
-cp -r analyze-code brainstorm coding-discipline knowledge-base style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
+cp -r analyze-code brainstorm coding-discipline knowledge-base research style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
 ```
 
 Skills are then available as slash commands in any Claude Code session:
@@ -39,6 +40,7 @@ Skills are then available as slash commands in any Claude Code session:
 /brainstorm
 /coding-discipline
 /knowledge-base
+/research
 /style-checker
 /test-driven-development
 /using-software-specialists
@@ -51,6 +53,7 @@ Invoke a skill by typing its slash command, optionally followed by a
 description of your task:
 
 ```
+/research what's the current best practice for idempotency keys in payment APIs?
 /brainstorm I want to build a rate limiter for our API
 /style-checker review the auth module
 /using-software-specialists add OAuth support to the backend
@@ -63,6 +66,17 @@ examples.
 
 A typical feature-development loop using these skills:
 
+0. **Research (whenever you have questions, not a goal)** — `/research`
+   brings a sourced, cited answer instead of asking you questions you can't yet
+   answer. It serves two roles: a standalone way to answer questions about your
+   *own codebase* ("do we have an endpoint for X?", "what's the payload of
+   event X?", "what happens when X?") via serena + the KB, and the *feature-loop
+   front door* for external questions ("what's the best-practice approach for
+   X?", comparing libraries) before `brainstorm`. Effort scales — a one-line
+   lookup stays ceremony-free; a deep trace or library evaluation gets confidence
+   levels and named gaps. It's the inverse of `brainstorm`: you ask, it answers.
+   Its findings make brainstorm's intent questions answerable; for an
+   already-clear path it can hand straight to `using-software-specialists`.
 1. **Define** — `/brainstorm` scopes the change and produces an approved plan.
    For cross-repo work, save the plan to a path outside the repo
    (e.g., `~/plans/YYYY-MM-DD-<topic>.md`) so all repos can reference it.
@@ -96,6 +110,11 @@ wiki↔code disagreements as findings. The user invokes `/knowledge-base`
 directly to query, ingest, update, or lint.
 
 ```
+            ┌──────────┐
+            │ research │ ◄─── "what's true / what's possible?"
+            └────┬─────┘
+                 │ sourced findings  (or straight to specialists)
+                 ▼
             ┌─────────────┐
             │  brainstorm │ ◄─── plan needs changes
             └──────┬──────┘
