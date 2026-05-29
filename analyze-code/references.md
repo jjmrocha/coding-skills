@@ -1,10 +1,10 @@
 # analyze-code — references
 
-Heavy reference material for the `analyze-code` skill. Load on demand from Step 9 or when a finding needs the detail.
+Heavy reference material for the `analyze-code` skill. Load on demand from Step 5 or when a finding needs the detail.
 
 ## Tooling discovery paths
 
-When Step 9 runs, search for the project's authoritative command list in this order. First match wins, but check all sources if rules conflict:
+When Step 5 runs, search for the project's authoritative command list in this order. First match wins, but check all sources if rules conflict:
 
 1. `.github/workflows/*.yml`, `.gitlab-ci.yml`, `.circleci/config.yml`, `buildkite/pipeline.yml` — CI workflows
 2. `Makefile`, `justfile`, `Taskfile.yml` — task runners
@@ -30,7 +30,7 @@ Trigger these when the listed file type appears in scope. Run each that is insta
 | Any text file | `gitleaks` (secret scan), `semgrep` (custom rule sets) |
 | Any source file | the project's language linter (delegated to `style-checker`) |
 
-If a project ships relevant files but none of these scanners is configured or installed, the absence is itself a Medium finding (Step 9 "no tooling configured" rule).
+If a project ships relevant files but none of these scanners is configured or installed, the absence is itself a Medium finding (Step 5 "no tooling configured" rule).
 
 ## Skip-path patterns
 
@@ -41,7 +41,7 @@ Exclude these from per-file analysis. File **presence** and version pinning rema
 - Generated code: `*.pb.go`, `*_pb2.py`, `*_pb2_grpc.py`, `*_generated.*`, `*.gen.go`, `*.g.dart`
 - Migrations: Alembic `migrations/versions/`, Django `*/migrations/`, Rails `db/migrate/`, Flyway `db/migration/`
 - Minified bundles: `*.min.js`, `*.min.css`
-- Lockfile **contents** (the file's existence is still a Step 9 signal)
+- Lockfile **contents** (the file's existence is still a Step 5 signal)
 
 A finding inside a skipped path is only valid if the user explicitly asked for the path to be analyzed.
 

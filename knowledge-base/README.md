@@ -99,7 +99,8 @@ colliding with repo names.
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Core skill — operating modes, page format, trust model, integration with other skills |
+| [SKILL.md](SKILL.md) | Core skill — operating modes, Query workflow, page format, trust model, integration with other skills |
+| [references/operator-workflows.md](references/operator-workflows.md) | Ingest, Update, Lint, and Delete protocols + the write lock — loaded only on write modes |
 | [references/page-template.md](references/page-template.md) | Page format and per-subfolder body shape |
 | [references/index-templates.md](references/index-templates.md) | Templates for the three special files (`wiki/index.md`, `wiki/<repo>/index.md`, `plans/index.md`) |
 | [references/helpers-and-patterns.md](references/helpers-and-patterns.md) | Inclusion bar for `helpers/` and creation channel for `patterns/` |

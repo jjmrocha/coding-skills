@@ -13,7 +13,7 @@ A user-curated, agent-maintained KB. Two top-level buckets:
 ## Core Principles (load-bearing)
 
 1. **Code is truth; wiki is a finding aid.** Every wiki claim in your reply must be backed by code you read this turn. No "quick lookup" exemption.
-2. **Writes autonomous; deletes require approval** (one exception — see [Delete protocol](#delete-protocol)). Wrong writes self-correct on the next read; deletes don't.
+2. **Writes autonomous; deletes require approval** (one exception — see [Delete protocol](references/operator-workflows.md#delete-protocol)). Wrong writes self-correct on the next read; deletes don't.
 3. **Multi-file sources read in full.** No sampling.
 
 ## When NOT to Use
@@ -55,17 +55,7 @@ Mode is determined by the user's verb.
 | **Update** | *"update the wiki with what we just changed"* | Write directly; summarize. Deletes → protocol. |
 | **Lint** | *"audit the KB"*, *"check for stale pages"* | Flag-only **except** auto-delete of non-plan pages with all-dead in-tree sources. |
 
-### Write lock (Ingest, Update, autonomous Delete)
-
-Multi-file writes aren't atomic. Take the advisory lock before writing; release after summary:
-
-```bash
-uv run scripts/kb-lock.py acquire <kb_path>   # exit 1 if blocked
-# ... writes ...
-uv run scripts/kb-lock.py release <kb_path>
-```
-
-If `acquire` exits non-zero, **stop**, surface the holder's PID and acquired-at to the user, don't write. Stale locks (>1h) reclaim automatically.
+**Write modes load their protocols on demand.** Query is read-only and detailed inline below. The full Ingest, Update, Lint, and Delete protocols — including the advisory write lock, ingest coverage rules, the seven lint checks, and the delete-verdict table — live in [references/operator-workflows.md](references/operator-workflows.md). Load that file the moment the user's verb is a write; don't write from memory.
 
 ### Query workflow
 
@@ -76,72 +66,6 @@ If `acquire` exits non-zero, **stop**, surface the holder's PID and acquired-at 
 5. **Cite both** in your reply: the code file you read this turn AND the wiki page that pointed you there.
 6. If code disagrees with wiki — even minor — **surface the disagreement explicitly**, give the code's answer as truth, flag the page for update. Never silently prefer one side.
 7. If neither has the answer, say so. Offer to add it once clarified.
-
-### Ingest workflow
-
-Acquire the write lock; release on summary success.
-
-1. **Enumerate the full source set, then read every file.** If the source resolves to more than one file, list every file first (`git ls-files`, `find <dir> -type f`, archive listing). Then read each. **No sampling.** The only allowed exclusions are files the user explicitly named out-of-scope, or boilerplate with no system surface (lockfiles, generated code, vendored deps, binary assets) — and you must announce any exclusion in the summary.
-2. Identify the destination: which repo, which subfolder under `wiki/<repo>/`, or `plans/`. Ask only when the source is genuinely ambiguous; for clean sources, pick the best fit and surface the choice in the summary.
-3. For each page: create or update; add `[[wiki-links]]`; set `sources:` (listing **every** contributing file) and `last_updated:`.
-4. Update the affected `wiki/<repo>/index.md` and the top-level `wiki/index.md` if a new repo or top-level page was added.
-5. **Summary is mandatory and leads with a coverage line:**
-   ```
-   Ingested 17/17 files from docs/architecture/ (0 excluded).
-   Wrote:
-     + wiki/order-svc/dependencies/sendgrid.md   email provider
-     + wiki/order-svc/events/order-created.md    schema, producers, consumers
-     ~ wiki/order-svc/index.md                   linked new pages
-   ```
-   Excluded files get a line each with the reason. **Coverage rule:** if read-count ≠ in-scope-count, you ingested partially — go back to step 1. Reporting "Wrote N pages" without "Ingested M/M files" is incomplete and forbidden.
-
-### Update workflow
-
-Acquire the write lock; release on summary success.
-
-1. Identify pages affected by the change.
-2. Write directly. Add `[[wiki-links]]`; set `last_updated:`.
-3. Update the repo's `wiki/<repo>/index.md` and `wiki/index.md` as needed.
-4. Summarize: one line per page, scannable (`+ new`, `~ updated`).
-5. Deletes → [Delete protocol](#delete-protocol).
-
-### Lint workflow
-
-```bash
-uv run scripts/lint.py <kb_path> --json
-```
-
-**Don't load pages into context to run lint manually** — the script keeps bodies out. Read the structured report. The seven checks:
-
-1. **Broken `sources:` paths** — script flags renames vs dead files separately; doesn't auto-fix paths.
-2. **Aging pages** — `last_updated` >90 days. Flag as *"needs review"*, not *"stale"*.
-3. **Orphan pages** — no inbound `[[wiki-link]]`.
-4. **Concept-gap candidates** — regex heuristic; triage by reading.
-5. **`[needs source]` markers** — unsourced claims.
-6. **All-dead in-tree sources** — non-plan pages with every `sources:` path truly dead (no rename) are **auto-delete candidates** per the [Delete protocol](#delete-protocol). Plans are flagged, never deleted. Renamed → not eligible (update path instead).
-7. **Pattern `kind:` validity** — pages under `patterns/` must declare `kind:` set to `convention | recipe | template`.
-
-Surface 1, 2, 3, 5, 7 to the user; triage 4 by reading; for 6 candidates, verify each with `check-sources.py` before deleting.
-
-### Delete protocol
-
-```bash
-uv run scripts/check-sources.py <page-path>
-```
-
-| Verdict | Action |
-|---|---|
-| `safe-to-delete` | All in-tree sources dead, no externals, not a plan, current repo matches page repo. **Delete autonomously.** |
-| `partial` | Drop dead/renamed entries from `sources:`; flag for review. Don't delete. |
-| `flag (renames)` | Update source paths. Don't delete. |
-| `flag (external / cross-repo / plan / no-sources)` | Surface to user. Don't delete. |
-| `all-alive` | Nothing to do. |
-
-**Autonomous delete = only `safe-to-delete`. Every other delete reason (page obsolete for non-source reasons, merging, restructuring, "user said delete") requires explicit approval.** Before approved deletes, show what's about to be deleted and which inbound `[[wiki-links]]` will break.
-
-Autonomous deletes still take the [write lock](#write-lock-ingest-update-autonomous-delete) around the delete + index updates.
-
-After any delete: remove the entry from the repo's `index.md` and `wiki/index.md`. Include the delete in the post-action summary.
 
 ## Page Format
 

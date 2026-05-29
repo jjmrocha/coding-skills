@@ -50,23 +50,19 @@ Don't inflate severity. Low stays Low. Reserve Critical for real blast radius.
 
 3. **Convention & duplication scan** (new or modified code only) — apply `coding-discipline` Parallel-Solution test: for each new helper, type, or pattern, `find_symbol`/`grep` for an existing equivalent first. Parallel implementation = **High**; convention drift = **Medium**; minor inconsistency = **Low**. Skip on greenfield.
 
-4. **Architecture lens** — map components and coupling; flag failure-mode and boundary smells. Includes runtime resilience (graceful shutdown, signal handling, healthchecks, retry/backoff) and cross-service consistency for surfaces discovered in Step 1.
+4. **Apply the five lenses** — Architecture, Quality, Performance, Security, Style, each covering its row in the Five Lenses table above against the scoped code. Directives beyond the table:
+   - **Architecture:** also check cross-service consistency for surfaces discovered in Step 1.
+   - **Performance:** report what the code reveals; don't flag missing profiling as a defect.
+   - **Security:** hardcoded secrets are Critical; a missing rotation/Vault reference where one is expected is High.
+   - **Style:** load `style-checker` — it owns linter discovery, severity mapping, and conflict-resolution.
 
-5. **Quality lens** — assess complexity, duplication, test-coverage signal. Includes CI/IaC config quality (Dockerfile, Makefile, GH Actions readability and structure) and 12-factor configuration discipline.
-
-6. **Performance lens** — hot paths, algorithmic complexity, N+1, unnecessary allocations. Report what the code reveals; don't flag missing profiling as a defect.
-
-7. **Security lens** — input trust, auth, secrets. Includes supply-chain (lockfile presence/drift, pinned base images, abandoned deps) and license/SBOM hygiene. Hardcoded secrets are Critical; missing rotation/Vault reference where one is expected is High.
-
-8. **Style lens** — load `style-checker`. It owns linter discovery, severity mapping, and conflict-resolution rules.
-
-9. **Run configured tooling** — for every linter, formatter, scanner, or test suite the project ships, **you must run it — "looked at the code" is not a substitute**.
+5. **Run configured tooling** — for every linter, formatter, scanner, or test suite the project ships, **you must run it — "looked at the code" is not a substitute**.
    - **Discovery path:** `.github/workflows` → `Makefile` → `package.json` scripts → `pyproject.toml` → `tox.ini` → `.pre-commit-config.yaml`. See [references.md](references.md) for the full ordering.
    - **Per file-type scanners:** Dockerfile → `hadolint` + `trivy`; `*.tf` → `tfsec` + `checkov`; lockfiles → `osv-scanner` / `npm audit` / `govulncheck`; any → `gitleaks`. Full matrix in [references.md](references.md).
    - Fold tool failures into findings at their natural severity (failing security test → Critical; lint nit → Low). Tooling configured but currently red is itself a finding. **Tooling configured but not invoked by CI is a Medium "CI hygiene" finding.** No tooling configured at all where relevant files exist is the same severity.
    - **Test suite execution:** report pass/fail counts, skipped-test list, and **new failures vs. the base SHA**. Flakiness analysis and perf timing are out of scope (use the `verify` skill).
 
-10. **Synthesize & deliver** — group, dedupe, rank by severity. Tag each finding `scope: system` or `scope: code`. Output two severity-ordered lists: **System-level findings** then **Code-level findings**. Cap Low at 10 per lens and Medium at 15 per lens; if hit, emit a meta-finding noting the truncation. Critical/High are uncapped.
+6. **Synthesize & deliver** — group, dedupe, rank by severity. Tag each finding `scope: system` or `scope: code`. Output two severity-ordered lists: **System-level findings** then **Code-level findings**. Cap Low at 10 per lens and Medium at 15 per lens; if hit, emit a meta-finding noting the truncation. Critical/High are uncapped.
 
 ## False-Positive Markers
 
