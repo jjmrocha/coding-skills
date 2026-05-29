@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git log *)",
+      "Bash(ls -la /Users/jrocha/SOURCES/AI/ai-recipes/skills/ 2>/dev/null; echo \"---grep README---\"; grep -n \"writing\\\\|skill-tester\\\\|create\" /Users/jrocha/SOURCES/AI/skills/README.md | head)",
+      "Read(//Users/jrocha/SOURCES/AI/ai-recipes/skills/**)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('/Users/jrocha/.claude/settings.json'\\)\\); print\\('enabledPlugins:', d.get\\('enabledPlugins'\\)\\); print\\('keys:', list\\(d.keys\\(\\)\\)\\)\")",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "mcp__serena__find_symbol",
+      "mcp__serena__activate_project"
+    ],
+    "additionalDirectories": [
+      "/Users/jrocha/.claude"
+    ]
+  }
+}

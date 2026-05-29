@@ -1,51 +1,38 @@
 # research
 
-A front-door skill for **answer-seeking** work: you have a question and need a
-sourced, cited answer — not a conversation that asks *you* questions.
+A skill for **answering questions about your own system** — you have a question
+and need a sourced, cited answer, not a conversation that asks *you* questions.
 
-It covers two flavours of question, picking the source by where the truth lives:
+It answers questions about:
 
-- **About your own system** (the common case) — "do we have an endpoint for X?",
-  "what's the payload of event X?", "what happens when X?", "how do I run X?".
-  Answered from the **code** (via serena) and the **KB**, which are
-  authoritative for internal questions.
-- **About the wider world** — "what's the best-practice approach for X?",
-  comparing libraries, fact-checking a claim. Answered from **official docs**
-  (context7) and **web search**.
+- **The code** — "do we have an endpoint for X?", "what's the payload of event
+  X?", "what happens when X?". Read with **serena**'s symbol tools
+  (`get_symbols_overview` → `find_symbol` → `find_referencing_symbols`) so the
+  agent loads only the relevant symbol and cites it — never answering from
+  memory, and reading far fewer tokens than opening whole files.
+- **What we've documented** — system surfaces, patterns, decisions, plans, how
+  we run things. Read from the **KB** (`knowledge-base`), then validated against
+  the code.
+
+**Code is ground truth.** When the KB and the code disagree, the code wins —
+report the drift and fix the KB.
 
 Effort scales to the question: a one-line lookup gets a direct cited answer with
-no ceremony; a deep trace or a library evaluation gets explicit confidence
-levels, conflict reporting, and a stopping criterion.
+no ceremony; a deeper trace gets explicit confidence levels, conflict reporting,
+and a stopping criterion set upfront.
 
-## Why it exists
+## What it does NOT do
 
-`brainstorm` and `research` both sit at the fuzzy front-end of a task, but they
-point in opposite directions:
-
-| | brainstorm | research |
-|---|---|---|
-| Who asks the questions | Agent asks **you** | **You** ask the agent |
-| What it resolves | Ambiguity about **intent** (what do you want?) | Ambiguity about **knowledge** (how is this done? what's true?) |
-| You need to supply | Answers / opinions | Just the question |
-| Output | A sharpened spec | Sourced findings + confidence + gaps |
-
-Without a dedicated front door, "I don't know how to do X — find me the right
-approach" requests get misrouted to `brainstorm`, which then interrogates a user
-who explicitly has no answers. This skill is the missing door.
-
-They often **chain**: research first (learn what's possible), then brainstorm
-(decide what *we* want, now that the intent questions are answerable).
-
-## Relationship to using-software-specialists
-
-The *how* of good research (source hierarchy, confidence, conflict reporting,
-stopping criterion) lives in the `deep-research-agent` specialist inside
-[using-software-specialists](../using-software-specialists/). This skill is the
-discoverable, top-level entry point that applies that mindset — reach for it on
-reflex the way you reach for `brainstorm`.
+**External / wider-world research** — best-practice approaches, comparing
+libraries, fact-checking a claim against official docs or the web — is not this
+skill's job. That work belongs to the `deep-research-agent` specialist inside
+[using-software-specialists](../using-software-specialists/), which owns the
+source hierarchy, confidence, and conflict-reporting discipline for outside
+sources. `research` hands those questions off rather than answering them from
+memory.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| [SKILL.md](SKILL.md) | Routing vs. brainstorm, the research method, scoping-question rule, handoff |
+| [SKILL.md](SKILL.md) | Where the answer lives (KB + code), the serena-first method, scoping-question rule, handoff |
