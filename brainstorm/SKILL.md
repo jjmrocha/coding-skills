@@ -37,6 +37,10 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 
 One question per message. Prefer multiple-choice when the options are known. Let each answer shape the next question. Ask "why" when the stated need and the real need might differ.
 
+**Recommend, don't interrogate.** For each question, lead with your recommended answer based on the context you've already gathered. Frame it as *"I'd default to X because Y — does that fit?"* rather than *"What should we do about X?"*. The user reacts; they don't have to generate. Switch to open-ended only when you genuinely have no basis to recommend.
+
+**Check the repo before asking.** If a question can be answered from the codebase, KB, or git history, answer it yourself and state your finding — don't ask the user to recite what's discoverable. Only escalate to a question when the answer isn't in the artifacts you can read.
+
 Progression template:
 - Purpose: *"What problem does this solve?"*
 - Goal: *"Why does this matter right now?"*
