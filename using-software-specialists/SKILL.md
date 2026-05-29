@@ -17,23 +17,11 @@ description: Use when starting any non-trivial software task — feature, bugfix
 | Single-line edit you already verified touches no auth, payment, schema, or public API | Just do it |
 | The relevant specialist was already applied this session for the same surface | Reuse the prior framing |
 
-## How Specialists Work Together
+## Phases
 
-Specialists apply in **phases**, not all at once. Each phase has a different goal:
+**Requirements** (what?) → **Design** (shape?) → **Plan** (order?) → **Implementation** (how?) → **Testing** (works?) → **Validation** (safe?) → **Documentation** (maintains?)
 
-```
-REQUIREMENTS → DESIGN → PLAN → IMPLEMENTATION → TESTING → VALIDATION → DOCUMENTATION
-     ↑           ↑       ↑           ↑              ↑           ↑              ↑
-   what?    what shape?  order?     how?       does it work?  is it safe?  who maintains?
-```
-
-Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
-
-**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan row's done-criteria below. Stop and surface gaps if **any** of these are missing: testable acceptance criteria, explicit scope exclusions, listed NFRs, decomposed steps with dependencies, riskiest work first, verification per step. Do not start coding against an incomplete plan.
-
-**Implementation:** load `coding-discipline` and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
-
-Move to the next phase only when the current one's output is complete:
+Advance only when the current phase's output is complete:
 
 | Phase | Done when... |
 |------|--------------|
@@ -42,8 +30,14 @@ Move to the next phase only when the current one's output is complete:
 | Plan | Tasks decomposed, dependencies explicit, riskiest work first, verification check per step |
 | Implementation | Feature works end-to-end (not just compiles), error/loading/empty states handled, contracts honored |
 | Testing | Edge cases enumerated and covered, no flaky tests, tests pass in CI not just locally |
-| Validation | Security review passed, QE strategy confirmed, "Validate Before Done" checklist answered |
+| Validation | Security review passed, QE strategy confirmed, "Validate Before Done" answered |
 | Documentation | Public APIs/READMEs/runbooks updated, owner assigned, outdated docs deleted |
+
+Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
+
+**Implementation:** load `coding-discipline` and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
+
+**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan row's done-criteria above. Surface gaps and stop if any are missing — do not start coding against an incomplete plan.
 
 ## Task Routing
 
@@ -73,30 +67,26 @@ Forward lookup by task domain. "Start with" = lead mindset. "Then add" = complem
 
 **Minimum rule:** Security Engineer + Quality Engineer must appear in "Before done" for any task that touches APIs, user data, or production code.
 
-## The Question Each Specialist Asks
+## Disambiguating Specialists
 
-When two specialists could both fire, each asks a unique disambiguating question — see [references/specialist-questions.md](references/specialist-questions.md). Load it before invoking a specialist whose role you're unsure of.
+When two specialists could both fire, each asks a unique question — see [references/specialist-questions.md](references/specialist-questions.md). Load it before invoking a specialist whose role you're unsure of.
 
 ### Tester vs Quality Engineer
 
-Complementary, not interchangeable:
+- **Tester** = craftsperson: edge cases, mock boundaries, assertion clarity for *this* code. Writes good tests during implementation.
+- **Quality Engineer** = strategist: right test level, testability of the design, inverted pyramid, flaky-test erosion. Validates the strategy before done.
 
-- **Tester** = craftsperson. Edge cases for *this* function, mock boundaries for *this* module, assertion clarity for *this* test.
-- **Quality Engineer** = strategist. Whether you're testing at the right level, whether the design is testable at all, whether the pyramid is inverted, whether flaky tests are eroding trust.
-
-**Rule:** Tester during implementation to write good tests; QE before done to validate the strategy.
-
-**The "systematic coverage" trap:** Edge case enumeration for a specific function — null inputs, boundary values, invalid types, overflow — IS Tester work, even when it feels systematic. QE handles whether you're testing at the right *level*, not whether you've covered all cases for *this function*. "Write tests for `calculateDiscount()`" → Tester leads.
+**The "systematic coverage" trap:** Edge-case enumeration for a specific function — null inputs, boundaries, invalid types, overflow — IS Tester work even when it feels systematic. QE owns the *level*, not whether you've covered all cases for *this function*. "Write tests for `calculateDiscount()`" → Tester leads.
 
 ## Validate Before Done
 
-Before marking any task complete, answer each item that applies. Security and QA are universal; the rest trigger when their conditions apply.
+Answer each item that applies before marking complete. Security and QA are universal; the rest trigger on their condition.
 
 - **Security** *(always)*: What inputs are trusted? What can be abused? Is auth enforced?
-- **QA** *(always)*: What edge cases haven't been tested? What fails under bad input or load?
-- **Troubleshoot** *(if you debugged anything)*: Is the root cause confirmed, or just the symptom patched?
-- **Refactor** *(if you changed existing code)*: Is all existing behavior preserved? Are tests still passing?
-- **Docs** *(if anything user- or operator-facing changed)*: Are public APIs / READMEs / runbooks updated? Who owns the doc going forward?
+- **QA** *(always)*: What edge cases are untested? What fails under bad input or load?
+- **Troubleshoot** *(if you debugged)*: Root cause confirmed, or just the symptom patched?
+- **Refactor** *(if you changed existing code)*: All existing behavior preserved? Tests still passing?
+- **Docs** *(if anything user/operator-facing changed)*: APIs / READMEs / runbooks updated? Owner assigned?
 
 ## Anti-Patterns
 
@@ -104,9 +94,7 @@ Routing rationalizations only — process discipline lives in `coding-discipline
 
 | If you think... | Reality |
 |---|---|
-| "The 'Start with' specialist is enough" / "The validate step is optional" | "Then add" and "Before done" columns are non-negotiable gates |
-| "Tester and Quality Engineer are the same" | Tester writes good tests; QE validates the testing *strategy* |
-| "I'll add validation later" / "It's internal, no security concerns" | Security belongs in design. Internal APIs have auth gaps, injection, and trust-boundary risks. |
+| "The 'Start with' specialist is enough" / "Validate is optional" / "It's internal, no security concerns" | "Then add" and "Before done" columns are non-negotiable gates. Internal APIs still have auth gaps, injection, and trust-boundary risks. |
 | "Existing tests still pass after the auth refactor, ship it" | Auth bugs don't fail tests — they create bypass paths your tests weren't written to catch. Auth refactors always require Security Engineer review regardless of test results. |
 
-**Cross-specialist handoff:** When a specialist spots an issue outside their domain, flag it explicitly for the relevant specialist. Don't silently ignore cross-domain concerns.
+When a specialist spots an issue outside their domain, flag it explicitly for the relevant specialist — don't silently ignore cross-domain concerns.
