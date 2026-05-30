@@ -1,6 +1,6 @@
 # Spec Template
 
-Use this as the starting structure when writing the spec in Step 6. Scale each section to complexity — a simple project may have 2-3 sentences per section; a complex one may have several paragraphs.
+Use this to structure the spec you present for approval (Steps 5–8). The spec is the approval artifact — presented in the conversation, not saved as a file; the durable saved artifact is the execution plan that Project Planner produces afterward. Scale each section to complexity — a simple project may have 2-3 sentences per section; a complex one may have several paragraphs.
 
 ---
 

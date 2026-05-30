@@ -29,9 +29,8 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 5. **Present design section-by-section** — confirm each section before moving on; cover architecture, components, data flow, error handling, testing.
 6. **Probe non-functional requirements** — explicitly ask about performance targets, scalability, security posture, compliance, accessibility. NFRs skipped here become rework later.
 7. **Validate the design** — before the final summary, check: placeholders/TBDs (fix them), internal contradictions (architecture vs feature descriptions), scope creep beyond a single plan, ambiguous requirements (pick one interpretation and make it explicit), and conformance with existing repo conventions (any new pattern for an already-solved problem class needs explicit justification).
-8. **Final summary & approval** — present the validated design; revise until the user explicitly approves.
-9. **Spec only if asked** — never write the spec file automatically. When asked, use [references/spec-template.md](references/spec-template.md). Default path: `<kb_path>/plans/<ticket-or-branch>.md` if `kb_path` is set (see `knowledge-base` for naming and `repos:` frontmatter); else `docs/specs/YYYY-MM-DD-<topic>.md` or the project's convention. If the user names a directory but not a filename, ask.
-10. **Hand off to planning** — pass the approved design to the `project-planner` specialist. Brainstorm ends at an approved design; planning begins after.
+8. **Final summary & approval** — present the validated design — the **spec**, structured with [references/spec-template.md](references/spec-template.md) — and revise until the user explicitly approves. The spec is the approval artifact: it lives in the conversation. Brainstorm does NOT write it to a file — the durable artifact is the plan produced in the next step.
+9. **Hand off to planning** — once the design is approved and the user signals to create the plan, invoke the `using-software-specialists` skill and let it route "turning an approved spec into an execution plan" to the **Project Planner** specialist. Pass the approved design (the spec) as its input. The execution **plan** Project Planner produces is the durable artifact — it (not the spec) is what gets saved to the KB under `<kb_path>/plans/` (see `knowledge-base` for path, naming, and `repos:` frontmatter; else `docs/specs/` or the project's convention). Brainstorm's job ends at the approved design — do NOT draft the plan ad hoc here or start coding; the plan is produced under Project Planner.
 
 ## Socratic Questioning
 
@@ -58,7 +57,7 @@ Scale each section to its complexity (2-3 sentences if simple, up to 300 words i
 User: "Tool to track my reading habits."
 Q (Step 3): "Finishing more books, or remembering what you read?" → "Remembering."
 Step 4 approaches: A) CLI + local markdown (rec.), B) Web + SQLite, C) Notion plugin.
-Step 5: confirm architecture section → confirm data section → ... → Step 10 handoff.
+Step 5: confirm architecture section → confirm data section → ... → Step 9 handoff to Project Planner (plan saved to KB).
 ```
 
 ## Revision Mode
