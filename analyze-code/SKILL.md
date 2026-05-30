@@ -18,13 +18,13 @@ Multi-lens audit of existing code. Applies five specialist perspectives and prod
 
 | Lens | What it covers | Reference |
 |------|----------------|-----------|
-| **Architecture** | Coupling, layering, public-API contracts, cohesion, deploy topology, runtime concerns (graceful shutdown, signals, healthchecks, retry/backoff) | `system-architect` |
-| **Quality** | Complexity, duplication, test-coverage signal, CI/IaC config quality (Dockerfile, Makefile, GH Actions), 12-factor config | `refactoring-expert` |
-| **Performance** | Hot paths, algorithmic complexity, N+1, unnecessary allocations | `performance-engineer` |
-| **Security** | Input trust, auth, supply-chain (lockfiles, pinned base images, vuln scanners), secrets (env hygiene, KMS/Vault refs, log/layer leakage), license/SBOM | `security-engineer` |
+| **Architecture** | Coupling, layering, public-API contracts, cohesion, deploy topology, runtime concerns (graceful shutdown, signals, healthchecks, retry/backoff) | `system-architect` specialist |
+| **Quality** | Complexity, duplication, test-coverage signal, CI/IaC config quality (Dockerfile, Makefile, GH Actions), 12-factor config | `refactoring-expert` specialist |
+| **Performance** | Hot paths, algorithmic complexity, N+1, unnecessary allocations | `performance-engineer` specialist |
+| **Security** | Input trust, auth, supply-chain (lockfiles, pinned base images, vuln scanners), secrets (env hygiene, KMS/Vault refs, log/layer leakage), license/SBOM | `security-engineer` specialist |
 | **Style** | Language style guide and formatting | `style-checker` skill |
 
-Apply **all five** — single-lens audits miss cross-cutting issues. Load specialists for Critical/High findings via `using-software-specialists`; lens questions alone aren't enough at that severity. Delegate the style lens to the `style-checker` skill.
+Apply **all five** — single-lens audits miss cross-cutting issues. Each lens loads its specialist from `using-software-specialists`; the lens questions are a starting point, not a substitute. The Style lens is the exception — it's performed by the `style-checker` skill.
 
 ## Severity Scale
 
@@ -39,30 +39,34 @@ Don't inflate severity. Low stays Low. Reserve Critical for real blast radius.
 
 ## Workflow
 
-1. **Scope & Boundary Frame** — pin down what's being audited and what surfaces it touches.
+1. **Scope & Boundary Frame** — pin down what's being audited.
    - **Scope:** PR mode = `git diff origin/main...HEAD`; module/repo mode = the path the user passed. Record in the report header.
-   - **Skip rules:** auto-generated, vendored, build-output, migration, minified — see [references.md](references.md). File presence is still a signal.
-   - **Public surface:** exports / `__all__` / package boundaries / OpenAPI specs. Public-API breaks are Critical/High in Step 2.
-   - **Deploy surface:** Dockerfiles, IaC, CI workflows, message-bus producers/consumers, REST routes. Feeds Architecture and Security lenses.
+   - **Skip rules:** auto-generated, vendored, build-output, minified — see [references.md](references.md). File presence is still a signal.
    - **If `kb_path` configured:** load `knowledge-base` first. Wiki↔code disagreements are findings per `knowledge-base` Integration rules.
 
-2. **Breaking-change scan** (modified code only) — for each changed signature, return type, raised error, side effect, or invariant on an existing symbol, list every caller via `find_referencing_symbols` or `grep`, verify the new contract holds at each call site, and report any caller that breaks as a finding. Public-API breaks are Critical/High; a single internal caller is Medium. Skip on greenfield.
+2. **Intent conformance** (skip if no spec and no plan) — gather intent from two sources: a spec/ticket the user provided in the request, and the implementation plan in the KB plans dir (if `kb_path` is configured and one exists). For each stated requirement or acceptance criterion, locate where the code satisfies it; for each plan step, confirm it was implemented.
+   - **Unmet requirement** (asked/planned but not delivered) = **High**; **Critical** if it's a correctness/security guarantee.
+   - **Undocumented deviation** (built differently from the plan, no ADR/note explaining why) = **Medium**.
+   - **Scope creep** (delivered but never asked for) = **Low**, unless it adds blast radius (new endpoint, new dependency), then **Medium**.
+   - If no spec and no plan exist, state that in the report and skip — do not invent acceptance criteria.
 
-3. **Convention & duplication scan** (new or modified code only) — apply `coding-discipline` Parallel-Solution test: for each new helper, type, or pattern, `find_symbol`/`grep` for an existing equivalent first. Parallel implementation = **High**; convention drift = **Medium**; minor inconsistency = **Low**. Skip on greenfield.
+3. **Breaking-change scan** (modified code only) — for each changed signature, return type, raised error, side effect, or invariant on an existing symbol, list every caller via `find_referencing_symbols` or `grep`, verify the new contract holds at each call site, and report any caller that breaks as a finding. Public-API breaks are Critical/High; a single internal caller is Medium. Skip on greenfield.
 
-4. **Apply the five lenses** — Architecture, Quality, Performance, Security, Style, each covering its row in the Five Lenses table above against the scoped code. Directives beyond the table:
-   - **Architecture:** also check cross-service consistency for surfaces discovered in Step 1.
+4. **Convention & duplication scan** (new or modified code only) — apply `coding-discipline` Parallel-Solution test: for each new helper, type, or pattern, `find_symbol`/`grep` for an existing equivalent first. Parallel implementation = **High**; convention drift = **Medium**; minor inconsistency = **Low**. Skip on greenfield.
+
+5. **Apply the five lenses** — Architecture, Quality, Performance, Security, Style, each covering its row in the Five Lenses table above against the scoped code. Directives beyond the table:
+   - **Architecture:** also check cross-service consistency where the changed code crosses service or package boundaries.
    - **Performance:** report what the code reveals; don't flag missing profiling as a defect.
    - **Security:** hardcoded secrets are Critical; a missing rotation/Vault reference where one is expected is High.
    - **Style:** load `style-checker` — it owns linter discovery, severity mapping, and conflict-resolution.
 
-5. **Run configured tooling** — for every linter, formatter, scanner, or test suite the project ships, **you must run it — "looked at the code" is not a substitute**.
-   - **Discovery path:** `.github/workflows` → `Makefile` → `package.json` scripts → `pyproject.toml` → `tox.ini` → `.pre-commit-config.yaml`. See [references.md](references.md) for the full ordering.
-   - **Per file-type scanners:** Dockerfile → `hadolint` + `trivy`; `*.tf` → `tfsec` + `checkov`; lockfiles → `osv-scanner` / `npm audit` / `govulncheck`; any → `gitleaks`. Full matrix in [references.md](references.md).
+6. **Run configured tooling** — for every linter, formatter, scanner, or test suite the project ships, **you must run it — "looked at the code" is not a substitute**.
+   - **Discovery path:** See [references.md](references.md) for the full ordering.
+   - **Per file-type scanners:** Full matrix in [references.md](references.md).
    - Fold tool failures into findings at their natural severity (failing security test → Critical; lint nit → Low). Tooling configured but currently red is itself a finding. **Tooling configured but not invoked by CI is a Medium "CI hygiene" finding.** No tooling configured at all where relevant files exist is the same severity.
    - **Test suite execution:** report pass/fail counts, skipped-test list, and **new failures vs. the base SHA**. Flakiness analysis and perf timing are out of scope (use the `verify` skill).
 
-6. **Synthesize & deliver** — group, dedupe, rank by severity. Tag each finding `scope: system` or `scope: code`. Output two severity-ordered lists: **System-level findings** then **Code-level findings**. Cap Low at 10 per lens and Medium at 15 per lens; if hit, emit a meta-finding noting the truncation. Critical/High are uncapped.
+7. **Synthesize & deliver** — group, dedupe, rank by severity. Tag each finding `scope: system` or `scope: code`. Output two severity-ordered lists: **System-level findings** then **Code-level findings**. Cap Low at 10 per lens and Medium at 15 per lens; if hit, emit a meta-finding noting the truncation. Critical/High are uncapped.
 
 ## False-Positive Markers
 
@@ -95,6 +99,10 @@ Undocumented suppressions stay at original severity — the absence of rationale
 
 ## Priority Actions
 1. [Critical|High] <action> — <file:line>
+
+## Intent Conformance
+<Source: spec/ticket provided | plan at <path> | none — skipped>
+- [Met | Unmet | Deviation | Scope-creep] <requirement or plan step> — <file:line or "not found">
 
 ## System-level Findings
 - [Severity · Confidence · root-cause|symptom] <Finding> — <file:line>
