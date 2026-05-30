@@ -9,14 +9,11 @@ description: Use when you have a question about this codebase or what we've docu
 
 ## Where the answer lives
 
-| Question is about... | Where to look |
-|---|---|
-| What we've documented — system surfaces, patterns, decisions, plans, how we run things | **knowledge-base** first (needs `kb_path`), then validate against code |
-| Code detail — endpoints, handlers, payloads, "what happens when X?" | **serena** (below) |
+The answer is always in the code — read it (preferably with serena) to get and confirm it. **If `kb_path` is configured, load `knowledge-base` first** to speed the search: use it to locate the right surfaces and files faster, then read the code to validate.
 
 Code is ground truth. When the KB and code disagree, the code wins — report the drift, and fix the KB.
 
-External / wider-world questions — best practice, library choice, "is X true?" — aren't this skill's job. Hand off to **using-software-specialists**; don't answer them from memory.
+External / wider-world questions — best practice, library choice, "is X true?" — aren't this skill's job. Use deep-research-agent specialist from **using-software-specialists** skill; don't answer them from memory.
 
 ## Read with serena, not from memory
 
@@ -28,9 +25,9 @@ For codebase questions, load the *actual* symbol — don't recall it:
 - **Direct lookup** ("do we have X?", "payload of event X?") → find it, cite `file:line`, done.
 - **Tracing** ("what happens when X?") → follow it with `find_referencing_symbols`; give confidence per finding, report conflicts, set the stopping criterion upfront.
 
-## Asking the user a question
+## Asking the user questions
 
-Default to investigating. At most **one** round of scoping questions, only when the answer changes *where you look* AND the user plausibly knows it. Never ask them what the research is supposed to tell you.
+**Clarify an ambiguous request before investigating.** If what the user wants answered isn't explicit, ask first — researching the wrong question wastes time and tokens. Keep it tight: ask only what you can't determine yourself and what changes *where you look*. Once the question is clear, investigate — don't ask the user to recite what you can read, and never ask what the research is supposed to tell you.
 
 ## Output
 

@@ -15,22 +15,22 @@ Turn ambiguous ideas into concrete, validated designs through guided Socratic di
 
 | Don't load when... | Instead... |
 |---|---|
-| User already approved a written plan/spec | Skip to `using-software-specialists` |
+| User already approved a written plan | Skip to `using-software-specialists` |
 | Bug fix or one-line change with clear scope | Skip to `using-software-specialists` |
 | User is asking a question, not requesting a build | Answer directly |
 | Revising an existing plan file | Jump to Revision Mode below |
 
 ## Steps
 
-1. **Explore context & conventions** — read existing architecture and prior decisions. For any capability that overlaps with what's already in the repo (pagination, auth, validation, error handling, persistence, logging, config), identify the libraries, patterns, and file/module layout in use. The design aligns with what exists unless divergence is explicitly stated and justified. **If `kb_path` is configured, load `knowledge-base` first** — it owns wiki/plan/helper/pattern reads.
+1. **Explore context & conventions** — read existing architecture and prior decisions. For any capability that overlaps with what's already in the repo, identify the libraries, patterns, and file/module layout in use. The design aligns with what exists unless divergence is explicitly stated and justified. **If `kb_path` is configured, load `knowledge-base` first** — it owns wiki/plan/helper/pattern reads.
 2. **Assess scope** — if the idea spans multiple independent systems, decompose first; each sub-project gets its own spec → plan → implementation cycle.
 3. **Ask clarifying questions** — one per message, Socratic style (see below).
 4. **Propose 2-3 approaches** — with trade-offs; lead with your recommendation and reasoning. For cross-domain work, load specialists from `using-software-specialists` (architect for system shape, security for trust boundaries, requirements-analyst for hidden assumptions) so trade-offs cover more than the happy path.
-5. **Present design section-by-section** — confirm each section before moving on; cover architecture, components, data flow, error handling, testing.
+5. **Present design section-by-section** — confirm each section before moving on; cover architecture, components, data flow, error handling, testing. Scale each section to its complexity (a couple sentences if simple, longer if nuanced); design for isolation — each component one clear purpose, internals changeable without breaking consumers.
 6. **Probe non-functional requirements** — explicitly ask about performance targets, scalability, security posture, compliance, accessibility. NFRs skipped here become rework later.
 7. **Validate the design** — before the final summary, check: placeholders/TBDs (fix them), internal contradictions (architecture vs feature descriptions), scope creep beyond a single plan, ambiguous requirements (pick one interpretation and make it explicit), and conformance with existing repo conventions (any new pattern for an already-solved problem class needs explicit justification).
 8. **Final summary & approval** — present the validated design — the **spec**, structured with [references/spec-template.md](references/spec-template.md) — and revise until the user explicitly approves. The spec is the approval artifact: it lives in the conversation. Brainstorm does NOT write it to a file — the durable artifact is the plan produced in the next step.
-9. **Hand off to planning** — once the design is approved and the user signals to create the plan, invoke the `using-software-specialists` skill and let it route "turning an approved spec into an execution plan" to the **Project Planner** specialist. Pass the approved design (the spec) as its input. The execution **plan** Project Planner produces is the durable artifact — it (not the spec) is what gets saved to the KB under `<kb_path>/plans/` (see `knowledge-base` for path, naming, and `repos:` frontmatter; else `docs/specs/` or the project's convention). Brainstorm's job ends at the approved design — do NOT draft the plan ad hoc here or start coding; the plan is produced under Project Planner.
+9. **Hand off to planning** — once the design is approved and the user signals to create the plan, load the **Project Planner** specialist from `using-software-specialists`. Convert the approved design (the spec) into an execution **plan** — this plan produced by the Project Planner (not the spec) is what gets saved to the KB under `<kb_path>/plans/` (see `knowledge-base`; if `kb_path` isn't configured, save to `docs/specs/` or the project's convention). Your role stops with the plan — do NOT start coding.
 
 ## Socratic Questioning
 
@@ -38,7 +38,7 @@ One question per message. Prefer multiple-choice when the options are known. Let
 
 **Recommend, don't interrogate.** For each question, lead with your recommended answer based on the context you've already gathered. Frame it as *"I'd default to X because Y — does that fit?"* rather than *"What should we do about X?"*. The user reacts; they don't have to generate. Switch to open-ended only when you genuinely have no basis to recommend.
 
-**Check the repo before asking.** If a question can be answered from the codebase, KB, or git history, answer it yourself and state your finding — don't ask the user to recite what's discoverable. Only escalate to a question when the answer isn't in the artifacts you can read.
+**Check the repo before asking.** If a question can be answered from the codebase or KB, answer it yourself and state your finding — don't ask the user to recite what's discoverable. Only escalate to a question when the answer isn't in the artifacts you can read.
 
 Progression template:
 - Purpose: *"What problem does this solve?"*
@@ -46,19 +46,6 @@ Progression template:
 - Constraints: *"What configuration, integrations, or existing systems should I know about?"*
 - Success: *"What does a successful outcome look like — what would it allow users to do?"*
 - Validate: *"So the core need is X — is that right?"*
-
-## Design Presentation
-
-Scale each section to its complexity (2-3 sentences if simple, up to 300 words if nuanced). Confirm each section before writing the next. Design for isolation: components with one clear purpose; internals can change without breaking consumers.
-
-## Example
-
-```
-User: "Tool to track my reading habits."
-Q (Step 3): "Finishing more books, or remembering what you read?" → "Remembering."
-Step 4 approaches: A) CLI + local markdown (rec.), B) Web + SQLite, C) Notion plugin.
-Step 5: confirm architecture section → confirm data section → ... → Step 9 handoff to Project Planner (plan saved to KB).
-```
 
 ## Revision Mode
 
