@@ -28,12 +28,14 @@ Advance only when the current phase's output is complete:
 | Requirements | Acceptance criteria testable, scope exclusions explicit, NFRs listed |
 | Design | Component boundaries defined, data model serves all access patterns, API contracts written |
 | Plan | Tasks decomposed, dependencies explicit, riskiest work first, verification check per step |
-| Implementation | Feature works end-to-end (not just compiles), error/loading/empty states handled, contracts honored |
-| Testing | Edge cases enumerated and covered, no flaky tests, tests pass in CI not just locally |
+| Implementation | Feature works end-to-end (not just compiles), each behavior driven by a test written first, error/loading/empty states handled, contracts honored |
+| Testing | Edge cases enumerated and covered beyond the TDD suite, test levels right (inverted pyramid), no flaky tests, tests pass in CI not just locally |
 | Validation | Security review passed, QE strategy confirmed, "Validate Before Done" answered |
 | Documentation | Public APIs/READMEs/runbooks updated, owner assigned, outdated docs deleted |
 
 Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
+
+**Testing is not "after" coding.** Tests are written test-first *during* Implementation (TDD). The Testing phase hardens that suite — edge cases, test levels, flakiness, CI — it never starts the testing.
 
 **Implementation:** load `coding-discipline` and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
 
