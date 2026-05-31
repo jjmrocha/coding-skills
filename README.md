@@ -82,8 +82,8 @@ A typical feature-development loop using these skills:
    (e.g., `~/plans/YYYY-MM-DD-<topic>.md`) so all repos can reference it.
 2. **Build** — `/using-software-specialists` ingests the plan, validates it
    against the Plan-phase done-criteria, and implements. The Implementation
-   phase loads `coding-discipline` (and optionally `/test-driven-development`
-   + `/writing-unit-tests`) before any code is written.
+   phase loads `coding-discipline` and `test-driven-development` (which pulls
+   in `writing-unit-tests`) before any code is written.
 3. **Audit** — `/analyze-code` reviews the result and produces a
    severity-ranked findings report with a *Suggested Next Actions* block
    that routes each finding cluster back to the right specialist.
@@ -98,8 +98,9 @@ The loop then closes through one of three back-edges:
 * **Bug surfaced during testing** → re-enter `/using-software-specialists`
   starting with Troubleshooter.
 
-`/style-checker` is invoked on demand, or implicitly by `/analyze-code` when
-the project has no configured linter.
+`/style-checker` is invoked on demand, or as the Style lens of every
+`/analyze-code` run (independent of whatever linter the project ships, which
+analyze-code runs separately as configured tooling).
 
 `/knowledge-base` sits underneath the loop as a shared substrate when
 `kb_path` is configured in CLAUDE.md: `brainstorm` reads the wiki for
@@ -109,33 +110,33 @@ loads it during Implementation to read the matching plan and the repo's
 wiki↔code disagreements as findings. The user invokes `/knowledge-base`
 directly to query, ingest, update, or lint.
 
-```
-            ┌──────────┐
-            │ research │ ◄─── "what's true / what's possible?"
-            └────┬─────┘
-                 │ sourced findings  (or straight to specialists)
-                 ▼
-            ┌─────────────┐
-            │  brainstorm │ ◄─── plan needs changes
-            └──────┬──────┘
-                   │ approved plan (file)
-                   ▼
-      ┌────────────────────────┐
-      │ using-software-        │ ◄─── findings to apply
-      │   specialists          │ ◄─── bug during testing
-      └────────────┬───────────┘
-                   │ implemented
-                   ▼
-            ┌─────────────┐
-            │ analyze-code│
-            └─────────────┘
-                   │ findings + next actions
-                   └──────────► back to one of the above
+```mermaid
+flowchart TD
+    Q([A question, not a goal]) --> RS[research]
+    Idea([A vague idea]) --> BS[brainstorm]
 
-                  ▲▲▲ reads and writes ▲▲▲
-            ┌─────────────────┐
-            │  knowledge-base │  (shared substrate, when kb_path configured)
-            └─────────────────┘
+    RS -->|sourced findings| BS
+    RS -.->|clear path| USS
+
+    BS -->|approved plan file| USS[using-software-specialists]
+    USS -->|implemented| AC[analyze-code]
+
+    AC -->|findings to apply| USS
+    AC -->|plan needs changes| BS
+    AC -->|bug during testing| USS
+    AC -->|clean| Ship([Ship])
+
+    subgraph during [During the Implementation phase]
+        CD[coding-discipline]
+        TDD[test-driven-development] --> WUT[writing-unit-tests]
+    end
+    USS -.loads.-> during
+
+    KB[(knowledge-base)] -.->|context| BS
+    KB -.->|plan + helpers/patterns| USS
+    KB -.->|drift findings| AC
+
+    AC -.->|style lens| SC[style-checker]
 ```
 
 ## License
