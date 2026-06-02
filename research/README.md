@@ -31,8 +31,10 @@ source hierarchy, confidence, and conflict-reporting discipline for outside
 sources. `research` hands those questions off rather than answering them from
 memory.
 
-## Files
+## Usage
 
-| File | Purpose |
-|------|---------|
-| [SKILL.md](SKILL.md) | Where the answer lives (KB + code), the serena-first method, scoping-question rule, handoff |
+```
+/research do we have an endpoint for password reset?
+/research what happens when an order is cancelled?
+/research is there a plan for PROJ-1234?
+```

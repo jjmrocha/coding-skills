@@ -31,7 +31,7 @@ For codebase questions, load the *actual* symbol — don't recall it:
 
 ## Output
 
-Answer + cited source. For non-trivial findings, add confidence and named gaps. Then hand off to **using-software-specialists** to plan and implement.
+Answer + cited source. For non-trivial findings, add confidence and named gaps. The deliverable is the answer — stop there. If the user then wants to act on it, that's a separate step (e.g. **using-software-specialists** to plan and implement).
 
 ## Red Flags
 

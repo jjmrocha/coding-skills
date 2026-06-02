@@ -2,8 +2,9 @@
 
 A Claude Code skill for Socratic requirements discovery. Turns vague ideas
 into concrete, validated designs through guided dialogue — one question at a
-time, no implementation until the design is approved. Only writes a spec
-file when the user explicitly asks for it.
+time, no implementation until the design is approved. The approved design
+(the spec) lives in the conversation; brainstorm then hands off to planning,
+which produces the durable plan.
 
 ## When to Use
 
@@ -19,13 +20,7 @@ file when the user explicitly asks for it.
 /brainstorm add collaborative editing to the document service
 ```
 
-## Files
-
-| File | Purpose |
-|------|---------|
-| [SKILL.md](SKILL.md) | Core skill — workflow, Socratic rules, principles |
-| [references/spec-template.md](references/spec-template.md) | Starting structure for the output spec |
-| [expected_outputs/sample-session.md](expected_outputs/sample-session.md) | Worked example session |
+See [a worked example session](expected_outputs/sample-session.md) for what the dialogue looks like end to end.
 
 ## Credit
 

@@ -38,12 +38,6 @@ Repeat until the feature is complete.
 /test-driven-development fix the race condition in the job queue
 ```
 
-## Files
-
-| File | Purpose |
-|------|---------|
-| [SKILL.md](SKILL.md) | Core skill — cycle phases with gates, adapting to existing code, excuse/reality table, red flags |
-
 ## Related Skills
 
 * [writing-unit-tests](../writing-unit-tests/) — scenario selection,

@@ -3,7 +3,7 @@
 A Claude Code skill that reviews code against **Google's official style
 guidelines**, focused on formatting and naming conventions only. Produces a
 structured violation report grouped by severity (Critical / High / Medium /
-Low).
+Low). It reports violations for you to fix — it does not auto-fix.
 
 For logic, architecture, or code-quality concerns (SOLID, code smells,
 etc.), use the `analyze-code` skill instead.
@@ -17,14 +17,6 @@ etc.), use the `analyze-code` skill instead.
 ## Supported Languages
 
 Go, Java, Python, JavaScript, TypeScript, Shell, Markdown.
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| [SKILL.md](SKILL.md) | Core skill — workflow, severity rubric, common mistakes |
-| [references/](references/) | One file per supported language with the Google style rules |
-| [expected_outputs/sample-report.md](expected_outputs/sample-report.md) | Reference output format for the violation report |
 
 ## Output Format
 

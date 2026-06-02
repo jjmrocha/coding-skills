@@ -43,25 +43,3 @@ with Arrange–Act–Assert (Given–When–Then).
 /writing-unit-tests improve coverage on the payment module
 ```
 
-## Blueprint
-
-The rules in this skill — mindset, FIRST-U principles, scenario taxonomy,
-AAA structure, mocking strategy, naming conventions, and layer-by-layer
-guidance — were derived from:
-
-**[docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md)**
-
-That document is the canonical reference. [`SKILL.md`](SKILL.md) is its
-Claude-optimized, actionable form.
-
-## Files
-
-| File | Purpose |
-|------|---------|
-| [SKILL.md](SKILL.md) | Agent-facing skill — scenario quadrants, FIRST-U table, AAA structure, mocking rules, language dispatch |
-| [docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md) | Human reference — the detailed guide with rationale, examples, and layer-by-layer guidance |
-| [references/java_unit_test.md](references/java_unit_test.md) | Agent reference — JUnit 5 + AssertJ + Mockito patterns |
-| [references/go_std_unit_test.md](references/go_std_unit_test.md) | Go `testing` stdlib patterns |
-| [references/go_testify_unit_test.md](references/go_testify_unit_test.md) | Go with testify (`assert`, `require`, `mock`) |
-| [references/python_pytest_unit_test.md](references/python_pytest_unit_test.md) | pytest + `monkeypatch` / `unittest.mock` |
-| [references/javascript_unit_test.md](references/javascript_unit_test.md) | Jest (with notes for Vitest) |

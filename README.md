@@ -19,10 +19,10 @@ focused instructions for a specific domain.
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
 | [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules) and implementation plans. Queryable on its own; consulted by `brainstorm`, `using-software-specialists`, and `analyze-code` when a `kb_path` is configured. |
-| [research](research/) | Front door for answer-seeking work — when you have a question, not a goal. Answers questions about *your own codebase* (endpoints, event payloads, "what happens when X?", "how do I run X?") via serena + the KB, and about the *wider world* (best practice, library choice, fact-checking) via official docs + web. Brings a sourced, cited answer instead of interrogating you; effort scales from a one-line lookup to a full traced investigation. The inverse of `brainstorm`. |
+| [research](research/) | Answers questions about *your own codebase* — endpoints, event payloads, "what happens when X?", "how do I run X?" — by reading the actual source (serena + the KB), never from memory. Brings a sourced, cited answer instead of interrogating you; effort scales from a one-line lookup to a full traced investigation. External / best-practice questions are handed off to the `deep-research-agent` specialist. The inverse of `brainstorm`. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
 | [test-driven-development](test-driven-development/) | Enforces the Red→Green→Refactor cycle before any production code is written. Covers the full TDD workflow: writing a failing test first, minimal implementation, and safe refactoring with a green suite. |
-| [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a task-routing table, symptom → specialist reverse lookup, and a "Validate Before Done" gate. |
+| [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a phase model, a task-routing table, and a "Validate Before Done" gate. |
 | [writing-unit-tests](writing-unit-tests/) | Guides unit test authorship in any language — scenario identification across four quadrants, FIRST-U principles, Arrange–Act–Assert structure, mocking strategy, and language-specific references. |
 
 ## Installation
@@ -53,7 +53,7 @@ Invoke a skill by typing its slash command, optionally followed by a
 description of your task:
 
 ```
-/research what's the current best practice for idempotency keys in payment APIs?
+/research do we have an endpoint for password reset, and what's its payload?
 /brainstorm I want to build a rate limiter for our API
 /style-checker review the auth module
 /using-software-specialists add OAuth support to the backend
@@ -67,19 +67,20 @@ examples.
 A typical feature-development loop using these skills:
 
 0. **Research (whenever you have questions, not a goal)** — `/research`
-   brings a sourced, cited answer instead of asking you questions you can't yet
-   answer. It serves two roles: a standalone way to answer questions about your
-   *own codebase* ("do we have an endpoint for X?", "what's the payload of
-   event X?", "what happens when X?") via serena + the KB, and the *feature-loop
-   front door* for external questions ("what's the best-practice approach for
-   X?", comparing libraries) before `brainstorm`. Effort scales — a one-line
-   lookup stays ceremony-free; a deep trace or library evaluation gets confidence
-   levels and named gaps. It's the inverse of `brainstorm`: you ask, it answers.
-   Its findings make brainstorm's intent questions answerable; for an
-   already-clear path it can hand straight to `using-software-specialists`.
-1. **Define** — `/brainstorm` scopes the change and produces an approved plan.
-   For cross-repo work, save the plan to a path outside the repo
-   (e.g., `~/plans/YYYY-MM-DD-<topic>.md`) so all repos can reference it.
+   brings a sourced, cited answer about your *own codebase* ("do we have an
+   endpoint for X?", "what's the payload of event X?", "what happens when X?")
+   by reading the source with serena + the KB, never from memory. Effort
+   scales — a one-line lookup stays ceremony-free; a deep trace gets confidence
+   levels and named gaps. Its findings make brainstorm's intent questions
+   answerable; for an already-clear path it can hand straight to
+   `using-software-specialists`. (External / best-practice questions go to the
+   `deep-research-agent` specialist, not here.)
+1. **Define** — `/brainstorm` scopes the change through Socratic dialogue and
+   produces an approved *spec*, then hands off to the Project Planner specialist,
+   which turns the spec into an execution plan. The plan is saved into the KB
+   under `<kb_path>/plans/` (or `docs/specs/` when no `kb_path` is configured),
+   so it persists across sessions and — for cross-repo work — can be referenced
+   from any repo.
 2. **Build** — `/using-software-specialists` ingests the plan, validates it
    against the Plan-phase done-criteria, and implements. The Implementation
    phase loads `coding-discipline` and `test-driven-development` (which pulls
@@ -104,7 +105,8 @@ analyze-code runs separately as configured tooling).
 
 `/knowledge-base` sits underneath the loop as a shared substrate when
 `kb_path` is configured in CLAUDE.md: `brainstorm` reads the wiki for
-system context and writes the approved plan into it; `using-software-specialists`
+system context, and the Project Planner it hands off to writes the resulting
+plan into `plans/`; `using-software-specialists`
 loads it during Implementation to read the matching plan and the repo's
 `Helpers` / `Patterns`; `analyze-code` reads it during Frame and surfaces
 wiki↔code disagreements as findings. The user invokes `/knowledge-base`
