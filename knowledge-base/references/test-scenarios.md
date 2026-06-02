@@ -2,7 +2,7 @@
 
 A regression suite for this skill. Run after any edit to SKILL.md, the reference files, or the scripts. Each scenario was used in the RED → GREEN cycle that produced the current version of the skill (2026-05-25): baselines without the skill were captured first, then the skill was tightened until every scenario flipped to PASS.
 
-The five tests cover the load-bearing disciplines. PASS/FAIL criteria are scripted into the prompts so a subagent's self-report is verifiable from its transcript.
+The six tests cover the load-bearing disciplines. PASS/FAIL criteria are scripted into the prompts so a subagent's self-report is verifiable from its transcript.
 
 ## Fixture
 
@@ -22,10 +22,12 @@ Build a synthetic KB + repo + ingest source at a scratch path (e.g., `/tmp/kb-sk
   repo/
     CLAUDE.md                               kb_path: /tmp/kb-skill-test/kb
     src/orders.py                           Status enum has only PENDING and PAID (NOT cancelled/refunded)
-  docs/                                     12 markdown files for the ingest test
+  docs/                                     12 markdown files for the ingest test (T2)
 ```
 
 The mismatch between `orders.md` (4 status values) and `src/orders.py` (2 status values) is the discipline trigger for T1 and T3.
+
+**T6 uses its own separate fixture** (empty-start, two repos ingested sequentially) described in the T6 section — it must not reuse the pre-populated wiki above.
 
 ## Running the suite
 
@@ -98,6 +100,40 @@ Dispatch all five scenarios in parallel to fresh subagents. Each subagent receiv
 - Bonus: subagent reads `references/helpers-and-patterns.md` to cite the criteria verbatim.
 
 **FAIL signals:** A new file under `wiki/order-svc/helpers/`; vague clarifying questions instead of refusal.
+
+## T6 — Cross-repo counterpart linking under sequential ingest (consumer → producer)
+
+This test reproduces the real production condition: repos are ingested **one at a time into a growing wiki**, the docs describe each repo's *own* behavior (they name endpoints and topics, **not** the owning repo), and the consumer repo is ingested **before** the producer repo exists on the wiki. The trap is that nothing ever links them.
+
+**Fixture (separate scratch path, e.g. `/tmp/kb-skill-test-x/`):**
+
+```
+kb/wiki/index.md            empty repo table
+kb/plans/index.md           empty
+order-svc/                  repo A — ingested FIRST
+  docs/overview.md          what order-svc does
+  docs/payment-flow.md      "before marking an order paid, call GET /stock/{sku};
+                             subscribe to the stock-updated topic" — NEVER names inventory-svc
+inventory-svc/              repo B — ingested SECOND
+  docs/overview.md          what inventory-svc does
+  docs/api.md               defines GET /stock/{sku}
+  docs/events.md            produces the stock-updated topic
+```
+
+**Run as two separate fresh subagent sessions** (no shared memory):
+1. *Session 1:* *"Ingest order-svc/docs/ into the order-svc wiki."* (inventory-svc is not yet on the wiki.)
+2. *Session 2:* *"Ingest inventory-svc/docs/ into the inventory-svc wiki."*
+
+**Failure mode it traps:** Session 1 writes a `dependencies/` page (and consumed-`events/` page) with a bare endpoint/topic and no link, because the producer isn't on the wiki yet. Session 2 adds inventory-svc but never goes back to link the now-resolvable references in order-svc. Result: two repos, no links between them.
+
+**PASS criteria (after BOTH sessions):**
+- `wiki/order-svc/dependencies/<inventory>.md` contains `[[wiki/inventory-svc/interfaces/get-stock]]`.
+- `wiki/order-svc/events/stock-updated.md` (consumed) contains `[[wiki/inventory-svc/events/stock-updated]]`.
+- Links are **one-way**: no edit to any `wiki/inventory-svc/` page adding order-svc as a caller/consumer.
+
+**FAIL signals:** After session 2, order-svc's pages still carry a bare `GET /stock/{sku}` / `stock-updated` with no `[[wiki-link]]` to inventory-svc; the agent in session 2 never scans existing pages for now-resolvable references.
+
+**Note:** session 1 producing an unlinked page is *expected and acceptable* (the producer doesn't exist yet). The discipline under test is whether the link ever gets made — which, given sequential ingest, requires a **backfill step in session 2** (scan existing pages for references the newly-ingested repo now satisfies), not just write-time forward-linking.
 
 ## What this suite does NOT cover
 

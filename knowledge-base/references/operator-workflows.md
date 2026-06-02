@@ -21,8 +21,9 @@ Acquire the write lock; release on summary success.
 1. **Enumerate the full source set, then read every file.** If the source resolves to more than one file, list every file first (`git ls-files`, `find <dir> -type f`, archive listing). Then read each. **No sampling.** The only allowed exclusions are files the user explicitly named out-of-scope, or boilerplate with no system surface (lockfiles, generated code, vendored deps, binary assets) — and you must announce any exclusion in the summary.
 2. Identify the destination: which repo, which subfolder under `wiki/<repo>/`, or `plans/`. Ask only when the source is genuinely ambiguous; for clean sources, pick the best fit and surface the choice in the summary.
 3. For each page: create or update; add `[[wiki-links]]`; set `sources:` (listing **every** contributing file) and `last_updated:`.
-4. Update the affected `wiki/<repo>/index.md` and the top-level `wiki/index.md` if a new repo or top-level page was added.
-5. **Summary is mandatory and leads with a coverage line:**
+4. **Cross-repo linking.** Forward-link the consumer pages you wrote, and backfill other repos' consumer pages that the surfaces you just documented now satisfy — see [Cross-repo linking](#cross-repo-linking).
+5. Update the affected `wiki/<repo>/index.md` and the top-level `wiki/index.md` if a new repo or top-level page was added.
+6. **Summary is mandatory and leads with a coverage line:**
    ```
    Ingested 17/17 files from docs/architecture/ (0 excluded).
    Wrote:
@@ -38,9 +39,47 @@ Acquire the write lock; release on summary success.
 
 1. Identify pages affected by the change.
 2. Write directly. Add `[[wiki-links]]`; set `last_updated:`.
-3. Update the repo's `wiki/<repo>/index.md` and `wiki/index.md` as needed.
-4. Summarize: one line per page, scannable (`+ new`, `~ updated`).
-5. Deletes → [Delete protocol](#delete-protocol).
+3. **Cross-repo linking** per [Cross-repo linking](#cross-repo-linking).
+4. Update the repo's `wiki/<repo>/index.md` and `wiki/index.md` as needed.
+5. Summarize: one line per page, scannable (`+ new`, `~ updated`).
+6. Deletes → [Delete protocol](#delete-protocol).
+
+## Cross-repo linking
+
+A dependency or consumed event often points at another service that is *also*
+documented in this KB. The link lives on the **consumer/caller** side, one-way
+(consumer → producer); never back-edit the upstream page to record its callers.
+Do **both** of the following on every Ingest and Update:
+
+1. **Forward-link as you write.** When writing a `dependencies/` or a consumed
+   `events/` page, take the referenced surface — the HTTP method+path
+   (`GET /stock/{sku}`) or the topic/event name (`stock-updated`) — and search
+   the wiki for a repo that owns it (`interfaces/` for endpoints, `events/` for
+   topics). If one does, add the one-way link
+   `[[wiki/<other-repo>/interfaces/<page>]]` or
+   `[[wiki/<other-repo>/events/<page>]]`. If none owns it yet, write the page
+   without the link and mark the surface `[needs source]`; backfill catches it
+   when the owner is ingested.
+
+2. **Backfill when you ingest a repo's interfaces/events.** After writing this
+   repo's producer-side `interfaces/` and `events/` pages, scan **every other
+   repo's** `dependencies/` and consumed `events/` pages for references to the
+   surfaces you just documented (match on method+path or topic name; the
+   `[needs source]` / "external" markers left by an earlier ingest are the
+   strongest signal). For each match, add the one-way `[[wiki-link]]` on that
+   consumer page and clear the stale "external / not documented" marker.
+   **This is in scope** — you are adding the consumer-side outbound link, not
+   rewriting another repo's content. Skipping it because "that's a different
+   repo" is the exact failure this step exists to prevent.
+
+**Producer pages never name their consumers.** When you create or update an
+`interfaces/` or producer-side `events/` page, do not list or link the services
+that call or consume it — even if a consumer is already on the wiki. The link is
+recorded only on the consumer's page. A producer that enumerates consumers
+recreates the bidirectional maintenance burden (every new consumer edits the
+producer's repo) that one-way linking exists to avoid.
+
+Report every cross-repo link you created or backfilled in the summary.
 
 ## Lint workflow
 

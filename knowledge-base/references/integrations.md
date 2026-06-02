@@ -12,8 +12,9 @@ All integrations are **gated on `kb_path` being configured** — when no KB exis
 
 ## Cross-references between pages (load-bearing for the integrations)
 
-Three link types the skill maintains:
+Four link types the skill maintains:
 
 - **Entity ↔ plan.** A plan's frontmatter lists touched entities; each entity page's *"Related plans"* section links back to plans that modified it.
-- **Event producer ↔ consumer.** Each event page lists `producer:` and `consumers:` as `[[wiki-links]]`. Both sides have the link, so following either direction works.
+- **Consumed event → producer event (cross-repo, one-way).** Each repo documents the events it consumes *and* produces; a consumed-event page links to the producing repo's `events/` page when that producer is on the wiki. The link flows **consumer → producer only** — producer pages don't enumerate consumers, so a new consumer never forces an edit to the producer's repo. See [Cross-repo linking](operator-workflows.md#cross-repo-linking).
+- **Dependency → interface (cross-repo, one-way).** A `dependencies/` page on the calling repo links to the called service's `interfaces/` page when that service is on the wiki. **Consumer → producer only**; the upstream interface page isn't back-edited. See [Cross-repo linking](operator-workflows.md#cross-repo-linking).
 - **Rule ↔ entity/endpoint.** A business rule like *"orders cancellable within 30 min"* links to the entity and endpoint where it's enforced. `analyze-code` can trace rule → enforcement points and flag missing enforcement as a finding.
