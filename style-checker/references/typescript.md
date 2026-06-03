@@ -135,7 +135,10 @@ const foo = require('./foo');
 
 - **Annotate** public API: function parameters, return types, exported symbols.
 - **Omit** types that TypeScript can trivially infer: `const x = 5` not `const x: number = 5`.
-- Array types: `string[]` (simple) or `Array<{x: number}>` (complex types).
+- Use **lowercase primitive types**: `string`, `number`, `boolean` — never `String`, `Number`, `Boolean`.
+- Array types: `string[]` (simple) or `Array<{x: number}>` (complex types). Likewise `readonly T[]`, **not** `ReadonlyArray<T>`.
+- Index signatures must use a **meaningful key label**: `{[userName: string]: number}`, not `{[key: string]: number}`.
+- **No empty `{}` type** — prefer `unknown`, `Record<string, T>`, or `object`.
 - **Avoid `any`**: prefer `unknown` for opaque values.
 - `Type | null` or `Type | undefined` instead of wrapper types.
 - Prefer optional fields (`?`) over `| undefined` in object types.
@@ -190,6 +193,8 @@ function sendMessage(message: string): boolean {
 |-----------|-------------|
 | `var` | `const` or `let` |
 | Default exports | Named exports |
+| `export let` (mutable binding export) | Export a `const`, or a getter |
+| `with` statement | Explicit property access |
 | `#private` fields | TypeScript `private` modifier |
 | `namespace Foo {}` | ES modules |
 | `const enum` | Plain `enum` |

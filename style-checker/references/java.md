@@ -2,6 +2,17 @@
 
 Source: https://google.github.io/styleguide/javaguide.html
 
+## Source File Basics
+
+- **Exactly one top-level class per file** (§3.4.1).
+- **File name = top-level class name** + `.java` (case-sensitive). `MyClass` lives in `MyClass.java`.
+- Encoding: **UTF-8**.
+- Whitespace: the **only** ASCII whitespace character is the space (0x20) — tabs are forbidden, including inside strings (use `\t`).
+- Prefer **special escape sequences** (`\n`, `\t`, `\"`, `\\`) over octal (`\012`) or Unicode (`\uXXXX`) escapes for the same character.
+- File sections in order, one blank line between each: license/copyright → `package` → imports → exactly one top-level class.
+
+---
+
 ## Naming Conventions
 
 | Identifier | Style | Example |
@@ -17,7 +28,9 @@ Source: https://google.github.io/styleguide/javaguide.html
 | Parameter | `lowerCamelCase` | `userName` |
 | Type parameter | Single uppercase letter or `ClassNameT` | `E`, `T`, `RequestT` |
 
-**Avoid**: Hungarian notation, underscores in class/method names (except JUnit tests).
+**Avoid**: Hungarian notation, underscores in class/method names (except JUnit tests), and special prefixes/suffixes (`mName`, `s_name`, `kName`, `name_`).
+
+**Parameters**: avoid single-character parameter names in public methods.
 
 **Constant definition**: A field is a constant only if it is `static`, `final`, and its content is **deeply immutable** with no detectable side effects. A `static final ArrayList` is **NOT** a constant — use `lowerCamelCase`.
 

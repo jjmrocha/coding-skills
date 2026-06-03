@@ -86,6 +86,12 @@ result = some_long_variable + another_variable \
 
 ---
 
+## Shebang
+
+- A shebang line (`#!/usr/bin/env python3` or `#!/usr/bin/python3`) belongs **only** on the main executable file that is run directly — not on imported library modules.
+
+---
+
 ## Imports
 
 - `from __future__ import` statements must appear first (before any other imports).
@@ -298,6 +304,15 @@ def func(x, y):
 - **Do not annotate** `self` or `cls` (unless using the `Self` type).
 - **Do not annotate** `__init__` return type.
 - Use `from __future__ import annotations` or quoted forward references for self-referencing types.
+- **Line-wrapping long annotated signatures**: prefer one parameter per line; a trailing comma after the last parameter pushes the return type onto its own line. Break between parameters, never between a parameter name and its type.
+
+```python
+def long_function_name(
+    var_one: int,
+    var_two: str,
+) -> ReturnType:
+    ...
+```
 
 ## Logging
 

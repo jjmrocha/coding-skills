@@ -19,6 +19,16 @@ Source: https://google.github.io/styleguide/shellguide.html
 - Executables: `.sh` extension optional; if it is a library sourced by others, must have `.sh`.
 - Constants: declared with `readonly` or `declare -xr` at the **top of the file**.
 - Local variables: always declare with `local` inside functions.
+- **Separate declaration from command-substitution assignment** — `local var; var="$(cmd)"`. Combining them (`local var="$(cmd)"`) masks the command's exit code, since `local` becomes the command that sets `$?`.
+
+```bash
+# Correct
+local my_var
+my_var="$(my_command)"
+
+# Wrong — exit code of my_command is lost
+local my_var="$(my_command)"
+```
 
 ```bash
 # Correct
@@ -195,6 +205,7 @@ echo "Result: `command`"
 - Prefer **`[[ ... ]]`** over `[ ... ]`, `test`, or `/usr/bin/[`.
 - Use **`==`** for string equality inside `[[ ... ]]` (not `=`).
 - Numeric comparisons: use **`(( ... ))`** or `-lt` / `-gt` inside `[[ ... ]]`.
+- Inside `(( ... ))` / `$(( ... ))`: omit the `${}` braces on variables (use `var`, not `${var}`), and keep a space after `((` and before `))`.
 - For **empty strings**: use `-z` and `-n` rather than filler characters like `x`.
 
 ```bash
@@ -277,6 +288,7 @@ mybinary "${flags[@]}"
 | Backticks `` `cmd` `` | `$(cmd)` |
 | `expr` for arithmetic | `$(( expression ))` |
 | `let` for arithmetic | `$(( expression ))` |
+| `$[ expression ]` for arithmetic | `$(( expression ))` |
 | `eval` for variable assignment | Direct assignment |
 | Aliases in scripts | Functions |
 | `[` (single bracket) for tests | `[[` (double bracket) |

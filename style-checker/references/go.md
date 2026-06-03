@@ -94,12 +94,14 @@ func (c *LRUCache[K, V]) Put(key K, value V) {}
   - `URL` → exported: `URL`, unexported: `url`
   - `HTTP` → exported: `HTTP`, unexported: `http`
   - `ID` → exported: `ID`, unexported: `id`
-- **Never** use mixed-case initialisms like `Url`, `Http`, `UserId`, `HttpUrl`.
+- **Never** invent mixed-case forms like `Url`, `Http`, `UserId`, `HttpUrl`.
+- **Exception:** initialisms that are *already* mixed-case in standard prose (`iOS`, `gRPC`, `DDoS`) keep their conventional form. Only the first letter changes for export — unexported `iOS` stays `iOS`, exported becomes `IOS`; `gRPC` → `GRPC` when it must lead an exported name.
 
 ```go
 // Correct
 func ParseURL(rawURL string) {}
 var userID int
+var iOSVersion string   // genuine mixed-case initialism, unexported
 
 // Wrong
 func ParseUrl(rawUrl string) {}
@@ -168,6 +170,7 @@ func NewCacheEntry() {}    // "cache.CacheEntry" is redundant
 
 - Prefer `nil` slice initialization for local variables over empty slice literals.
 - There is no functional difference; `nil` is idiomatic.
+- Test emptiness with `len(s) == 0`, not `s == nil` — APIs should not force a distinction between nil and empty slices.
 
 ```go
 // Prefer
@@ -175,6 +178,12 @@ var s []int
 
 // Avoid
 s := []int{}
+
+// Correct emptiness check
+if len(s) == 0 { ... }
+
+// Wrong
+if s == nil { ... }
 ```
 
 ### Named Result Parameters
@@ -323,3 +332,4 @@ if err == nil {
 - `if` statements should **not be line-broken**; extract boolean operands to separate variables when the condition is too long.
 - `for` and `switch` (old-style `:` colon statements) should remain on a single line.
 - Yoda conditions (`if nil == err`) are **prohibited** — place the variable on the left.
+- **No `break` at the end of a `switch` clause** — Go cases do not fall through, so a trailing `break` is redundant. Use a labeled `break` only to exit an enclosing `for` from inside a `switch`.

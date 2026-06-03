@@ -2,6 +2,19 @@
 
 Source: https://google.github.io/styleguide/jsguide.html
 
+## Source File Basics & Structure
+
+- Encoding: **UTF-8**. The only ASCII whitespace is the space (0x20) — **tabs forbidden**.
+- Prefer special escape sequences (`\n`, `\t`) over numeric escapes (`\x0a`).
+- File sections in order, exactly one blank line between each (implementation may have 1–2):
+  1. License / copyright (if present)
+  2. `@fileoverview` JSDoc (if present)
+  3. `goog.module` / ES `import` statements
+  4. `goog.require` statements
+  5. Implementation
+
+---
+
 ## Naming Conventions
 
 | Identifier | Style | Example |
@@ -69,6 +82,21 @@ else
 - Use **`const`** and **`let`**. **Never `var`.**
 - **One variable per declaration** (`const a = 1; const b = 2;` not `const a = 1, b = 2;`).
 - Declare variables as **close to first use** as possible.
+
+---
+
+## Object & Array Literals
+
+- Use `{}` and `[]` literals — never `new Object()` / `new Array()`.
+- **Do not mix** quoted and unquoted keys in a single object literal.
+- Prefer **method shorthand** (`{method() {}}`) and **property shorthand** (`{foo, bar}`).
+- Trailing comma when a line break precedes the closing `}` or `]`.
+
+---
+
+## Number Literals
+
+- Numeric base prefixes are **lowercase**: `0x`, `0o`, `0b` (e.g., `0xff`, not `0XFF`).
 
 ---
 

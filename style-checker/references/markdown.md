@@ -10,6 +10,7 @@ Source: https://google.github.io/styleguide/docguide/style.html
 - Space required after `#`.
 - Heading names: **unique and fully descriptive** within the document.
 - Capitalization: follow Google Developer Documentation Style Guide (sentence case for headings).
+- **Preserve the original capitalization** of product, tool, and binary names everywhere (e.g., `gRPC`, `iOS`, `npm`) — don't sentence-case them to fit a heading.
 
 ```markdown
 # Document Title
