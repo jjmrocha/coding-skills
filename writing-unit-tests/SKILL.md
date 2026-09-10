@@ -11,10 +11,11 @@ For a detailed human-readable guide, see [docs/how-to-write-unit-tests.md](docs/
 
 ## Steps
 
-1. **Inspect existing tests** — read 2-3 nearby test files. Note naming, assertion library, mock framework, fixture patterns. Existing project conventions override the language reference.
+1. **Inspect existing tests** — if the project instructions (CLAUDE.md, CLAUDE.local.md) name reference test files, those *are* the convention: read them first and follow them even when tests next to the code under test differ — neighbours may be legacy; mention the drift once. Without named references, read 2-3 nearby test files. Note naming, assertion library, mock framework, fixture patterns. Project conventions override the language reference.
 2. **List scenarios** — enumerate cases across the four quadrants. Present for confirmation before writing (skip if user says proceed).
 3. **Read the language reference** — pick the matching file from the dispatch table below.
 4. **Write tests** — one behavior per test. AAA structure. Run the full suite — never leave it red.
+5. **Prove the assertions bite** — for a test whose contract is a side effect on a mock (a rollback, a commit, a publish), break that side effect once in the code under test, confirm the test fails, restore it. A test that passes both ways asserts nothing.
 
 ## Scenario Quadrants
 
@@ -70,3 +71,6 @@ If no reference exists for the project's language, apply the principles above an
 | `new Date()`, `Math.random()`, real clock | Pin time, seed randomness — non-determinism breaks Repeatable |
 | Mocking the third-party SDK directly | Wrap in a port you own, mock the port |
 | Silently copying broken patterns from existing tests | Flag the anti-pattern to the user |
+| `.Maybe()` / optional expectations on the calls that *are* the contract | Register every call explicitly; a test that passes whether or not the rollback happened verifies nothing |
+| Boolean flags in the table that the loop body turns into mock expectations | Put the expectations in the case (a `prepareMock` closure or equivalent) so the reader sees exactly which calls the scenario makes |
+| Following the neighbouring tests when the project names reference files | The references win; neighbours may be legacy |

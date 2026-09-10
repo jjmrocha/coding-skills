@@ -18,7 +18,7 @@ Six failure modes most common in LLM-written code, with the counter for each.
 | **Speculative complexity** | Adding config/abstraction nobody asked for | Build the smallest thing |
 | **Hallucination** | Referencing symbols/APIs/paths that don't exist | Verify before writing; run before claiming done |
 | **Drift** | Losing the original goal over a long session | Stop when the verifiable check passes |
-| **Parallel solution** | New helper/pattern for a problem the repo already solves | Search first; reuse what exists |
+| **Parallel solution** | New helper/pattern for a problem the repo already solves — or a tidier variant of one it already uses | Search first; reuse what exists, and match its shape instead of improving it |
 
 ## Falsifiable Tests
 
@@ -39,6 +39,8 @@ Six failure modes most common in LLM-written code, with the counter for each.
 
 Parallel solutions double maintenance, split conventions, and confuse future readers about which version is canonical.
 
+Finding the existing solution isn't enough — copy its shape. A tidier variant of a pattern the repo uses everywhere is still a parallel solution: the repo now has two ways to do one job, and yours is the outlier. Match the existing verbosity even when a wrapper would be cleaner. If the tidier version is genuinely better, propose it as its own change — never smuggle it in as a side effect.
+
 ## Pre-Commit Self-Check
 
 1. **Assumption** — stated, or "n/a"?
@@ -46,7 +48,7 @@ Parallel solutions double maintenance, split conventions, and confuse future rea
 3. **Simplicity** — could a senior cut this in half?
 4. **Verification** — confirmed referenced symbols/APIs exist? Ran the code, not just wrote it?
 5. **Goal** — can you name the check that proves this is done?
-6. **Reuse** — checked the codebase for an existing solution (helpers, patterns, libraries)?
+6. **Reuse** — checked the codebase for an existing solution (helpers, patterns, libraries), and matched its shape rather than improving it?
 
 A "no" on any line: stop and revise; don't ship and explain.
 
@@ -61,5 +63,6 @@ A "no" on any line: stop and revise; don't ship and explain.
 | "I'm pretty sure that method exists" / "It should work" | Hallucination — look it up; run before claiming done |
 | "I lost track of what they wanted" | Drift — restate the goal |
 | "I'll just write a quick helper" / "I'll add a library for this" | Grep first; the repo may already solve it |
+| "The repo does this inline everywhere, but a wrapper is cleaner" | Still a parallel solution — copy the inline shape; propose the wrapper separately |
 
 For trivial tasks (typo fix, one-line rename), use judgment — this skill biases toward caution.
