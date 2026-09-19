@@ -31,8 +31,8 @@ reported — there is no "quick lookup" exemption.
 
 **When NOT to use:**
 
-* No `kb_path` configured in CLAUDE.md → skill refuses; do not invent a
-  default location
+* No `kb_path` configured → skill refuses; do not invent a default
+  location
 * The question is about code visible in the working directory → read the
   code directly
 * User preferences, session state, deadlines → use Claude Code's
@@ -40,8 +40,8 @@ reported — there is no "quick lookup" exemption.
 
 ## Configuration
 
-One key in the project's CLAUDE.md (or in a global CLAUDE.md if one KB
-serves many related repos):
+One key, read from the agent instructions. A global instruction source
+works when one KB serves many related repos:
 
 ```yaml
 kb_path: /Users/you/.kb/work    # required — absolute path. No default.

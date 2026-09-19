@@ -120,7 +120,7 @@ change already introduced.
 analyze-code runs separately as configured tooling).
 
 `/knowledge-base` sits underneath the loop as a shared substrate when
-`kb_path` is configured in CLAUDE.md: `brainstorm` reads the wiki for
+`kb_path` is configured: `brainstorm` reads the wiki for
 system context, and the Project Planner it hands off to writes the resulting
 plan into `plans/`; `using-software-specialists`
 loads it during Implementation to read the matching plan and the repo's

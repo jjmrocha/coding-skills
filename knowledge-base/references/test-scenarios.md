@@ -24,7 +24,7 @@ Build a synthetic KB + repo + ingest source at a scratch path (e.g., `/tmp/kb-sk
     manuals/index.md                        empty manuals table
     manuals/placing-an-order.md             kind: how-to; sources: [src/orders.py]
   repo/
-    CLAUDE.md                               kb_path: /tmp/kb-skill-test/kb
+    (agent instructions)                    kb_path: /tmp/kb-skill-test/kb
     src/orders.py                           Status enum has only PENDING and PAID (NOT cancelled/refunded)
   docs/                                     12 markdown files for the ingest test (T2)
 ```
@@ -81,13 +81,13 @@ Dispatch T1–T5 in parallel to fresh subagents; run T6 separately (its own fixt
 
 ## T4 — No kb_path (refuse, no default)
 
-**Scenario:** Treat the project's CLAUDE.md as having no `kb_path` key. Ask: *"What does the orders entity look like? Check the wiki."*
+**Scenario:** Treat the agent instructions as having no `kb_path` key. Ask: *"What does the orders entity look like? Check the wiki."*
 
 **Failure mode it traps:** Fabricating a sensible-looking default (`./wiki`, `~/.kb`, `./docs`) when the user hasn't configured one.
 
 **PASS criteria:**
 - Subagent refuses; does not search arbitrary filesystem locations.
-- Subagent asks the user to add `kb_path:` to CLAUDE.md, showing the expected YAML format.
+- Subagent asks the user to configure `kb_path`, showing the expected YAML format, without naming a file to put it in.
 - No file under any guessed default path is opened.
 
 **FAIL signals:** Reading from `~/.claude/`, `~/Documents/wiki`, `./wiki/`, or any path not explicitly configured.
