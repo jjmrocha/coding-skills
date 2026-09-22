@@ -172,7 +172,7 @@ Undocumented suppressions stay at original severity — the absence of rationale
 <Summary; reference the style-checker report for full detail.>
 
 ## Suggested Next Actions
-- **Critical / High** → re-enter `using-software-specialists` with the matching specialist. Routing table in [references.md](references.md). One fix loop per finding cluster.
+- **Critical / High** → `addressing-findings` walks them one at a time, loading the matching specialist per finding. Routing table in [references.md](references.md).
 - **Medium** → ticket or batch into a planned cleanup, or address now if the cluster is cheap.
 - **Low** → optional inline fix, batch with the next touch of the file, or accept.
 ```

@@ -15,6 +15,7 @@ focused instructions for a specific domain.
 
 | Skill | What it does |
 |-------|-------------|
+| [addressing-findings](addressing-findings/) | Walks an analyze-code report or a PR's review comments one finding at a time — explain, propose options, recommend, ask. Nothing changes until you approve, and it never posts to the PR — it hands you the reply text. |
 | [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, security, and style. Produces a prioritized findings report — a deep review, not a gate decision. |
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
@@ -32,12 +33,13 @@ focused instructions for a specific domain.
 Copy the skill directories you want into your Claude Code skills folder:
 
 ```bash
-cp -r analyze-code brainstorm coding-discipline designing-interfaces guiding-manual-testing knowledge-base research style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
+cp -r addressing-findings analyze-code brainstorm coding-discipline designing-interfaces guiding-manual-testing knowledge-base research style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
 ```
 
 Skills are then available as slash commands in any Claude Code session:
 
 ```
+/addressing-findings
 /analyze-code
 /brainstorm
 /coding-discipline
@@ -96,8 +98,9 @@ A typical feature-development loop using these skills:
 
 The loop then closes through one of three back-edges:
 
-* **Findings to apply** → re-enter `/using-software-specialists` with the
-  specialist named in the analyze-code report.
+* **Findings to apply** → `/addressing-findings` walks the report one finding
+  at a time, loading the specialist each finding names. The same walk handles
+  review comments on a PR.
 * **Plan needs changes** → re-enter `/brainstorm` against the existing plan
   file. It enters revision mode — diffs the requested change, asks only
   about the deltas, and updates the plan in place.
@@ -132,6 +135,7 @@ directly to query, ingest, update, or lint.
 flowchart TD
     Q([A question, not a goal]) --> RS[research]
     Idea([A vague idea]) --> BS[brainstorm]
+    PR([PR review comments]) --> AF[addressing-findings]
 
     RS -->|sourced findings| BS
     RS -.->|clear path| USS
@@ -139,7 +143,8 @@ flowchart TD
     BS -->|approved plan file| USS[using-software-specialists]
     USS -->|implemented| AC[analyze-code]
 
-    AC -->|findings to apply| USS
+    AC -->|findings to apply| AF
+    AF -->|approved fix| USS
     AC -->|plan needs changes| BS
     AC -->|bug during testing| USS
     AC -->|clean| Ship([Ship])
