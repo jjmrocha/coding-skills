@@ -1,6 +1,6 @@
 ---
 name: knowledge-base
-description: Use when reading or writing a configured KB (wiki / plans / manuals) — system surfaces, helpers, patterns, plans, operator manuals — or ingesting docs, updating after code changes, or auditing for staleness. Requires kb_path in CLAUDE.md.
+description: Use when reading or writing a configured KB (wiki / plans / manuals) — system surfaces, helpers, patterns, plans, operator manuals — or ingesting docs, updating after code changes, or auditing for staleness. Requires kb_path configured in the agent instructions.
 ---
 
 # Knowledge Base
@@ -19,11 +19,13 @@ A user-curated, agent-maintained KB. Three top-level buckets:
 
 ## When NOT to Use
 
-- No `kb_path` configured in CLAUDE.md → refuse; **do not invent a default**.
+- No `kb_path` configured → refuse; **do not invent a default**.
 - Question is about code visible in the working directory → read the code directly.
 - Personal memory (preferences, project state) → `~/.claude` memory, not the KB.
 
 ## Configuration
+
+One key, read from the agent instructions — wherever this agent takes its standing instructions. Never tell the user which file to put it in.
 
 ```yaml
 kb_path: /Users/you/.kb/work    # required — absolute path. No default.
@@ -109,7 +111,7 @@ Any divergence — silent claim, reinvented helper, violated `patterns/` convent
 
 | Mistake | Fix |
 |---|---|
-| Inventing a `kb_path` default | Refuse; ask user to set it in CLAUDE.md |
+| Inventing a `kb_path` default | Refuse; ask the user to configure `kb_path` in the agent instructions |
 | Citing only the wiki in your reply | Cite both: code file read this turn + wiki page that pointed you there |
 | Listing only the first contributing file under `sources:` | List **every** file that contributed |
 | Inline `(source: ...)` in page body instead of `sources:` frontmatter | Provenance belongs in frontmatter so lint can audit it |
