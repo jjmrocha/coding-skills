@@ -1,7 +1,7 @@
 # writing-unit-tests
 
 A Claude Code skill for writing unit tests in any language. The agent-facing
-[SKILL.md](SKILL.md) is a concise checklist (~560 words); the human-facing
+[SKILL.md](SKILL.md) is a concise checklist; the human-facing
 [docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md) is the
 detailed guide with rationale and examples.
 
@@ -22,14 +22,15 @@ detailed guide with rationale and examples.
 
 ## How It Works
 
-The skill follows a four-step workflow:
+The skill follows a five-step workflow:
 
 | Step | What happens |
 |------|-------------|
-| **1. Inspect** | Read 2–3 nearby test files to learn project conventions (naming, assertion library, mock framework, fixture patterns) |
-| **2. Identify scenarios** | List test cases across four quadrants: happy path, negative inputs, boundary conditions, and error paths |
-| **3. Get approval** | Present the scenario list and wait for confirmation before writing |
-| **4. Write & run** | Implement one behavior per test, run the full suite, fix any failures |
+| **1. Inspect** | Read the reference test files named in CLAUDE.md, if any — they win over neighbouring tests. Otherwise read 2–3 nearby test files to learn project conventions (naming, assertion library, mock framework, fixture patterns) |
+| **2. Identify scenarios** | List test cases across four quadrants — happy path, negative inputs, boundary conditions, error paths — and present them for confirmation before writing |
+| **3. Load the language reference** | Pick the matching reference for the project's stack |
+| **4. Write & run** | Implement one behavior per test, run the full suite, never leave it red |
+| **5. Prove the assertions bite** | For tests whose contract is a side effect on a mock, break that side effect once, confirm the test fails, restore it |
 
 All tests must satisfy the **FIRST-U principles** — Fast, Isolated,
 Repeatable, Self-validating, Timely, Understandable — and be structured

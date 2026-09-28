@@ -26,7 +26,7 @@ The skill enforces three gates, one per cycle phase:
 |-------|------------|------|
 | **RED** | Write one failing test for the next behavior | Confirm it fails for the right reason |
 | **GREEN** | Write the minimum code to pass the test | Full suite must be green — no regressions |
-| **REFACTOR** | Improve structure without changing behavior | Suite stays green throughout |
+| **REFACTOR** | Improve structure without changing behavior — walk six items (duplication, naming, cognitive complexity, single responsibility, side effects, dead code) and report one line each | Checklist reported, then suite green |
 
 Repeat until the feature is complete.
 

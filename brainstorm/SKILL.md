@@ -34,7 +34,7 @@ Turn ambiguous ideas into concrete, validated designs through Socratic dialogue.
 
 ## Socratic Questioning
 
-One question per message. Prefer multiple-choice when the options are known. Let each answer shape the next question. Ask "why" when the stated need and the real need might differ.
+One question per message. Ask in plain text — no option-picker tools. When the options are known, name them inside the question. Let each answer shape the next question. Ask "why" when the stated need and the real need might differ.
 
 **Recommend, don't interrogate.** For each question, lead with your recommended answer based on context already gathered. Frame it as *"I'd default to X because Y — does that fit?"* rather than *"What should we do about X?"*. The user reacts; they don't have to generate. Switch to open-ended only when you genuinely have no basis to recommend.
 

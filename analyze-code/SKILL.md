@@ -21,7 +21,7 @@ Report-only. This skill never applies fixes; it routes them.
 | Lens | What it covers | Reference |
 |------|----------------|-----------|
 | **Architecture** | Coupling, layering, public-API contracts, cohesion, deploy topology, runtime concerns (graceful shutdown, signals, healthchecks, retry/backoff) | `system-architect` specialist |
-| **Quality** | Three named angles — Simplification, Efficiency, Altitude (see Step 5) — plus test-coverage signal, CI/IaC config quality (Dockerfile, Makefile, GH Actions), 12-factor config | `refactoring-expert` specialist |
+| **Quality** | Four named angles — Simplification, Efficiency, Interface depth, Altitude (see Step 5) — plus test-coverage signal, CI/IaC config quality (Dockerfile, Makefile, GH Actions), 12-factor config | `refactoring-expert` specialist |
 | **Performance** | Hot paths, algorithmic complexity, N+1, unnecessary allocations | `performance-engineer` specialist |
 | **Security** | Input trust, auth, supply-chain (lockfiles, pinned base images, vuln scanners), secrets (env hygiene, KMS/Vault refs, log/layer leakage), license/SBOM | `security-engineer` specialist |
 | **Style** | Language style guide and formatting | `style-checker` skill |
@@ -80,7 +80,7 @@ Don't inflate severity. Low stays Low. Reserve Critical for real blast radius.
 
 5. **Apply the five lenses** — Architecture, Quality, Performance, Security, Style, each covering its row in the Five Lenses table above against the scoped code. Directives beyond the table:
    - **Architecture:** also check cross-service consistency where the changed code crosses service or package boundaries.
-   - **Quality:** run three named angles, each producing findings that name the concrete cost (what is duplicated, wasted, or made harder to maintain) rather than a vague smell. Reuse is not here — Step 4b owns it.
+   - **Quality:** run four named angles, each producing findings that name the concrete cost (what is duplicated, wasted, or made harder to maintain) rather than a vague smell. Reuse is not here — Step 4b owns it.
      - **Simplification** — unnecessary complexity the change adds: redundant or derivable state, copy-paste with slight variation, deep nesting, dead code left behind. **Name the simpler form that does the same job.**
      - **Efficiency** — wasted work the change introduces: redundant computation or repeated I/O, independent operations run sequentially, blocking work added to startup or a hot path. Also long-lived objects built from closures or captured environments — they hold the entire enclosing scope alive for the object's lifetime, which leaks when that scope holds large values; prefer a struct or class copying only the fields it needs. **Name the cheaper alternative.**
      - **Interface depth** — for each new or widened interface, what must the caller now know (types, constants, invariants) versus what does the module hide? A method that returns stored state and hides nothing widens the surface for free-looking reasons — a zero-line diff in the implementer is not evidence the change was free. Load `designing-interfaces`. **Name the behavior that should have moved behind the interface.**
