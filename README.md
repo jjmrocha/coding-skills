@@ -17,7 +17,7 @@ focused instructions for a specific domain.
 |-------|-------------|
 | [addressing-findings](addressing-findings/) | Walks an analyze-code report or a PR's review comments one finding at a time — explain, propose options, recommend, ask. Nothing changes until you approve, and it never posts to the PR — it hands you the reply text. |
 | [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, security, and style. Produces a prioritized findings report — a deep review, not a gate decision. |
-| [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. No implementation until the design is approved. |
+| [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. Features that split into atomic parts are planned and built one sub-task at a time from a single feature plan. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
 | [designing-interfaces](designing-interfaces/) | Makes interface width visible before the implementation is written. Requires a four-line contract — what the caller must learn, what the module hides, where the seam is, what the test calls — and sends the design back when nothing is hidden. Counterweights `coding-discipline`'s minimality bias, which on its own selects for the shallower design. |
 | [guiding-manual-testing](guiding-manual-testing/) | Walks you through verifying a change by hand on a real environment (local or staging) with real data — one step at a time, you run it and paste the output back. Enforces a matched pair (the case that must change and the case that must not), predictions written before execution, and a restore point before any mutation. Report-only; never touches the environment itself. |
@@ -87,6 +87,10 @@ A typical feature-development loop using these skills:
    under `<kb_path>/plans/` (or `docs/specs/` when no `kb_path` is configured),
    so it persists across sessions and — for cross-repo work — can be referenced
    from any repo.
+   When the scope splits into atomic parts, brainstorm instead saves a
+   *feature plan* listing the sub-tasks, then runs design → plan → build
+   for one sub-task at a time, asking before starting the next. In a new
+   session, `/brainstorm continue <feature>` resumes from the feature plan.
 2. **Build** — `/using-software-specialists` ingests the plan, validates it
    against the Plan-phase done-criteria, and implements. The Implementation
    phase loads `designing-interfaces`, `coding-discipline`, and
@@ -141,6 +145,7 @@ flowchart TD
     RS -.->|clear path| USS
 
     BS -->|approved plan file| USS[using-software-specialists]
+    USS -.->|next sub-task| BS
     USS -->|implemented| AC[analyze-code]
 
     AC -->|findings to apply| AF
