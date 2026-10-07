@@ -26,7 +26,7 @@ Advance only when the current phase's output is complete:
 | Phase | Done when... |
 |------|--------------|
 | Requirements | Acceptance criteria testable, scope exclusions explicit, NFRs listed |
-| Design | Component boundaries defined, data model serves all access patterns, API contracts written, and every new or widened interface has a `designing-interfaces` contract whose HIDDEN slot is non-empty |
+| Design | Component boundaries defined, data model serves all access patterns, API contracts written, and every new or widened interface has a `designing-interfaces` contract that passes its read-back |
 | Plan | Tasks decomposed, dependencies explicit, riskiest work first, verification check per step |
 | Implementation | Feature works end-to-end (not just compiles), each behavior driven by a test written first, error/loading/empty states handled, contracts honored |
 | Testing | Edge cases enumerated and covered beyond the TDD suite, test levels right (inverted pyramid), no flaky tests, tests pass in CI not just locally |

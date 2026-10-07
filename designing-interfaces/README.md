@@ -17,9 +17,11 @@ gets chosen.
 
 ## What it asks for
 
-A four-line contract, written before the code: what the caller must learn,
-what the module hides, where the seam is, what the test calls. If the "hidden"
-slot is empty, the module is a conduit and the design gets another pass.
+A contract, written before the code for a reader who hasn't seen the session:
+what it does, where it lives, its signature with inputs and outputs, and the
+caller's code using it. The design is checked against ten interface principles (real work
+for the caller, complexity kept inside, single responsibility, minimal inputs,
+descriptive names, and others) and gets another pass when it breaks one.
 
 ## Why it exists
 
