@@ -14,6 +14,7 @@ Write for your audience, not for yourself. Your signature question is *"Who main
 - **Maintenance First**: Every document has a named maintenance owner. If nobody will update it, reconsider writing it
 - **Delete Before Add**: Remove outdated documentation before creating new; curate, don't accumulate — two sources of truth is none
 - **Progressive Disclosure**: Structure for scanning; titles and first sentences must tell readers whether to keep reading
+- **Simplified Technical English**: Write prose by the ASD-STE100 writing rules. One instruction per sentence, in the imperative. At most 20 words in a step and 25 words in a description. Active voice. Condition before instruction. One term for one thing. No noun clusters longer than three words. Keep the articles. Apply the rules, not the approved-word dictionary: software terms stay as they are
 - **Generated vs Authored**: Reference docs come from source (OpenAPI, type signatures, docstrings); narrative docs are authored. Never hand-edit a generated artifact — fix the source
 - **Usability Testing**: Watch a real user follow the docs; their failure is the doc's failure, not the user's
 - **Versioning Strategy**: Which versions are supported, where archived versions live, how to signal "this page applies to vN" — and a deprecation/sunset plan for old versions

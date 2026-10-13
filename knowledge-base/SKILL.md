@@ -79,6 +79,8 @@ The user's verb determines the mode.
 
 YAML frontmatter (`summary`, `sources` ≥1 entry, `last_updated: YYYY-MM-DD`, `kind:` on `patterns/` and `manuals/`) + Markdown body. Wiki-links use **paths from the KB root, no extension**: `[[wiki/<repo>/entities/<name>]]`, `[[plans/<ticket>]]`. Citations live in `sources:`, never inline (use `[needs source]` for unsupported claims). Full template, per-subfolder body shape, and the special-case rule for `wiki/index.md` (uses standard markdown links): [references/page-template.md](references/page-template.md), [references/index-templates.md](references/index-templates.md).
 
+Plans start with `## In short` and are written for the user to read. The rule is in [references/page-template.md](references/page-template.md).
+
 `helpers/` and `patterns/` have a specific inclusion bar and creation channel — see [references/helpers-and-patterns.md](references/helpers-and-patterns.md).
 
 ## Manuals

@@ -29,11 +29,14 @@ Load the specialist the finding names; if it names none, pick one through `using
 
 Full form:
 
+Write for a reader who has not opened the file. Use complete sentences. Say what each function, type or term is the first time it appears. Restate the finding in your own plain words. Do not copy the report's tags or wording.
+
 1. **`## Finding N of M: <plain-language title>`** (PR comment: add `— <author>, #<comment id>`)
-2. **Issue** — what is wrong, quoting the line(s) with `file:line`. What it affects and when it bites. If an earlier claim about it was wrong, correct it here.
-3. **Fix options** — usually two, each with its cost and the tests it adds. Include "keep it and document why" when that is a real option. Steps only the user can do (rotate a key, change infra) are named as such.
-4. **Recommendation** — one option, one sentence why.
-5. **One question**, plain text, ending the message: "Apply A?" No option pickers, no second question.
+2. **Context** — one or two sentences: what this code does and who calls it.
+3. **Issue** — what is wrong, quoting the line(s) with `file:line`. What it affects and when it bites. If an earlier claim about it was wrong, correct it here.
+4. **Fix options** — usually two, each with its cost and the tests it adds. Show the recommended option as a short before/after snippet. Include "keep it and document why" when that is a real option. Steps only the user can do (rotate a key, change infra) are named as such.
+5. **Recommendation** — one option, one sentence why.
+6. **One question**, plain text, ending the message: "Apply A?" No option pickers, no second question.
 
 Compact form — when the user signals time pressure ("move fast", "we're late", "batch these"): title, Issue in one line, recommended fix as a snippet with the tests it adds and any user-only step, "Apply?".
 
@@ -47,7 +50,7 @@ Then stop.
 | Approve several by number ("apply 1, 3, 5") | Apply exactly those, verify once, report, present the next undecided finding. |
 | Approve + extra scope ("and tidy it while you're there") | Apply the approved option only. Extra scope that overlaps a later finding waits for that finding; anything else becomes a new finding at the end of the list. |
 | Skip ("next", "later", "leave it") | Don't re-pitch. Record as skipped; present the next finding. |
-| Confusion ("explain", "I didn't understand") | Re-explain the same finding with before/after snippets and no new options. Repeat the question. |
+| Confusion ("explain", "I didn't understand") | Re-explain the same finding in different words, with one concrete example: an input, what the code does with it now, and what it should do. No new options. Repeat the question. |
 | Pushback on the premise | Accept the correction; drop or narrow the finding. Save the correction to memory if it should outlive the session. |
 | "I made changes, check them" | Report-only: build, lint, tests, what is now resolved, what is still open. No edits. |
 

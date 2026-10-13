@@ -142,7 +142,16 @@ Undocumented suppressions stay at original severity — the absence of rationale
 | gitleaks | — | skipped | not installed |
 | trivy | 0.50 | failed (2 CVEs) | |
 
-**Summary:** <1-2 sentences — headline findings>
+## In plain words
+<Written for a reader who has not opened the code. Complete sentences, no tags. Say what each function, type or term is the first time it appears.>
+
+<One sentence on the overall state of the code.>
+
+<One short paragraph for each Critical or High finding: what is wrong, and what happens if it stays.>
+
+<One sentence that counts the Medium and Low findings.>
+
+The sections below are the detailed record. `addressing-findings` walks them one at a time.
 
 ## Priority Actions
 1. [Critical|High] <action> — <file:line>
