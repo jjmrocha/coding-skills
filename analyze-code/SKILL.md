@@ -160,6 +160,11 @@ The sections below are the detailed record. `addressing-findings` walks them one
 <Source: spec/ticket provided | plan at <path> | none — skipped>
 - [Met | Unmet | Deviation | Scope-creep] <requirement or plan step> — <file:line or "not found">
 
+## Verification
+| Candidate | Where | Verdict |
+|-----------|-------|---------|
+| <one line> | <file:line> | Confirmed / Plausible / Refuted |
+
 ## System-level Findings
 - [Severity · Confirmed|Plausible · root-cause|symptom] <Finding> — <file:line>
   - Evidence: <snippet or reference>
