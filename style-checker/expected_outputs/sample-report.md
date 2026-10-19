@@ -22,18 +22,17 @@
 ## Medium
 
 ### Go
-- `cmd/main.go:7` — **Rule**: Package-name import path segment uses underscores. Found `"github.com/org/my_pkg"`, expected lowercase no-underscore path
+- `cmd/main.go:7` — **Rule**: A renamed import's local name follows package naming (lowercase, no underscores). Found `my_pkg "github.com/org/mypkg/v2"`, expected `mypkg`
 - `internal/parser/parse.go:28` — **Rule**: Import group ordering. Standard library and third-party packages are not separated by a blank line
 
 ### TypeScript
-- `src/services/auth.service.ts:55` — **Rule**: Line exceeds 80 characters (found 97). Refactor or split the expression
+- `src/services/auth.service.ts:55` — **Rule**: Use an interface, not a type alias, for object types. Found `type AuthState = {...}`, expected `interface AuthState {...}`
 
 ## Low
 
 ### Python
-- `src/models/user.py:3` — **Rule**: Blank lines between top-level definitions. Expected 2 blank lines before `class user_model`, found 1
+- `src/models/user.py:17` — **Rule**: Blank lines between top-level definitions. Expected 2 blank lines before `class user_model`, found 1
 - `src/utils/helpers.py:44` — **Rule**: Inline comment spacing. Expected 2 spaces before `#`, found 1
 
 ## Clean files
 - `cmd/server.go`
-- `src/services/auth.service.ts` (lines 1–54 only; see Medium violation at line 55)

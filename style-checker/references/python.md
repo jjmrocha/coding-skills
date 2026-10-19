@@ -26,18 +26,21 @@ Source: https://google.github.io/styleguide/pyguide.html
 
 ### Single-Character Names
 Allowed **only** for:
-- Loop counters: `i`, `j`, `k`
+- Loop counters and iterators: `i`, `j`, `k`, `v`
 - Exception identifier in `except` clause: `e`
-- File handle: `f`
-- Private TypeVar with no constraints
+- File handle in a `with` statement: `f`
+- Private TypeVar or ParamSpec with no constraints: `_T`, `_P`
+- Names that match established notation in a reference paper or algorithm
 
-**Never** use single-character names in other contexts.
+**Never** use single-character names in other contexts. A name's descriptiveness should grow with its scope: `i` is fine in a 5-line block, too vague across nested scopes.
 
 ### Prohibited Naming Patterns
 - Dashes in module/file names (use underscores: `my_module.py` not `my-module.py`)
 - `__double_underscore__` names (reserved by Python; beyond `__init__`, `__str__`, etc.)
 - Names ending with type information (e.g., don't use `id_to_name_dict`)
 - Offensive terms or abbreviations unfamiliar outside the project
+- Abbreviations made by deleting letters within a word
+- Leading double underscore (`__private`) for name mangling — discouraged; use a single underscore
 
 ### Required Receiver Names
 - `self` is **required** as the first parameter of instance methods.
@@ -45,7 +48,7 @@ Allowed **only** for:
 - These names are reserved and must not be used for other identifiers.
 
 ### Acronyms
-Treat as whole words in `CapWords`: `HttpServer`, `XmlParser` (not `HTTPServer`, `XMLParser`)
+Follow PEP 8: in `CapWords`, capitalize every letter of an acronym: `HTTPServerError`, `XMLParser` (not `HttpServerError`). In `lower_with_under` names, acronyms are lowercase: `send_acronym_via_https`.
 
 ---
 
@@ -71,7 +74,10 @@ foo = long_function_name(
 ## Line Length
 
 - **80 characters** maximum.
-- Exceptions: long import lines, URLs in comments, string literals that can't be split, `pylint` disable comments.
+- Exceptions: long import statements; URLs, pathnames, or long flags in comments; long module-level string constants without whitespace (URLs, pathnames); `pylint` disable comments.
+- Docstring summary lines must always stay within 80 characters.
+- Any other line may exceed 80 characters only when the Black or Pyink formatter cannot bring it under the limit.
+- Prefer breaking at the highest syntactic level. Put a long URL in a comment on its own line rather than splitting it.
 - **Never use backslash** for explicit line continuation — use implicit joining inside `()`, `[]`, or `{}`.
 
 ```python
@@ -96,15 +102,16 @@ result = some_long_variable + another_variable \
 
 - `from __future__ import` statements must appear first (before any other imports).
 - One import per line. Exception: `from typing import X, Y` and `from collections.abc import X, Y` are allowed.
-- Import **entire modules**, not individual names. Exception: `typing`, `collections.abc`, and `typing_extensions` modules.
+- Use `import x` for packages and modules. Use `from x import y` only when `y` is a module and `x` is its package. Never import a class or function by name. Exception: symbols from `typing`, `collections.abc`, and `typing_extensions` are imported directly.
 - **No relative imports** — always use full package paths.
 - **No wildcard imports** (`from module import *` is forbidden).
-- Sort order (each group separated by a blank line):
+- Imports go at the top of the file, after the module docstring and before globals and constants.
+- Sort order (a blank line between groups is optional):
   1. `from __future__ import ...`
   2. Python standard library
   3. Third-party libraries
   4. Local/repository sub-packages
-- Sort **lexicographically** within each group (case-insensitive).
+- Sort **lexicographically** within each group (case-insensitive), by the module's full package path (the `path` in `from path import ...`).
 
 ### Import Aliases (`as`)
 
@@ -135,8 +142,8 @@ from myproject import my_module
 
 # Wrong — relative import
 from . import module
-# Wrong — importing individual names from non-typing modules
-from os import path
+# Wrong — importing a class by name instead of its module
+from collections import OrderedDict
 ```
 
 ---
@@ -147,11 +154,17 @@ from os import path
 - Use the opposite quote to avoid escaping: `"don't"` or `'say "hello"'`.
 - **Docstrings**: always use `"""` triple double-quotes.
 - Multi-line strings: prefer `"""` over `'''`.
-- String formatting preference: f-strings > `%` > `.format()` > concatenation.
+- Use an f-string, the `%` operator, or `.format()` to format strings. Google does not rank them. A single join with `+` is fine, but **do not format with `+`**.
+- Do not accumulate a string with `+` or `+=` in a loop. Append to a list and `''.join()` it, or write to an `io.StringIO`.
+- Multi-line strings do not follow code indentation. To avoid embedded leading spaces, use concatenated single-line strings or `textwrap.dedent()`.
 
 ```python
-# Preferred
+# Correct
 name = f"Hello, {user.name}!"
+pair = first + second  # a single join is fine
+
+# Wrong — formatting with +
+message = "name: " + name + "; score: " + str(n)
 
 # Docstring always uses """
 def func():
@@ -162,8 +175,9 @@ def func():
 
 ### Trailing Commas
 
-- Recommended when the closing bracket does not appear on the same line as the final element.
+- Recommended only when the closing bracket does not appear on the same line as the final element, and for single-element tuples.
 - Hints auto-formatters to produce one-item-per-line formatting.
+- Wrong: a trailing comma followed by the closing bracket on the same line as the last element of a multi-line list (`    6,]`).
 
 ```python
 # Correct — trailing comma triggers multi-line formatting
@@ -187,7 +201,7 @@ result = solve(
 ## Whitespace in Expressions
 
 - **No** whitespace inside `()`, `[]`, `{}`: `spam(ham[1], {'eggs': 2})`.
-- **No** whitespace before `,`, `;`, or `:`.
+- **No** whitespace before `,`, `;`, or `:`. **One space** after them, except at the end of a line.
 - **No** whitespace before `(` in function calls or indexing: `spam(1)`, `list[0]`.
 - **No** trailing whitespace.
 - **No** vertical alignment of tokens across consecutive lines.
@@ -220,6 +234,7 @@ def func(a: int = 0, b: str = ''):
 - Allowed **only for one-liners**; keep under 60–80 characters.
 - Prefer generator expressions or list comprehensions over `map()` / `filter()` with lambda.
 - If a lambda exceeds one line, refactor it into a named `def`.
+- For common operations, use the `operator` module instead of a lambda: `operator.mul`, not `lambda x, y: x * y`.
 
 ```python
 # Acceptable
@@ -231,7 +246,7 @@ result = [x * 2 for x in items]
 
 ### Comprehensions & Generator Expressions
 - Allowed for **simple cases** where intent is clear.
-- **No multiple `for` clauses** or deeply nested filters — those belong in `for` loops.
+- **No multiple `for` clauses** and no multiple filter expressions — those belong in `for` loops.
 - Optimize for **readability** over conciseness.
 - Generator expressions acceptable as single function arguments.
 
@@ -247,30 +262,37 @@ result = [f(x) for x in data if cond(x) for y in x.children if y.active]
 
 ## Parentheses
 
-- Use **sparingly**; not required around tuples (except single-element tuples or empty tuples).
-- Not required in `return` or `if` statements unless clarifying grouping or splitting lines.
-- Acceptable for line continuation or to clarify the tuple vs. expression boundary.
+- Use **sparingly**. Parentheses around tuples are fine but not required.
+- **Do not** use them in `return` statements or conditions (`if`, `while`, `not`), unless they wrap a line continuation or mark a tuple.
 
 ```python
-# Unnecessary parentheses (don't flag as violation, just note preference)
-return foo
+# Correct
 if x:
+return foo
+return (spam, beans)
+onesie = (foo,)
 
-# Necessary — 1-tuple
-return (value,)
+# Wrong
+if (x):
+if not(x):
+return (foo)
 ```
 
 ---
 
 ## Comments & Docstrings
 
-- All public modules, classes, functions, and methods **require docstrings**.
-- Docstring first line: summary (≤80 chars). Blank line, then detailed description.
+- A function or method **requires a docstring** when it is part of the public API, has nontrivial size, or has non-obvious logic.
+- No docstring is required on test modules, on `unittest.TestCase` subclasses, or on their `test_` methods. A docstring that only repeats the name should be omitted.
+- A method decorated with `@override` needs no docstring unless it changes the base contract. Without `@override`, an overriding method needs one. `"""See base class."""` is not useful.
+- Docstring first line: a summary of at most 80 characters that ends with a period, question mark, or exclamation point. Then a blank line, then the detailed description.
+- The summary may be descriptive (`"""Fetches rows."""`) or imperative (`"""Fetch rows."""`), but one file must use one style. A `@property` docstring describes the value like an attribute: `"""The Bigtable path."""`, not `"""Returns the Bigtable path."""`.
+- Section bodies (`Args:`, `Returns:` or `Yields:`, `Raises:`) use a hanging indent of 2 or 4 spaces, consistent within the file. `Returns:` may be omitted when the function returns only `None`, or when the summary starts with "Returns" and fully describes the value.
 - Google-style docstring sections:
 
 ```python
 def func(x, y):
-    """Summary line (imperative mood).
+    """Summary line ending with a period.
 
     Args:
         x: Description of x.
@@ -284,25 +306,28 @@ def func(x, y):
     """
 ```
 
-- Module docstring: required; include usage examples.
-- Class docstring: document class-level attributes.
+- Every file starts with license boilerplate, then a module docstring describing its contents and usage. Usage examples are optional.
+- Class docstring: the summary says what an instance represents (`"""The address of a cheese shop."""`), not `"""Class that describes..."""`. An exception says what it represents, not when it is raised. Public attributes, except properties, go in an `Attributes:` section.
 - Block comments: indented to same level as code, then `# ` + text.
 - Inline comments: two spaces before `#`, then one space after.
 - Comments explain **why**, not what. No obvious descriptions.
-- `TODO` format: `# TODO: crbug.com/123456 - Description`
+- `TODO` format: `# TODO(crbug.com/123456): Description`. The parentheses hold a link to the context, ideally a bug. The old form `# TODO: crbug.com/123456 - Description` is discouraged in new code. Do not name a person or team as the context, as in `# TODO(@username): ...`.
 
 ---
 
 ## Type Annotations
 
-- `X | None` instead of `Optional[X]` (Python 3.10+).
+- `X | None` is recommended in new code; `Optional[X]` is still allowed.
+- A parameter that can be `None` must say so in its type. Wrong: `def f(a: str = None)`. Correct: `def f(a: str | None = None)`.
+- Type aliases use `CapWords` (`_Private` when module-only) and are annotated with `TypeAlias`: `_LossAndGradient: TypeAlias = tuple[Tensor, Tensor]`.
+- Names imported from `typing` or `collections.abc` are treated like keywords: do not define them in your code. On a collision, use `from typing import Any as AnyType`.
 - Use abstract container types: `collections.abc.Sequence` over `list`.
 - Prefer built-in generics: `list[T]` over `typing.List[T]`.
 - Import types from `typing` and `collections.abc` directly.
 - Use `TYPE_CHECKING` block for annotation-only imports that would cause runtime cycles.
 - Private TypeVar: `_T = TypeVar("_T")`.
-- **Do not annotate** `self` or `cls` (unless using the `Self` type).
-- **Do not annotate** `__init__` return type.
+- Annotating `self`, `cls`, or the `__init__` return type is not necessary. Do not flag it when present. Use `Self` when the type matters.
+- Not every function must be annotated. At least the public API should be.
 - Use `from __future__ import annotations` or quoted forward references for self-referencing types.
 - **Line-wrapping long annotated signatures**: prefer one parameter per line; a trailing comma after the last parameter pushes the return type onto its own line. Break between parameters, never between a parameter name and its type.
 

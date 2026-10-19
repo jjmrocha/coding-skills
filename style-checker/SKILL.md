@@ -7,7 +7,7 @@ description: "Use when checking, reviewing, or auditing code style, formatting, 
 
 Reviews code against Google's official style guidelines for **formatting and naming only**. Does not check logic, architecture, or code quality (SOLID, smells). Does not auto-fix — reports violations to fix.
 
-**Supported languages:** Go, Java, Python, JavaScript, TypeScript, Shell, Markdown.
+**Supported languages:** C++, C#, Go, Haskell, HTML/CSS, Java, JavaScript, JSON, Kotlin, Python, TypeScript, Shell, Markdown.
 
 ## Workflow
 
@@ -26,6 +26,12 @@ Scan the repo (or the path the user provided) and, for each supported language p
 | Go | [references/go.md](references/go.md) | `*.go` |
 | Shell | [references/shell.md](references/shell.md) | `*.sh`, `*.bash` |
 | Markdown | [references/markdown.md](references/markdown.md) | `*.md` |
+| C++ | [references/cpp.md](references/cpp.md) | `*.cc`, `*.cpp`, `*.cxx`, `*.h`, `*.hh`, `*.hpp` |
+| C# | [references/csharp.md](references/csharp.md) | `*.cs` |
+| Haskell | [references/haskell.md](references/haskell.md) | `*.hs`, `*.lhs` |
+| HTML/CSS | [references/htmlcss.md](references/htmlcss.md) | `*.html`, `*.htm`, `*.css`, `*.scss`, `*.sass`, `*.gss` |
+| Kotlin | [references/kotlin.md](references/kotlin.md) | `*.kt`, `*.kts` |
+| JSON | [references/json.md](references/json.md) | `*.json` (data and API payloads; the reference lists tool config files to skip) |
 
 **Always skip:** `vendor/`, `node_modules/`, `.git/`, `*.pb.go`, `*_generated.go`, and any file whose first lines contain `// Code generated` or `# Generated`. **Deprioritize** test/spec files (`*_test.go`, `*.spec.*`, `test_*.py`) unless the user explicitly asks to include them.
 

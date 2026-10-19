@@ -5,12 +5,11 @@ Source: https://google.github.io/styleguide/docguide/style.html
 ## Headings
 
 - Use **ATX-style headings** (`#`, `##`, `###`) — **never** Setext-style underlines (`===` or `---`).
-- Exactly **one H1** per document (the title).
-- Blank line **before and after** every heading.
-- Space required after `#`.
-- Heading names: **unique and fully descriptive** within the document.
-- Capitalization: follow Google Developer Documentation Style Guide (sentence case for headings).
-- **Preserve the original capitalization** of product, tool, and binary names everywhere (e.g., `gRPC`, `iOS`, `npm`) — don't sentence-case them to fit a heading.
+- Exactly **one H1** per document (the title), ideally the same or nearly the same as the file name. All other headings are H2 or deeper.
+- Space after `#`, and a blank line **before and after** every heading.
+- Heading names: **unique and fully descriptive** within the document, even for sub-sections (`### Foo summary`, not a second `### Summary`), because anchors are built from them.
+- Capitalization: follow the Google Developer Documentation Style Guide (sentence case for titles and headings).
+- **Preserve the original capitalization** of product, tool, and binary names everywhere (`Markdown`, `gRPC`, `iOS`, `npm`).
 
 ```markdown
 # Document Title
@@ -29,137 +28,125 @@ Section
 
 ---
 
+## Document Layout
+
+Recommended layout:
+1. `# Title`
+2. Author (optional)
+3. Short introduction: 1–3 sentences
+4. `[TOC]` (only where the hosting supports it)
+5. Content sections, starting at `## H2`
+6. `## See also` (optional final section with further links)
+
+### Table of Contents
+- `[TOC]` is a directive of hosting such as Gitiles. GitHub and most other renderers do not support it. **Do not report a missing `[TOC]`** unless the project uses such hosting.
+- Where used: place it after the introduction and before the first H2. Omit it when all content is visible without scrolling on a laptop.
+
+---
+
 ## Line Length
 
 - **80-character limit** for prose.
-- Exceptions (may exceed 80 chars): URLs, links, tables, headings, code blocks.
-- Use reference-style links for long URLs that would break the 80-char limit.
+- Exceptions (may exceed 80 chars): links, tables, headings, code blocks. Text before and after a long link is still wrapped.
+
+---
+
+## Trailing Whitespace
+
+- **Prohibited.** Do not use two trailing spaces for a line break.
+- For a hard line break, use a trailing backslash `\`, sparingly. Better: avoid the need and start a new paragraph with a blank line.
 
 ---
 
 ## Lists
 
-### Unordered Lists
-- Use `*` for list markers (not `-` or `+`).
-- Nested items: **4-space indent**.
-- Single-line lists: 1 space between marker and text suffices for short, non-nested lists.
+### Markers and Spacing
+- The guide sets **no rule** between `*` and `-` for bullets. Its examples use `*`. Report only mixed markers within one list, as Low.
+- Use a **4-space indent** for wrapped text and nested lists, for both numbered and bulleted lists:
+  - Numbered: 2 spaces after `1.`, so the text starts at column 4.
+  - Bulleted: 3 spaces after `*`, so the text starts at column 4.
+  - Wrapped text in a nested list: 8-space indent.
+- Small, non-nested, single-line lists may use one space after the marker.
 
 ```markdown
-* First item
-* Second item
-    * Nested item
+1.  Use 2 spaces after the item number, so the text itself is indented 4 spaces.
+    Use a 4-space indent for wrapped text.
+2.  Use 2 spaces again for the next item.
+
+*   Use 3 spaces after a bullet, so the text itself is indented 4 spaces.
+    1.  Nested numbered item.
+        Wrapped text in a nested list needs an 8-space indent.
+
+* Foo
+* Bar
 ```
 
-### Ordered Lists
-- Use **lazy numbering** (all `1.`) for long or frequently changed lists.
+### Numbering
+- Use **lazy numbering** (all `1.`) for long lists that may change, especially nested ones.
 - Use full sequential numbering (`1.`, `2.`, `3.`) for short, stable lists.
-- Content alignment: 2 spaces after the number, 3 spaces after bullets (for 4-space total indent).
-
-```markdown
-1. First item
-1. Second item
-1. Third item
-
-or:
-
-1. First item
-2. Second item
-3. Third item
-```
-
-### Lists with Code Blocks
-
-- Indent code blocks **4 additional spaces** from the list item to maintain list context.
-
-```markdown
-1. Step one:
-    ```python
-    print("hello")
-    ```
-```
 
 ---
 
-## Tables
-
-- Use for **tabular data** with uniform distribution requiring quick scanning.
-- **Avoid** for sparse data or simple lists — use a bullet list instead.
-- Use **reference-style links** inside table cells to keep content concise and under the 80-char limit.
-
----
-
-## Code Formatting
+## Code
 
 ### Inline Code
-- Use **backticks** for: field names, file names, file types, short code snippets, technical terms.
-
-```markdown
-Use `myVariable` and save to `config.json`.
-```
+- Use **backticks** for short code quotations, field names, commands, and file types in a generic sense (`README.md`).
+- Use a code span to stop Markdown processing, for example a fake path or example URL that would autolink: `` `https://www.google.com/search?q=$TERM` ``.
 
 ### Code Blocks
-- Use **fenced blocks** (triple backticks) with an explicit language tag.
-- **Never** use indented code blocks (4-space indent interpreted as code).
-- Use trailing backslash `\` to escape newlines in command examples (for copy-paste support).
+- Use **fenced blocks** (triple backticks) for any code longer than one line.
+- **Declare the language** on the fence (` ```python `).
+- Fenced blocks are strongly recommended over indented (4-space) code blocks, which cannot declare a language and have ambiguous boundaries.
+- Escape newlines with a trailing backslash `\` in command-line snippets meant to be copied into a terminal.
 
 ```markdown
-    ```bash
-    command1 \
-      --flag value \
-      --other flag
+    ```shell
+    $ bazel run :target -- --flag --foo=longlonglonglonglongvalue \
+      --bar=anotherlonglonglonglonglonglonglonglongvalue
     ```
 ```
 
+### Code Blocks in Lists
+- Indent a fenced block to the list item's text indentation so it does not break the list.
+- An indented code block inside a list is indented 4 additional spaces from the list indentation.
+
 ```markdown
-    ```python
-    def hello():
-        print("hello")
+*   Bullet.
+    ```c++
+    int foo;
     ```
-```
-
-Wrong (indented code block):
-```markdown
-    def hello():
-        print("hello")
-```
-
----
-
-## Emphasis
-
-- `**bold**` for strong emphasis.
-- `*italic*` for light emphasis.
-- Use emphasis **sparingly**.
-- Prefer **backtick inline code** over emphasis for technical terms, file names, field names, and code references.
-
-```markdown
-<!-- Preferred for technical terms -->
-Use the `--verbose` flag.
-
-<!-- Not recommended -->
-Use the *verbose* flag.
+*   Next bullet.
 ```
 
 ---
 
 ## Links
 
-- Use **descriptive link text** — avoid "click here", "here", "link".
-- Internal links: use **explicit paths** (`/path/to/file.md`), not full URLs.
-- Relative paths: safe within same directory; avoid `../` constructions.
-- **Reference-style links**: use for long URLs or repeated references to maintain 80-char limit.
-- Define references just before the next heading in their section.
+- **Shorten links** wherever possible.
+- **Informative link text**: wrap the most fitting phrase. Never "here", "link", or the bare URL as text.
+- Links to other Markdown pages: use the **explicit path** (`/path/to/page.md`), not the full qualified URL.
+- Relative paths are fine within the same directory. **Avoid `../`** relative paths.
+
+### Reference Links
+- Use reference links (`[text][ref]`) **only when the URL is long enough to hurt readability** inline. For a short URL, inline it.
+- Use them more often in tables, to keep cells short, and to avoid repeating the same URL.
+- Define a reference just before the next heading, at the end of the section where it is first used. A reference used in several sections goes at the end of the document.
 
 ```markdown
 <!-- Good -->
-See the [configuration guide](docs/config.md).
-Visit the [Google style guide][style-guide].
+See the [configuration guide](/docs/config.md).
+The [style guide] says not to use reference links unless you have to.
 
-[style-guide]: https://google.github.io/styleguide/
+[style guide]: https://docs.google.com/document/d/13HQBxfhCwx8lVRuN2Wf6poqvAfVeEXmFVcawP5I6B3c/edit
+
+## Next section
 
 <!-- Avoid — non-descriptive text -->
-See [here](https://very-long-url.example.com).
-[Click here](docs/config.md) for the guide.
+See [here](https://example.com/docs).
+<!-- Avoid — reference link for a short URL -->
+The [style guide][style_guide] says so.
+
+[style_guide]: https://google.com/Markdown-style
 ```
 
 ---
@@ -167,61 +154,33 @@ See [here](https://very-long-url.example.com).
 ## Blank Lines
 
 - **One blank line** before and after headings.
-- **One blank line** (empty line) between paragraphs.
-- **No trailing spaces** for line breaks — use a blank line between paragraphs instead.
+- **One blank line** between paragraphs.
 
 ---
 
-## Trailing Whitespace
+## Tables
 
-- **Prohibited.** No trailing spaces at end of lines.
-- Use trailing backslash `\` to escape newlines within code blocks if needed.
+- Use for **tabular data** with fairly uniform distribution across two dimensions, or many parallel items with distinct attributes, that needs quick scanning.
+- **Avoid** for data that fits a list: poor distribution (many empty or identical cells), few rows relative to columns, or long prose in cells.
+- Use reference links inside table cells to keep them short.
 
 ---
 
 ## HTML
 
-- **Strongly prefer Markdown over HTML** wherever possible.
-- Use HTML only when Markdown cannot express the required formatting.
-- HTML inside Markdown reduces portability (some renderers like Gitiles don't support it).
+- **Strongly prefer Markdown over HTML.** Avoid HTML hacks; reconsider whether you need the effect. Big tables are the main exception.
+- HTML reduces portability (Gitiles does not render HTML).
 
 ---
 
 ## Images
 
-- Use sparingly and prefer simple screenshots.
-- Always include **descriptive alt text** for accessibility.
-- Show rather than describe when appropriate.
-
----
-
-## Table of Contents
-
-- Add `[TOC]` directive after the introduction, before the first H2 heading.
-- Omit `[TOC]` only if all content is visible "above the fold" on a laptop screen.
-
----
-
-## Document Structure
-
-Recommended layout:
-1. `# Title`
-2. Author (optional)
-3. Introduction paragraph(s)
-4. `[TOC]`
-5. Content sections (each `## H2`)
-6. `## See also` (optional final section)
-
----
-
-## File Naming
-
-- Lowercase with underscores or dashes: `my_document.md`, `getting-started.md`.
-- `README.md` is the conventional name for directory-level documentation.
+- Use sparingly; prefer simple screenshots. Use them when it is easier to show than to describe (UI navigation).
+- Always include **descriptive alt text**.
 
 ---
 
 ## Documentation Philosophy
 
-- Maintain a **small set of fresh and accurate docs**, not sprawling, outdated documentation.
-- **Better/Best Rule**: accept iterative improvements over perfectionism to maintain author productivity.
+- Maintain a **small set of fresh and accurate docs**, not sprawling, outdated documentation. Delete cruft in small batches.
+- **Better/Best Rule**: accept iterative improvements over perfectionism to keep authors productive.

@@ -16,7 +16,7 @@ etc.), use the `analyze-code` skill instead.
 
 ## Supported Languages
 
-Go, Java, Python, JavaScript, TypeScript, Shell, Markdown.
+C++, C#, Go, Haskell, HTML/CSS, Java, JavaScript, JSON, Kotlin, Python, TypeScript, Shell, Markdown.
 
 ## Output Format
 
