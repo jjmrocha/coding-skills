@@ -97,7 +97,7 @@ Don't inflate severity. Low stays Low. Reserve Critical for real blast radius.
 
 7. **Verify** — everything Steps 2–5 produced is a *candidate*, not a finding.
 
-   Dedup candidates pointing at the same line and mechanism, keeping the one with the most concrete evidence. Then adjudicate each survivor with **one verifier subagent** that has not seen the finder's reasoning — independence is the whole mechanism; a self-check in the same context only re-confirms itself. Each verifier returns exactly one verdict:
+   Dedup candidates pointing at the same line and mechanism, keeping the one with the most concrete evidence. Then adjudicate each survivor with **one verifier subagent** that has not seen the finder's reasoning — independence is the whole mechanism; a self-check in the same context only re-confirms itself. Asking for this review is asking for its verifier subagents, so start them without waiting for a separate request. Each verifier returns exactly one verdict:
 
    - **Confirmed** — can name the inputs or state that trigger it and the resulting wrong outcome. Quotes the line.
    - **Plausible** — the mechanism is real but the trigger is uncertain (timing, environment, config). States what would confirm it.
