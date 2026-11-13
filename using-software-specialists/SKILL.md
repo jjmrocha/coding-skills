@@ -37,7 +37,7 @@ Backend and Frontend implementation can run in parallel against an agreed API co
 
 **Testing is not "after" coding.** Tests are written test-first *during* Implementation (TDD). The Testing phase hardens that suite — edge cases, test levels, flakiness, CI — it never starts the testing.
 
-**Implementation:** load `designing-interfaces`, `coding-discipline`, and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
+**Implementation:** load `designing-top-down`, `designing-interfaces`, `coding-discipline`, and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
 
 **If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan row's done-criteria above. Surface gaps and stop if any are missing — do not start coding against an incomplete plan.
 

@@ -20,6 +20,7 @@ focused instructions for a specific domain.
 | [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. Features that split into atomic parts are planned and built one sub-task at a time from a single feature plan. No implementation until the design is approved. |
 | [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
 | [designing-interfaces](designing-interfaces/) | Makes interface width visible before the implementation is written. Requires a contract written before the code — what it does, where it lives, its signature with inputs and outputs, and the caller's code using it — and sends the design back when it breaks one of ten interface principles (real work for the caller, complexity kept inside, single responsibility, minimal inputs, descriptive names, and others). Counterweights `coding-discipline`'s minimality bias, which on its own selects for the shallower design. |
+| [designing-top-down](designing-top-down/) | Sets the order in which code is written: the top function first, as real code that calls stubs for the unsolved steps, then each stub in turn until no unsolved step is left. Keeps the top function readable as an explanation of the problem, instead of a mix of argument parsing, file handling and formatting. |
 | [guiding-manual-testing](guiding-manual-testing/) | Walks you through verifying a change by hand on a real environment (local or staging) with real data — one step at a time, you run it and paste the output back. Enforces a matched pair (the case that must change and the case that must not), predictions written before execution, and a restore point before any mutation. Report-only; never touches the environment itself. |
 | [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules), implementation plans, and plain-language operator manuals. Queryable on its own; the wiki and plans are consulted by `brainstorm`, `using-software-specialists`, and `analyze-code` when a `kb_path` is configured. |
 | [research](research/) | Answers questions about *your own codebase* — endpoints, event payloads, "what happens when X?", "how do I run X?" — by reading the actual source (serena + the KB), never from memory. Brings a sourced, cited answer instead of interrogating you; effort scales from a one-line lookup to a full traced investigation. External / best-practice questions are handed off to the `deep-research-agent` specialist. The inverse of `brainstorm`. |
@@ -33,7 +34,7 @@ focused instructions for a specific domain.
 Copy the skill directories you want into your Claude Code skills folder:
 
 ```bash
-cp -r addressing-findings analyze-code brainstorm coding-discipline designing-interfaces guiding-manual-testing knowledge-base research style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
+cp -r addressing-findings analyze-code brainstorm coding-discipline designing-interfaces designing-top-down guiding-manual-testing knowledge-base research style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
 ```
 
 Skills are then available as slash commands in any Claude Code session:
@@ -93,9 +94,9 @@ A typical feature-development loop using these skills:
    session, `/brainstorm continue <feature>` resumes from the feature plan.
 2. **Build** — `/using-software-specialists` ingests the plan, validates it
    against the Plan-phase done-criteria, and implements. The Implementation
-   phase loads `designing-interfaces`, `coding-discipline`, and
-   `test-driven-development` (which pulls in `writing-unit-tests`) before any
-   code is written.
+   phase loads `designing-top-down`, `designing-interfaces`,
+   `coding-discipline`, and `test-driven-development` (which pulls in
+   `writing-unit-tests`) before any code is written.
 3. **Audit** — `/analyze-code` reviews the result and produces a
    severity-ranked findings report with a *Suggested Next Actions* block
    that routes each finding cluster back to the right specialist.
@@ -158,6 +159,7 @@ flowchart TD
     GT -->|bug proven| USS
 
     subgraph during [During the Implementation phase]
+        DTD[designing-top-down]
         DI[designing-interfaces]
         CD[coding-discipline]
         TDD[test-driven-development] --> WUT[writing-unit-tests]
