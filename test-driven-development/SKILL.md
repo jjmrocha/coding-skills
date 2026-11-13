@@ -43,10 +43,11 @@ Walk each item and report one line for it — what you changed, or "already clea
 - **Single responsibility** — does this function do one thing?
 - **No side effects** — mutation of arguments, globals, or receiver state that the name doesn't advertise
 - **Dead code and speculative generality** — delete it
+- **Readability** — read [references/readability.md](references/readability.md) and answer each of its Check questions for the code you wrote. Report one line per question: what you changed, or what you saw that shows the code already passes.
 
 For significant structural changes, load the `refactoring-expert` specialist from `using-software-specialists`.
 
-**Gate:** the six lines above, then the suite green. Then write the next failing test.
+**Gate:** every line above reported, then the suite green. Then write the next failing test.
 
 ## Adapting to Existing Code
 
