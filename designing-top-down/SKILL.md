@@ -61,4 +61,4 @@ Read the top function out loud. It should sound like the explanation from step 1
 
 ## Other skills
 
-`test-driven-development` decides when tests are written. This skill decides the order in which functions are written and how the code is split.
+`writing-unit-tests` writes the tests once the code works. This skill decides the order in which functions are written and how the code is split.

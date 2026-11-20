@@ -12,7 +12,7 @@ action, waits for the output, interprets it, and only then proposes the next.
 
 ## When Not to Use
 
-* Writing automated tests → `test-driven-development` / `writing-unit-tests`
+* Writing automated tests → `writing-unit-tests`
 * Auditing the code itself → `analyze-code`
 * Answering questions about how code works → `research`
 * Production environments — not supported

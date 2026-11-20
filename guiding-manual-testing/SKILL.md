@@ -13,7 +13,7 @@ Prove a change behaves correctly against real data on a real environment. The us
 
 | Situation | Instead |
 |---|---|
-| Writing automated tests | `test-driven-development` / `writing-unit-tests` |
+| Writing automated tests | `writing-unit-tests` |
 | Auditing the code itself | `analyze-code` |
 | Answering "how does X work" from the code | `research` |
 | Production environment | Not supported — local, testing or staging only |
@@ -103,7 +103,7 @@ Unexpected observations are the most valuable output. A verification that passes
 The report is the deliverable. Do not fix what the verification found — this skill observes, it does not change code. Route instead:
 
 - **Verification failed** → `using-software-specialists`, starting with Troubleshooter.
-- **A bug was proven** → reproduce it as a failing test first (`test-driven-development`), so the fix has a red test behind it.
+- **A bug was proven** → reproduce it as a failing test first (`writing-unit-tests`), so the fix has a red test behind it.
 - **Unexpected observations** → `analyze-code` if they suggest the change needs a broader audit.
 
 ## Report Template

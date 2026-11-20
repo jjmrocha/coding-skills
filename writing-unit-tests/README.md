@@ -10,7 +10,7 @@ detailed guide with rationale and examples.
 * Adding tests to new or existing code
 * Improving coverage for a module or function
 * Fixing or refactoring broken tests
-* Starting a TDD cycle before writing production code
+* Reproducing a proven bug with a failing test before fixing it
 * Reviewing whether existing tests follow good practices
 
 **When NOT to use:**

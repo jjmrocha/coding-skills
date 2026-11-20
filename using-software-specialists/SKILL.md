@@ -28,18 +28,20 @@ Advance only when the current phase's output is complete:
 | Requirements | Acceptance criteria testable, scope exclusions explicit, NFRs listed |
 | Design | Component boundaries defined, data model serves all access patterns, API contracts written, and every new or widened interface has a `designing-interfaces` contract that passes its read-back |
 | Plan | Tasks decomposed, dependencies explicit, riskiest work first, verification check per step |
-| Implementation | Feature works end-to-end (not just compiles), each behavior driven by a test written first, error/loading/empty states handled, contracts honored |
-| Testing | Edge cases enumerated and covered beyond the TDD suite, test levels right (inverted pyramid), no flaky tests, tests pass in CI not just locally |
+| Implementation | Feature works end-to-end (not just compiles), each behavior covered by a test, error/loading/empty states handled, contracts honored |
+| Testing | Edge cases enumerated and covered beyond the unit tests, test levels right (inverted pyramid), no flaky tests, tests pass in CI not just locally |
 | Validation | Security review passed, QE strategy confirmed, "Validate Before Done" answered |
 | Documentation | Public APIs/READMEs/runbooks updated, owner assigned, outdated docs deleted |
 
 Backend and Frontend implementation can run in parallel against an agreed API contract — the contract is the seam.
 
-**Testing is not "after" coding.** Tests are written test-first *during* Implementation (TDD). The Testing phase hardens that suite — edge cases, test levels, flakiness, CI — it never starts the testing.
+**Tests come after the code.** Once the code works, write its tests with `writing-unit-tests`, still during Implementation. The Testing phase hardens them — edge cases, test levels, flakiness, CI.
 
-**Implementation:** load `designing-top-down`, `designing-interfaces`, `coding-discipline`, and `test-driven-development`. If `kb_path` is configured, also load `knowledge-base` first.
+**Implementation:** load `designing-top-down` and `coding-discipline`. If `kb_path` is configured, also load `knowledge-base` first.
 
-**If the user provides a plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan row's done-criteria above. Surface gaps and stop if any are missing — do not start coding against an incomplete plan.
+**If the user provides a feature plan from `brainstorm`** (a plan file with a sub-task table), implement the `in progress` sub-task from the spec saved in its section. If that sub-task has no saved spec, stop and send the work back to `brainstorm`.
+
+**If the user provides any other plan file** (e.g., *"plan and implement using ~/plans/X.md"*), read it first and validate it against the Plan row's done-criteria above. Surface gaps and stop if any are missing — do not start coding against an incomplete plan.
 
 ## Task Routing
 

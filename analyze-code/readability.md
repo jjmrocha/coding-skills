@@ -2,7 +2,7 @@
 
 Code is written once, changed a few times, and read hundreds of times. Readable code lets a reader understand it on the first pass, top to bottom, without jumping around or decoding.
 
-Check the code you wrote against each item.
+Check the changed code against each item.
 
 ## 1. The top function reads like a summary
 

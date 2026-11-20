@@ -25,7 +25,6 @@ focused instructions for a specific domain.
 | [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules), implementation plans, and plain-language operator manuals. Queryable on its own; the wiki and plans are consulted by `brainstorm`, `using-software-specialists`, and `analyze-code` when a `kb_path` is configured. |
 | [research](research/) | Answers questions about *your own codebase* — endpoints, event payloads, "what happens when X?", "how do I run X?" — by reading the actual source (serena + the KB), never from memory. Brings a sourced, cited answer instead of interrogating you; effort scales from a one-line lookup to a full traced investigation. External / best-practice questions are handed off to the `deep-research-agent` specialist. The inverse of `brainstorm`. |
 | [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
-| [test-driven-development](test-driven-development/) | Enforces the Red→Green→Refactor cycle before any production code is written. Covers the full TDD workflow: writing a failing test first, minimal implementation, and safe refactoring with a green suite. |
 | [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a phase model, a task-routing table, and a "Validate Before Done" gate. |
 | [writing-unit-tests](writing-unit-tests/) | Guides unit test authorship in any language — scenario identification across four quadrants, FIRST-U principles, Arrange–Act–Assert structure, mocking strategy, and language-specific references. |
 
@@ -34,7 +33,7 @@ focused instructions for a specific domain.
 Copy the skill directories you want into your Claude Code skills folder:
 
 ```bash
-cp -r addressing-findings analyze-code brainstorm coding-discipline designing-interfaces designing-top-down guiding-manual-testing knowledge-base research style-checker test-driven-development using-software-specialists writing-unit-tests ~/.claude/skills/
+cp -r addressing-findings analyze-code brainstorm coding-discipline designing-interfaces designing-top-down guiding-manual-testing knowledge-base research style-checker using-software-specialists writing-unit-tests ~/.claude/skills/
 ```
 
 Skills are then available as slash commands in any Claude Code session:
@@ -49,7 +48,6 @@ Skills are then available as slash commands in any Claude Code session:
 /knowledge-base
 /research
 /style-checker
-/test-driven-development
 /using-software-specialists
 /writing-unit-tests
 ```
@@ -83,20 +81,18 @@ A typical feature-development loop using these skills:
    `using-software-specialists`. (External / best-practice questions go to the
    `deep-research-agent` specialist, not here.)
 1. **Define** — `/brainstorm` scopes the change through Socratic dialogue and
-   produces an approved *spec*, then hands off to the Project Planner specialist,
-   which turns the spec into an execution plan. The plan is saved into the KB
-   under `<kb_path>/plans/` (or `docs/specs/` when no `kb_path` is configured),
-   so it persists across sessions and — for cross-repo work — can be referenced
-   from any repo.
-   When the scope splits into atomic parts, brainstorm instead saves a
-   *feature plan* listing the sub-tasks, then runs design → plan → build
-   for one sub-task at a time, asking before starting the next. In a new
+   splits it into sub-tasks. It saves a *feature plan* with the agreed scope
+   and the sub-task list into the KB under `<kb_path>/plans/` (or
+   `docs/specs/` when no `kb_path` is configured), so it persists across
+   sessions and — for cross-repo work — can be referenced from any repo.
+   Then it designs one sub-task at a time. Each approved *spec* is saved in
+   its sub-task's section of the feature plan, and implementation starts
+   from it. Brainstorm asks before starting the next sub-task. In a new
    session, `/brainstorm continue <feature>` resumes from the feature plan.
-2. **Build** — `/using-software-specialists` ingests the plan, validates it
-   against the Plan-phase done-criteria, and implements. The Implementation
-   phase loads `designing-top-down`, `designing-interfaces`,
-   `coding-discipline`, and `test-driven-development` (which pulls in
-   `writing-unit-tests`) before any code is written.
+2. **Build** — `/using-software-specialists` implements the in-progress
+   sub-task from its saved spec. The Implementation phase loads
+   `designing-top-down` and `coding-discipline`. Once the code works,
+   `writing-unit-tests` writes its tests.
 3. **Audit** — `/analyze-code` reviews the result and produces a
    severity-ranked findings report with a *Suggested Next Actions* block
    that routes each finding cluster back to the right specialist.
@@ -118,8 +114,8 @@ it proposes one action at a time, reads the output you paste back, and interpret
 it. A failed verification or an unexpected finding feeds the same back-edges as
 an audit.
 
-`/designing-interfaces` is loaded twice in the loop: during Implementation,
-before any interface is written, and again as part of the Quality lens of every
+`/designing-interfaces` is used twice in the loop: in `/brainstorm`, for each
+interface the spec proposes, and as part of the Quality lens of every
 `/analyze-code` run, where the same depth check is applied to interfaces the
 change already introduced.
 
@@ -129,8 +125,8 @@ analyze-code runs separately as configured tooling).
 
 `/knowledge-base` sits underneath the loop as a shared substrate when
 `kb_path` is configured: `brainstorm` reads the wiki for
-system context, and the Project Planner it hands off to writes the resulting
-plan into `plans/`; `using-software-specialists`
+system context and writes the feature plan, with each approved spec, into
+`plans/`; `using-software-specialists`
 loads it during Implementation to read the matching plan and the repo's
 `Helpers` / `Patterns`; `analyze-code` reads it during Frame and surfaces
 wiki↔code disagreements as findings. The user invokes `/knowledge-base`
@@ -145,7 +141,7 @@ flowchart TD
     RS -->|sourced findings| BS
     RS -.->|clear path| USS
 
-    BS -->|approved plan file| USS[using-software-specialists]
+    BS -->|approved spec in feature plan| USS[using-software-specialists]
     USS -.->|next sub-task| BS
     USS -->|implemented| AC[analyze-code]
 
@@ -160,9 +156,8 @@ flowchart TD
 
     subgraph during [During the Implementation phase]
         DTD[designing-top-down]
-        DI[designing-interfaces]
         CD[coding-discipline]
-        TDD[test-driven-development] --> WUT[writing-unit-tests]
+        WUT[writing-unit-tests]
     end
     USS -.loads.-> during
 
@@ -171,7 +166,7 @@ flowchart TD
     KB -.->|drift findings| AC
 
     AC -.->|style lens| SC[style-checker]
-    AC -.->|quality lens| DI
+    AC -.->|quality lens| DI[designing-interfaces]
 ```
 
 ## License

@@ -1,6 +1,6 @@
 ---
 name: writing-unit-tests
-description: Use when writing unit tests for specific code — adding tests, improving coverage, or starting a TDD cycle. Triggers on "add tests", "write tests for X", or when modifying code that needs tests.
+description: Use when writing unit tests for specific code — adding tests, improving coverage, or reproducing a proven bug before fixing it. Triggers on "add tests", "write tests for X", or when modifying code that needs tests.
 ---
 
 # Writing Unit Tests
@@ -16,6 +16,10 @@ For a detailed human-readable guide, see [docs/how-to-write-unit-tests.md](docs/
 3. **Read the language reference** — pick the matching file from the dispatch table below.
 4. **Write tests** — one behavior per test. AAA structure. Run the full suite — never leave it red.
 5. **Prove the assertions bite** — for a test whose contract is a side effect on a mock (a rollback, a commit, a publish), break that side effect once in the code under test, confirm the test fails, restore it. A test that passes both ways asserts nothing.
+
+## Bug Fixes
+
+When a bug is proven, write a test that reproduces it before you fix it. Run it and watch it fail, then fix the bug and watch it pass. The test stays as a regression guard.
 
 ## Scenario Quadrants
 

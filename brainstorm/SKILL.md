@@ -18,7 +18,7 @@ Turn ambiguous ideas into concrete, validated designs through Socratic dialogue.
 | User already approved a written plan | Skip to `using-software-specialists` |
 | Bug fix or one-line change with clear scope | Skip to `using-software-specialists` |
 | User is asking a question, not requesting a build | Answer directly |
-| Changing an existing plan file (scope, split, or a sub-task's plan) | Jump to Revision Mode below |
+| Changing an existing plan file (scope, split, or a sub-task's spec) | Jump to Revision Mode below |
 | Feature plan exists with `pending` or `in progress` sub-tasks | Jump to Sub-task Mode — step 4 if one is `in progress`, else step 3 |
 
 ## Steps
@@ -27,11 +27,10 @@ Turn ambiguous ideas into concrete, validated designs through Socratic dialogue.
 2. **Agree scope** — ask clarifying questions (see Socratic Questioning) until what's in and out of scope is agreed. A question belongs here only if its answer moves something in or out of scope. Design choices (tax treatment, ordering, edge cases, naming, where code lives) are not scope: they wait for the sub-task that needs them.
 3. **Split** — always switch to **Sub-task Mode**. Size is never a reason to skip it. Steps 4–8 then run once per sub-task.
 4. **Propose 2-3 approaches** — with trade-offs; lead with your recommendation and reasoning. For cross-domain work, load specialists from `using-software-specialists` (architect for system shape, security for trust boundaries, requirements-analyst for hidden assumptions) so trade-offs cover more than the happy path.
-5. **Present design section-by-section** — confirm each section before moving on; cover architecture, components, data flow, error handling, testing. Scale each section to its complexity (a couple sentences if simple, longer if nuanced); design for isolation — each component one clear purpose, internals changeable without breaking consumers.
+5. **Present design section-by-section** — confirm each section before moving on; cover architecture, components, data flow, error handling, test approach. When a section proposes an interface, load `designing-interfaces` and write its contract in that section. Scale each section to its complexity (a couple sentences if simple, longer if nuanced); design for isolation — each component one clear purpose, internals changeable without breaking consumers.
 6. **Probe non-functional requirements** — explicitly ask about performance targets, scalability, security posture, compliance, accessibility. NFRs skipped here become rework later.
 7. **Validate the design** — before the final summary, check: placeholders/TBDs (fix them), internal contradictions (architecture vs feature descriptions), scope creep beyond a single plan, ambiguous requirements (pick one interpretation and make it explicit), and conformance with existing repo conventions (any new pattern for an already-solved problem class needs explicit justification).
-8. **Final summary & approval** — present the validated design — the **spec**, structured with [references/spec-template.md](references/spec-template.md) — and revise until the user explicitly approves. The spec is the approval artifact: it lives in the conversation. Brainstorm does NOT write it to a file — the durable artifact is the plan produced in the next step.
-9. **Hand off to planning** — once the design is approved and the user signals to create the plan, load the **Project Planner** specialist from `using-software-specialists`. Convert the approved design (the spec) into an execution **plan** — this plan produced by the Project Planner (not the spec) is what gets saved to the KB under `<kb_path>/plans/` (see `knowledge-base`; if `kb_path` isn't configured, save to `docs/specs/` or the project's convention). Your role stops with the plan — do NOT start coding. This step runs once per sub-task, through Sub-task Mode steps 3–4.
+8. **Final summary & approval** — present the validated design — the **spec**, structured with [references/spec-template.md](references/spec-template.md) — and revise until the user explicitly approves. On approval, save the spec in the sub-task's section of the feature plan and mark the sub-task `in progress`.
 
 ## Sub-task Mode
 
@@ -52,11 +51,11 @@ Turn ambiguous ideas into concrete, validated designs through Socratic dialogue.
 ### Steps
 
 1. **Propose the split** — ordered list of sub-tasks (see How to split), one line each: what it delivers, what it depends on. Revise until approved.
-2. **Save the feature plan** — load **Project Planner** from `using-software-specialists`; write one plan file to the same location as Step 9 with the agreed scope and the sub-task list, each `pending`. No sub-task detail yet.
-3. **Next sub-task** — take the first `pending` sub-task and run Steps 4–8 scoped to it alone. On approval, Project Planner adds its detailed plan to the same file and marks it `in progress`. Hand off to `using-software-specialists` for implementation; brainstorm writes no code.
+2. **Save the feature plan** — write one plan file with the agreed scope and the sub-task list, each `pending`. No sub-task detail yet. With `kb_path` configured, save it under `<kb_path>/plans/` in the plan format of `knowledge-base`. Without it, save it to `docs/specs/` or the project's convention.
+3. **Next sub-task** — take the first `pending` sub-task and run Steps 4–8 scoped to it alone. Step 8 saves its spec. Then ask the user whether to start the implementation. On yes, hand off to `using-software-specialists`; brainstorm writes no code.
 4. **After implementation** — ask the user if they're ready to start the next sub-task. On yes, mark the current one `done` and return to step 3. Stop when none remain.
 
-Design one sub-task at a time. Later sub-tasks stay one-liners until their turn. If a sub-task's design needs to change an earlier sub-task's design, say so and agree the change before continuing; record it in the feature plan and include the rework in the current sub-task's plan.
+Design one sub-task at a time. Later sub-tasks stay one-liners until their turn. If a sub-task's design needs to change an earlier sub-task's design, say so and agree the change before continuing; record it in the feature plan and include the rework in the current sub-task's spec.
 
 ## Socratic Questioning
 
