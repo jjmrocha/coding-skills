@@ -1,33 +1,36 @@
 # designing-interfaces
 
 A Claude Code skill that makes interface width visible before the
-implementation is written. Loaded alongside `coding-discipline` on every
-coding turn, and by `analyze-code`'s Quality lens on review.
+implementation is written. It runs at design time. `brainstorm` loads it for
+each interface a spec proposes, the Design phase of
+`using-software-specialists` requires its contract, and the quality lens of
+`analyze-code` loads it during review.
 
 The core rule: **a zero-line diff is not a zero-cost change.** The cheapest
 change to write is usually the one that pushes complexity out to the callers,
 where no diff records it.
 
-## When to Use
+## When to use
 
-Adding or changing anything other code will call — a type, function, method,
-module, or package — before the implementation exists. Also when a caller needs
-data a module doesn't currently expose, which is the moment the shallow design
-gets chosen.
+Before the implementation exists, whenever you add or change anything that
+other code will call, such as a type, function, method, module or package.
+Also when a caller needs data that a module does not expose yet, because that
+is the moment the shallow design gets chosen.
 
 ## What it asks for
 
-A contract, written before the code for a reader who hasn't seen the session:
-what it does, where it lives, its signature with inputs and outputs, and the
-caller's code using it. The design is checked against ten interface principles (real work
-for the caller, complexity kept inside, single responsibility, minimal inputs,
-descriptive names, and others) and gets another pass when it breaks one.
+A contract, written before the code for a reader who has not seen the
+session: what it does, where it lives, its signature with inputs and outputs,
+and the caller's code using it. The design is checked against ten interface
+principles (real work for the caller, complexity kept inside, single
+responsibility, minimal inputs, descriptive names, and others) and gets
+another pass when it breaks one.
 
 ## Why it exists
 
-`coding-discipline` minimizes what you build; this skill constrains what you
-expose. They conflict in exactly one place — the shallow design is almost
-always the smaller diff — and this skill owns that case.
+`coding-discipline` minimizes what you build, and this skill constrains what
+you expose. They conflict in exactly one place, because the shallow design is
+almost always the smaller diff. This skill owns that case.
 
 ## Provenance
 

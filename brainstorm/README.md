@@ -1,19 +1,21 @@
 # brainstorm
 
-A Claude Code skill for Socratic requirements discovery. Turns vague ideas
-into concrete, validated designs through guided dialogue — one question at a
-time, no implementation until the design is approved. The approved design
-(the spec) lives in the conversation; brainstorm then hands off to planning,
-which produces the durable plan.
+A Claude Code skill for Socratic requirements discovery. It turns a vague idea
+into a concrete, validated design through questions, asked one at a time.
+Nothing is implemented until you approve the design.
 
-## When to Use
+Brainstorm splits every feature into small sub-tasks and saves the agreed
+scope and the sub-task list in a feature plan. It then designs one sub-task at
+a time. Each approved design, the spec, is saved in that sub-task's section of
+the feature plan, and `/using-software-specialists` implements it from there.
 
-* A user presents a vague idea ("I want to build X")
-* Requirements are unclear and need to be drawn out before coding
-* A feature should be scoped and designed before a plan is written
-* A feature splits into atomic parts — brainstorm agrees scope, saves a
-  feature plan with the sub-tasks, then designs, plans and hands off one
-  sub-task at a time
+## When to use
+
+- You present a vague idea, such as "I want to build X".
+- The requirements are unclear and must be drawn out before coding.
+- A feature should be scoped and designed before any code is written.
+- An existing feature plan must change. Brainstorm asks only about the parts
+  that change and updates the plan in place.
 
 ## Usage
 
@@ -24,7 +26,8 @@ which produces the durable plan.
 /brainstorm continue the notifications feature
 ```
 
-See [a worked example session](expected_outputs/sample-session.md) for what the dialogue looks like end to end.
+[A worked example session](expected_outputs/sample-session.md) shows the
+dialogue from start to end.
 
 ## Credit
 

@@ -1,36 +1,48 @@
 # guiding-manual-testing
 
-A Claude Code skill for manually verifying a change against a real environment
-with real data. The agent guides one step at a time: it proposes a single
-action, waits for the output, interprets it, and only then proposes the next.
+A Claude Code skill for testing a change by hand against a real environment
+with real data. The agent guides you one step at a time: it proposes a single
+action, waits for the output, interprets it, and only then proposes the next
+step.
 
-## When to Use
+## When to use
 
-* Verifying a fix or feature behaves correctly on a local or staging environment
-* Confirming a change works against real data before merging or releasing
-* Testing a code path that only manifests with production-shaped data
+- Checking that a fix or feature behaves correctly on a local, testing or
+  staging environment.
+- Confirming that a change works against real data before you merge or
+  release it.
+- Testing a code path that only shows up with production-shaped data.
 
-## When Not to Use
+## When not to use
 
-* Writing automated tests → `writing-unit-tests`
-* Auditing the code itself → `analyze-code`
-* Answering questions about how code works → `research`
-* Production environments — not supported
+- Writing automated tests. Use `writing-unit-tests`.
+- Auditing the code itself. Use `analyze-code`.
+- Answering questions about how the code works. Use `research`.
+- Production environments, which are not supported.
 
-## What It Enforces
+## What it enforces
 
-* **One step per message.** No multi-step plans, no branching instructions.
-* **Matched pair.** Both the case that must change and the case that must not
-  have to be observed before anything is called a pass.
-* **Real creation paths first.** Run the job or use the UI; direct database
-  mutation is a fallback that must be justified.
-* **Restore point before direct mutation.** If data is mutated directly, the
-  restoring statement is captured first; data produced by running the real path
-  is left in place. Blast radius is stated before any trigger.
+- Each message holds one step. There are no multi-step plans and no
+  branching instructions.
+- A check passes only when both cases of a matched pair were observed: the
+  case that must change and the case that must not.
+- Data is produced through the real paths first, by running the job or using
+  the UI. Changing the database directly is a fallback that must be justified.
+- Before any direct change to data, the statement that restores it is
+  captured. Data produced through the real paths stays in place. The blast
+  radius of each trigger is stated before it runs.
 
 ## Output
 
-A verification report delivered in the conversation: what was under test, the
-environment, the subject chosen and why, each case with its predicted and
-observed evidence, any unexpected observations as separate findings, and, when
-data was mutated directly, confirmation that cleanup restored it.
+A verification report in the conversation. It states what was under test, the
+environment, the subject chosen and why, and each case with its predicted and
+observed evidence. Unexpected observations are listed as separate findings.
+When data was changed directly, the report confirms that the cleanup restored
+it.
+
+## Usage
+
+```
+/guiding-manual-testing help me test this on staging
+/guiding-manual-testing verify the order cancellation fix on my local environment
+```

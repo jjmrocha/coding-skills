@@ -1,40 +1,41 @@
 # writing-unit-tests
 
-A Claude Code skill for writing unit tests in any language. The agent-facing
-[SKILL.md](SKILL.md) is a concise checklist; the human-facing
-[docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md) is the
-detailed guide with rationale and examples.
+A Claude Code skill for writing unit tests in any language. The agent reads
+[SKILL.md](SKILL.md), a short checklist. People read
+[docs/how-to-write-unit-tests.md](docs/how-to-write-unit-tests.md), the
+detailed guide with the reasons and examples.
 
-## When to Use
+## When to use
 
-* Adding tests to new or existing code
-* Improving coverage for a module or function
-* Fixing or refactoring broken tests
-* Reproducing a proven bug with a failing test before fixing it
-* Reviewing whether existing tests follow good practices
+- Adding tests to new or existing code.
+- Improving coverage for a module or function.
+- Fixing or refactoring broken tests.
+- Reproducing a proven bug with a failing test before fixing it.
+- Reviewing whether existing tests follow good practice.
 
-**When NOT to use:**
+## When not to use
 
-* Integration or E2E tests where real services are involved → FIRST-U still
-  applies, but this skill focuses on unit-level isolation
-* Diagnosing a flaky test suite → use `/using-software-specialists` with
-  the `quality-engineer` specialist first
+- Integration or end-to-end tests that use real services. The FIRST-U
+  principles still apply, but this skill is about tests of isolated units.
+- Diagnosing a flaky test suite. Use `/using-software-specialists` with the
+  quality-engineer specialist first.
 
-## How It Works
+## How it works
 
-The skill follows a five-step workflow:
+The skill first reads the project's existing tests to learn its conventions.
+Test files named in CLAUDE.md take priority over the tests next to the code.
+It then lists the test cases in four groups (happy path, negative inputs,
+boundary conditions and error paths) and asks you to confirm them before it
+writes anything. It writes one behavior per test, runs the full suite, and never
+leaves it failing. For a test whose contract is a side effect on a mock, it breaks
+that side effect once to prove that the test fails.
 
-| Step | What happens |
-|------|-------------|
-| **1. Inspect** | Read the reference test files named in CLAUDE.md, if any — they win over neighbouring tests. Otherwise read 2–3 nearby test files to learn project conventions (naming, assertion library, mock framework, fixture patterns) |
-| **2. Identify scenarios** | List test cases across four quadrants — happy path, negative inputs, boundary conditions, error paths — and present them for confirmation before writing |
-| **3. Load the language reference** | Pick the matching reference for the project's stack |
-| **4. Write & run** | Implement one behavior per test, run the full suite, never leave it red |
-| **5. Prove the assertions bite** | For tests whose contract is a side effect on a mock, break that side effect once, confirm the test fails, restore it |
+Every test must meet the **FIRST-U principles** (Fast, Isolated, Repeatable,
+Self-validating, Timely, Understandable) and follow the Arrange, Act, Assert
+structure, also called Given, When, Then.
 
-All tests must satisfy the **FIRST-U principles** — Fast, Isolated,
-Repeatable, Self-validating, Timely, Understandable — and be structured
-with Arrange–Act–Assert (Given–When–Then).
+Language references cover Go (standard library and testify), Java, JavaScript
+and Python with pytest.
 
 ## Usage
 
@@ -43,4 +44,3 @@ with Arrange–Act–Assert (Given–When–Then).
 /writing-unit-tests add tests for the UserService
 /writing-unit-tests improve coverage on the payment module
 ```
-

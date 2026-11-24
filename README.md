@@ -1,136 +1,111 @@
 # coding-skills
 
-A collection of Claude Code skills for software development — reusable
-behavioral modules that load specialist mindsets, enforce discipline, and
-structure complex workflows.
+Claude Code skills for software development. They give the agent a fixed
+method for each part of the work: scoping a feature, designing its
+interfaces, writing and testing the code, and reviewing the result.
 
-## What's a Skill?
-
-A Claude Code skill is a Markdown file (or directory) with a `SKILL.md` at the
-root. The file starts with a YAML header declaring a `name` and `description`.
-Claude Code loads it on demand via the `/skill-name` slash command, injecting
-focused instructions for a specific domain.
+A skill is a directory with a `SKILL.md` file. Claude Code loads a skill when
+your request matches the skill's description, or when you call it by name as
+a slash command.
 
 ## Skills
 
 | Skill | What it does |
-|-------|-------------|
-| [addressing-findings](addressing-findings/) | Walks an analyze-code report or a PR's review comments one finding at a time — explain, propose options, recommend, ask. Nothing changes until you approve, and it never posts to the PR — it hands you the reply text. |
-| [analyze-code](analyze-code/) | Multi-lens audit of existing code across architecture, quality, performance, security, and style. Produces a prioritized findings report — a deep review, not a gate decision. |
-| [brainstorm](brainstorm/) | Turns vague ideas into concrete, validated specs through Socratic dialogue — one question at a time. Features that split into atomic parts are planned and built one sub-task at a time from a single feature plan. No implementation until the design is approved. |
-| [coding-discipline](coding-discipline/) | Names the six most common LLM coding failure modes (silent assumption, scope creep, speculative complexity, hallucination, drift, parallel solution) and the counter-move for each. |
-| [designing-interfaces](designing-interfaces/) | Makes interface width visible before the implementation is written. Requires a contract written before the code — what it does, where it lives, its signature with inputs and outputs, and the caller's code using it — and sends the design back when it breaks one of ten interface principles (real work for the caller, complexity kept inside, single responsibility, minimal inputs, descriptive names, and others). Counterweights `coding-discipline`'s minimality bias, which on its own selects for the shallower design. |
-| [designing-top-down](designing-top-down/) | Sets the order in which code is written: the top function first, as real code that calls stubs for the unsolved steps, then each stub in turn until no unsolved step is left. Keeps the top function readable as an explanation of the problem, instead of a mix of argument parsing, file handling and formatting. |
-| [guiding-manual-testing](guiding-manual-testing/) | Walks you through verifying a change by hand on a real environment (local or staging) with real data — one step at a time, you run it and paste the output back. Enforces a matched pair (the case that must change and the case that must not), predictions written before execution, and a restore point before any mutation. Report-only; never touches the environment itself. |
-| [knowledge-base](knowledge-base/) | User-curated, agent-maintained project wiki for system surfaces (entities, interfaces, jobs, dependencies, events, business rules), implementation plans, and plain-language operator manuals. Queryable on its own; the wiki and plans are consulted by `brainstorm`, `using-software-specialists`, and `analyze-code` when a `kb_path` is configured. |
-| [research](research/) | Answers questions about *your own codebase* — endpoints, event payloads, "what happens when X?", "how do I run X?" — by reading the actual source (serena + the KB), never from memory. Brings a sourced, cited answer instead of interrogating you; effort scales from a one-line lookup to a full traced investigation. External / best-practice questions are handed off to the `deep-research-agent` specialist. The inverse of `brainstorm`. |
-| [style-checker](style-checker/) | Reviews code against Google's official style guidelines. Produces a structured violation report grouped by severity (Critical / High / Medium / Low). Supports Go, Java, Python, JavaScript, TypeScript, Shell, and Markdown. |
-| [using-software-specialists](using-software-specialists/) | Routes software tasks to the right specialist mindset (security engineer, architect, tester, DBA, etc.) at the right phase. Includes a phase model, a task-routing table, and a "Validate Before Done" gate. |
-| [writing-unit-tests](writing-unit-tests/) | Guides unit test authorship in any language — scenario identification across four quadrants, FIRST-U principles, Arrange–Act–Assert structure, mocking strategy, and language-specific references. |
+|-------|--------------|
+| [addressing-findings](addressing-findings/) | Works through an `analyze-code` report or the review comments on a pull request, one finding at a time. For each finding it explains the problem, recommends a fix and waits for your approval. It never posts to the pull request. It gives you the reply text instead. |
+| [analyze-code](analyze-code/) | Reviews existing code through five lenses: architecture, quality, performance, security and style. An independent check confirms or rejects each finding before it goes into a report ranked by severity. It reports only and never changes the code. |
+| [brainstorm](brainstorm/) | Turns a vague idea into an approved spec through questions, asked one at a time. It splits every feature into small sub-tasks, saves them in a feature plan and designs one sub-task at a time. It writes no code. |
+| [coding-discipline](coding-discipline/) | Names six common failure modes of code written by language models, such as silent assumptions and scope creep, and gives the counter for each. |
+| [designing-interfaces](designing-interfaces/) | Requires a written contract for each new or changed interface before the code exists. The contract states what the code does, where it lives, its signature and how a caller uses it. A design that pushes work onto its callers is sent back. |
+| [designing-top-down](designing-top-down/) | Sets the order in which code is written. The top function comes first, as real code that calls stubs for the unsolved steps. Each stub is then written in turn, until no unsolved step is left. |
+| [guiding-manual-testing](guiding-manual-testing/) | Guides you through testing a change by hand with real data on a local, testing or staging environment. It proposes one step at a time, and you run it and paste the output back. It never runs anything itself. |
+| [knowledge-base](knowledge-base/) | Maintains a project knowledge base: a wiki of each repository's system surfaces, implementation plans, and plain-language manuals for operators. The other skills read it when `kb_path` is configured. |
+| [research](research/) | Answers questions about your own codebase, such as "do we have an endpoint for X?", by reading the code and the knowledge base. Every answer cites its source. |
+| [style-checker](style-checker/) | Checks code against Google's style guides for formatting and naming, and reports the violations by severity. It supports 13 languages, including Go, Java, Python, TypeScript and Shell. |
+| [using-software-specialists](using-software-specialists/) | Routes a software task to the specialists it needs, such as a security engineer, an architect or a tester, at each phase of the work. Every task ends with a checklist of security and quality questions that must be answered before the task is done. |
+| [writing-unit-tests](writing-unit-tests/) | Guides you in writing unit tests in any language. It lists the test cases before it writes them and includes references for Go, Java, JavaScript and Python. |
+
+## Requirements
+
+- [Claude Code](https://claude.com/claude-code).
+- Optional: the [serena](https://github.com/oraios/serena) MCP server. `research`
+  uses it to read single symbols instead of whole files. Without it,
+  `research` falls back to search and file reads.
 
 ## Installation
 
-Copy the skill directories you want into your Claude Code skills folder:
+Copy the skill directories into your Claude Code skills folder. Several skills
+load other skills, for example `analyze-code` loads `style-checker` and
+`designing-interfaces`, so install all of them unless you have a reason not to:
 
 ```bash
-cp -r addressing-findings analyze-code brainstorm coding-discipline designing-interfaces designing-top-down guiding-manual-testing knowledge-base research style-checker using-software-specialists writing-unit-tests ~/.claude/skills/
+cp -r addressing-findings analyze-code brainstorm coding-discipline \
+  designing-interfaces designing-top-down guiding-manual-testing \
+  knowledge-base research style-checker using-software-specialists \
+  writing-unit-tests ~/.claude/skills/
 ```
 
-Skills are then available as slash commands in any Claude Code session:
+## Configuration
 
+Only `knowledge-base` needs configuration. Add `kb_path`, the absolute path of
+the knowledge base, to your agent instructions:
+
+```yaml
+kb_path: /Users/you/.kb/work
 ```
-/addressing-findings
-/analyze-code
-/brainstorm
-/coding-discipline
-/designing-interfaces
-/guiding-manual-testing
-/knowledge-base
-/research
-/style-checker
-/using-software-specialists
-/writing-unit-tests
-```
+
+Without `kb_path`, `knowledge-base` refuses to run, and `brainstorm` saves its
+plans in `docs/specs/`, or wherever the project already keeps them.
 
 ## Usage
 
-Invoke a skill by typing its slash command, optionally followed by a
-description of your task:
+Call a skill by its slash command and describe the task after it:
 
 ```
-/research do we have an endpoint for password reset, and what's its payload?
 /brainstorm I want to build a rate limiter for our API
-/style-checker review the auth module
 /using-software-specialists add OAuth support to the backend
+/analyze-code review the auth module
+/research do we have an endpoint for password reset, and what is its payload?
 ```
 
-See each skill's own `README.md` for detailed usage, file structure, and
-examples.
+Each skill's own `README.md` has more examples.
 
-## Workflows
+## How the skills work together
 
-A typical feature-development loop using these skills:
+A feature usually goes through four skills in order:
 
-0. **Research (whenever you have questions, not a goal)** — `/research`
-   brings a sourced, cited answer about your *own codebase* ("do we have an
-   endpoint for X?", "what's the payload of event X?", "what happens when X?")
-   by reading the source with serena + the KB, never from memory. Effort
-   scales — a one-line lookup stays ceremony-free; a deep trace gets confidence
-   levels and named gaps. Its findings make brainstorm's intent questions
-   answerable; for an already-clear path it can hand straight to
-   `using-software-specialists`. (External / best-practice questions go to the
-   `deep-research-agent` specialist, not here.)
-1. **Define** — `/brainstorm` scopes the change through Socratic dialogue and
-   splits it into sub-tasks. It saves a *feature plan* with the agreed scope
-   and the sub-task list into the KB under `<kb_path>/plans/` (or
-   `docs/specs/` when no `kb_path` is configured), so it persists across
-   sessions and — for cross-repo work — can be referenced from any repo.
-   Then it designs one sub-task at a time. Each approved *spec* is saved in
-   its sub-task's section of the feature plan, and implementation starts
-   from it. Brainstorm asks before starting the next sub-task. In a new
-   session, `/brainstorm continue <feature>` resumes from the feature plan.
-2. **Build** — `/using-software-specialists` implements the in-progress
-   sub-task from its saved spec. The Implementation phase loads
-   `designing-top-down` and `coding-discipline`. Once the code works,
-   `writing-unit-tests` writes its tests.
-3. **Audit** — `/analyze-code` reviews the result and produces a
-   severity-ranked findings report with a *Suggested Next Actions* block
-   that routes each finding cluster back to the right specialist.
+1. `/brainstorm` agrees the scope with you and splits the feature into
+   sub-tasks. It saves a feature plan in `<kb_path>/plans/`, or in
+   `docs/specs/` when no `kb_path` is configured. It then designs one
+   sub-task at a time and saves each approved spec in the feature plan. In a
+   new session, `/brainstorm continue <feature>` resumes from the plan.
+2. `/using-software-specialists` implements the sub-task that is in progress,
+   from its saved spec. It loads `designing-top-down` and `coding-discipline`
+   while it writes the code, and `writing-unit-tests` when the code works.
+3. `/analyze-code` reviews the result. The report ends with suggested next
+   actions that send each group of findings to the specialist who should fix
+   it.
+4. `/addressing-findings` applies the fixes you approve, one finding at a time.
 
-The loop then closes through one of three back-edges:
+If the review shows that the plan must change, run `/brainstorm` on the
+existing plan file. It asks only about the parts that change and updates the
+plan in place. If testing finds a bug, run `/using-software-specialists`
+again, starting with the troubleshooter specialist.
 
-* **Findings to apply** → `/addressing-findings` walks the report one finding
-  at a time, loading the specialist each finding names. The same walk handles
-  review comments on a PR.
-* **Plan needs changes** → re-enter `/brainstorm` against the existing plan
-  file. It enters revision mode — diffs the requested change, asks only
-  about the deltas, and updates the plan in place.
-* **Bug surfaced during testing** → re-enter `/using-software-specialists`
-  starting with Troubleshooter.
+The other skills come in at specific points:
 
-`/guiding-manual-testing` is invoked on demand, when you want to confirm a change behaves
-correctly against real data before merging or releasing. It runs nothing itself —
-it proposes one action at a time, reads the output you paste back, and interprets
-it. A failed verification or an unexpected finding feeds the same back-edges as
-an audit.
-
-`/designing-interfaces` is used twice in the loop: in `/brainstorm`, for each
-interface the spec proposes, and as part of the Quality lens of every
-`/analyze-code` run, where the same depth check is applied to interfaces the
-change already introduced.
-
-`/style-checker` is invoked on demand, or as the Style lens of every
-`/analyze-code` run (independent of whatever linter the project ships, which
-analyze-code runs separately as configured tooling).
-
-`/knowledge-base` sits underneath the loop as a shared substrate when
-`kb_path` is configured: `brainstorm` reads the wiki for
-system context and writes the feature plan, with each approved spec, into
-`plans/`; `using-software-specialists`
-loads it during Implementation to read the matching plan and the repo's
-`Helpers` / `Patterns`; `analyze-code` reads it during Frame and surfaces
-wiki↔code disagreements as findings. The user invokes `/knowledge-base`
-directly to query, ingest, update, or lint.
+- `/research` answers questions about the code at any time. Its answers can
+  settle questions that `brainstorm` would otherwise ask you.
+- `/guiding-manual-testing` checks a change against real data before you merge
+  or release it. A failed check goes back into the loop like a review finding.
+- `designing-interfaces` checks each interface that `brainstorm` proposes, and
+  `analyze-code` uses it again in its quality lens.
+- `style-checker` runs on its own, or as the style lens of `analyze-code`.
+- `knowledge-base` gives the other skills shared context when `kb_path` is
+  configured. `brainstorm` reads the wiki and writes the plans,
+  `using-software-specialists` reads the plan and the repository's helpers and
+  patterns, and `analyze-code` reports places where the wiki and the code
+  disagree.
 
 ```mermaid
 flowchart TD
@@ -165,10 +140,11 @@ flowchart TD
     KB -.->|plan + helpers/patterns| USS
     KB -.->|drift findings| AC
 
+    BS -.->|interface contracts| DI[designing-interfaces]
+    AC -.->|quality lens| DI
     AC -.->|style lens| SC[style-checker]
-    AC -.->|quality lens| DI[designing-interfaces]
 ```
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

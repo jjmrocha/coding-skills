@@ -1,89 +1,91 @@
 # knowledge-base
 
-A Claude Code skill for a user-curated, agent-maintained project knowledge
-base (KB). The KB holds three kinds of content: a **wiki** of per-repo system
-surfaces (entities, interfaces, jobs, dependencies, events, business rules)
-plus internal-knowledge subfolders (`helpers/`, `patterns/`); **plans**
-for implementation work (often spanning repos); and **manuals** explaining
-the system in plain language to human operators without a technical
-background. Queryable on its own; the wiki and plans are consulted by
-`brainstorm`, `using-software-specialists`, and `analyze-code` when a
-`kb_path` is configured.
+A Claude Code skill for a project knowledge base (KB) that you curate and the
+agent maintains. The KB holds three kinds of content:
 
-**The wiki is a finding aid, not a source of truth.** Pages exist to point
-an agent at the code that implements a surface and to carry the *why*
-(rationale, ownership, history) the code can't express. Every wiki claim
-used in an answer is cross-checked against the cited code before being
-reported — there is no "quick lookup" exemption.
+- A **wiki** of each repository's system surfaces (entities, interfaces, jobs,
+  dependencies, events and business rules), plus internal-knowledge folders
+  for `helpers/` and `patterns/`.
+- **Plans** for implementation work, which often span several repositories.
+- **Manuals** that explain the system in plain language to operators without
+  a technical background.
 
-## When to Use
+You can query the KB on its own. When `kb_path` is configured, `brainstorm`,
+`using-software-specialists` and `analyze-code` also read the wiki and the
+plans.
 
-* Asking about the system: entities, REST endpoints, Kafka events, cron
-  jobs, external services, business rules
-* Looking up an implementation plan by ticket or feature branch
-* Asking for an operator-facing manual explaining part of the system in
-  plain language
-* Recording what was learned during a session (system docs, ADR-style
-  decisions, business rules)
-* Updating the wiki after a code change introduced or modified a tracked
-  surface
-* Auditing the KB for staleness, orphans, or unsourced claims
+**The wiki is a finding aid, not a source of truth.** A page points the agent
+at the code that implements a surface, and it carries the reasons, ownership
+and history that the code cannot express. Every wiki claim used in an answer
+is checked against the cited code before it is reported, including quick
+lookups.
 
-**When NOT to use:**
+## When to use
 
-* No `kb_path` configured → skill refuses; do not invent a default
-  location
-* The question is about code visible in the working directory → read the
-  code directly
-* User preferences, session state, deadlines → use Claude Code's
-  `~/.claude` memory, not the KB
+- Asking about the system: entities, REST endpoints, Kafka events, cron jobs,
+  external services and business rules.
+- Looking up an implementation plan by ticket or feature branch.
+- Asking for a manual that explains part of the system to operators in plain
+  language.
+- Recording what was learned during a session, such as system docs, decisions
+  in the style of an ADR, or business rules.
+- Updating the wiki after a code change added or changed a tracked surface.
+- Auditing the KB for stale pages, orphan pages or claims without a source.
+
+## When not to use
+
+- When no `kb_path` is configured. The skill refuses and does not invent a
+  default location.
+- When the question is about code in the working directory. Read the code
+  directly.
+- For user preferences, session state or deadlines. Use Claude Code's memory
+  in `~/.claude`, not the KB.
 
 ## Configuration
 
-One key, read from the agent instructions. A global instruction source
-works when one KB serves many related repos:
+The skill reads one key from the agent instructions. A global instruction
+file works when one KB serves many related repositories:
 
 ```yaml
-kb_path: /Users/you/.kb/work    # required — absolute path. No default.
+kb_path: /Users/you/.kb/work    # required, absolute path, no default
 ```
 
-Multiple related repos (e.g., a microservices workspace) can share one KB
-by pointing to the same path.
+Several related repositories, such as the services of one workspace, can
+share one KB by pointing to the same path.
 
-## How It Works
+## How it works
 
-Four operating modes, each chosen by the user's verb:
+The verb in your request chooses one of four modes:
 
-| Mode | Trigger phrase example | Discipline |
-|------|------------------------|------------|
-| **Query** | *"what events does the Order Service publish?"* | Read-only |
-| **Ingest** | *"read this doc and store what's relevant"* | Write directly; ask only when source is ambiguous; summarize after |
-| **Update** | *"we added the order.cancelled event, update the KB"* | Write directly; summarize after. Deletes need approval |
-| **Lint** | *"audit the KB for stale pages"* | Flag-only, except auto-deletes unprotected pages with all-dead in-tree sources |
+| Mode | Example request | Discipline |
+|------|-----------------|------------|
+| **Query** | *"what events does the Order Service publish?"* | Read-only. |
+| **Ingest** | *"read this doc and store what's relevant"* | Writes directly, asks only when the source is ambiguous, and summarizes after. |
+| **Update** | *"we added the order.cancelled event, update the KB"* | Writes directly and summarizes after. Deletes need approval. |
+| **Lint** | *"audit the KB for stale pages"* | Only flags problems, with one exception: it deletes unprotected pages whose in-tree sources are all gone. |
 
-**Code is the source of truth. The wiki is a finding aid.** The wiki points
-at the code and carries surrounding context; the code answers the question.
-The query workflow always reads the cited code before replying, and
-discrepancies are surfaced explicitly. Writes happen directly (wrong writes
-self-correct when readers follow the pointer), but deletes require approval
-— except the one autonomous case where a page's `sources:` are all dead
-in-tree and the page is neither a plan nor a manual.
+A query always reads the cited code before it replies, and it reports any
+difference between the wiki and the code. Writes happen directly, because a
+wrong write gets corrected the next time a reader follows its pointer to the
+code. Deletes need your approval, with one exception: a page whose `sources:`
+are all gone from the tree, and which is neither a plan nor a manual, is
+deleted without asking.
 
-Manuals follow the same sourcing discipline in a different register. They
-are created only when asked for, refreshed automatically when a source file
+Manuals follow the same sourcing rules in plainer language. They are created
+only when you ask for one, refreshed automatically when a source file
 changes, and never deleted without approval.
 
-## Storage Layout
+## Storage layout
 
 ```
 <kb_path>/                            the knowledge base (KB)
-  plans/                              one bucket — plans (often span repos)
+  plans/                              one bucket: plans (often span repos)
     index.md                          plans TOC
     <ticket-or-branch>.md             e.g., proj-1234.md, feature-add-search.md
-  manuals/                            one bucket — operator-facing docs
+  manuals/                            one bucket: operator-facing docs
     index.md                          manuals TOC
     <topic-slug>.md                   e.g., running-a-valuation.md
-  wiki/                               another bucket — per-repo system docs
+  wiki/                               another bucket: per-repo system docs
     index.md                          wiki TOC: lists every repo
     <repo-name>/                      one per repo, name auto-detected from git
       index.md                        repo TOC
@@ -91,11 +93,12 @@ changes, and never deleted without approval.
       helpers/ patterns/              internal-knowledge subfolders
 ```
 
-There is no KB-root `index.md` — `wiki/index.md`, `plans/index.md`, and
-`manuals/index.md` are parallel entry points. `manuals/` is flat like
-`plans/` because a manual can cover the whole system rather than one repo.
-The bucket layout leaves room for future top-level categories
-(`decisions/`, `glossary/`) without colliding with repo names.
+There is no `index.md` at the root of the KB. `wiki/index.md`,
+`plans/index.md` and `manuals/index.md` are three separate entry points.
+`manuals/` is flat like `plans/`, because a manual can cover the whole system
+instead of one repository. The bucket layout leaves room for new top-level
+categories later, such as `decisions/` or `glossary/`, without clashing with
+repository names.
 
 ## Usage
 

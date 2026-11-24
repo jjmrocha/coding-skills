@@ -9,7 +9,7 @@ functions that do not exist yet.** Then do the same for each of those
 functions, one at a time, until every function can be written without calling
 a new unsolved one.
 
-## When to Use
+## When to use
 
 Implementing a feature, tool, or function that needs more than a few lines of
 code, before writing that code. This includes cases where the whole solution

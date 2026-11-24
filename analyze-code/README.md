@@ -1,30 +1,45 @@
 # analyze-code
 
-A Claude Code skill for multi-lens code audits. Applies five specialist
-perspectives — architecture, quality, performance, security, and coding
-style — to existing code and produces a deep review of what was found, not a
-gate decision.
+A Claude Code skill for reviewing existing code. It looks at the code through
+five specialist lenses (architecture, quality, performance, security and
+style) and writes a ranked report of what it found. The report is a deep
+review and gives no pass or fail verdict.
 
-## When to Use
+## When to use
 
-* Auditing a module or codebase for health before a large change
-* Personal quality gate before opening a PR
-* Evaluating inherited or legacy code
-* Assessing technical debt level
+- Auditing a module or codebase for health before a large change.
+- Checking your own work before you open a pull request.
+- Evaluating inherited or legacy code.
+- Assessing the level of technical debt.
 
-**When NOT to use:**
+## When not to use
 
-* Writing new code → use `/using-software-specialists`
-* Diagnosing a specific bug → use `/using-software-specialists` with the
-  `troubleshooter` specialist
+- Writing new code. Use `/using-software-specialists`.
+- Diagnosing a specific bug. Use `/using-software-specialists` with the
+  troubleshooter specialist.
 
-## How It Works
+## How it works
 
-The skill runs a scope-and-boundary frame; checks intent conformance, breaking changes, and convention/duplication drift; applies five lenses (Architecture, Quality, Performance, Security, Style); runs the project's configured tooling; then adjudicates every candidate through an independent verify pass before synthesizing survivors into a ranked report split into **System-level** and **Code-level** sections. See [SKILL.md](SKILL.md) for the full workflow and [references.md](references.md) for heavy reference (scanner-per-file-type matrix, tooling discovery paths, skip-path patterns, security exclusions, specialist routing).
+The review runs in this order:
 
-Each finding carries severity, a verifier verdict (Confirmed or Plausible), scope tag (system/code), file:line, evidence snippet, impact, action, and a routing specialist for the audit → fix loop.
+1. It fixes the scope of the review and the files to skip.
+2. It checks the change against its spec or plan, looks for breaking changes,
+   and looks for code that drifts from the project's conventions or
+   duplicates something the project already has.
+3. It applies the five lenses.
+4. It runs the linters, scanners and test suites that the project has
+   configured.
+5. A separate verifier, which has not seen the reasoning behind each candidate
+   finding, confirms or rejects it.
+6. The findings that survive go into a report ranked by severity, with one
+   section for system-level findings and one for code-level findings.
 
-The skill is report-only — it never applies fixes.
+Each finding has a severity, the verifier's verdict (Confirmed or Plausible),
+its scope, the file and line, an evidence snippet, the impact, the action to
+take, and the specialist who should fix it.
+
+The skill reports only and never applies fixes. Use `/addressing-findings` to
+work through the report. [SKILL.md](SKILL.md) has the full workflow.
 
 ## Usage
 

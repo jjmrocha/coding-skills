@@ -1,35 +1,36 @@
 # research
 
-A skill for **answering questions about your own system** — you have a question
-and need a sourced, cited answer, not a conversation that asks *you* questions.
+A skill for **answering questions about your own system**. You have a question
+and need an answer with cited sources, and the skill brings that answer to you
+instead of asking you questions.
 
-It answers questions about:
+It answers two kinds of question:
 
-- **The code** — "do we have an endpoint for X?", "what's the payload of event
-  X?", "what happens when X?". Read with **serena**'s symbol tools
-  (`get_symbols_overview` → `find_symbol` → `find_referencing_symbols`) so the
-  agent loads only the relevant symbol and cites it — never answering from
-  memory, and reading far fewer tokens than opening whole files.
-- **What we've documented** — system surfaces, patterns, decisions, plans, how
-  we run things. Read from the **KB** (`knowledge-base`), then validated against
-  the code.
+- Questions about the code, such as "do we have an endpoint for X?", "what is
+  the payload of event X?" or "what happens when X?". It reads the code with
+  **serena**'s symbol tools (`get_symbols_overview`, then `find_symbol`, then
+  `find_referencing_symbols`), so the agent loads only the relevant symbol and
+  cites it. It never answers from memory, and it reads far fewer tokens than
+  it would by opening whole files.
+- Questions about what the team has documented: system surfaces, patterns,
+  decisions, plans and how things are run. It reads these from the knowledge
+  base (`knowledge-base`) and then checks them against the code.
 
-**Code is ground truth.** When the KB and the code disagree, the code wins —
-report the drift and fix the KB.
+**Code is ground truth.** When the knowledge base and the code disagree, the
+code wins. The skill reports the drift and fixes the knowledge base.
 
-Effort scales to the question: a one-line lookup gets a direct cited answer with
-no ceremony; a deeper trace gets explicit confidence levels, conflict reporting,
-and a stopping criterion set upfront.
+The effort matches the question. A one-line lookup gets a direct answer with a
+citation and nothing more. A deeper trace gets a confidence level for each
+finding, a report of any conflicts, and a stopping criterion set at the start.
 
-## What it does NOT do
+## What it does not do
 
-**External / wider-world research** — best-practice approaches, comparing
-libraries, fact-checking a claim against official docs or the web — is not this
-skill's job. That work belongs to the `deep-research-agent` specialist inside
-[using-software-specialists](../using-software-specialists/), which owns the
-source hierarchy, confidence, and conflict-reporting discipline for outside
-sources. `research` hands those questions off rather than answering them from
-memory.
+It does not research the wider world: best practices, library comparisons, or
+checking a claim against official docs or the web. That work belongs to the
+`deep-research-agent` specialist in
+[using-software-specialists](../using-software-specialists/), which ranks
+outside sources, rates confidence and reports conflicts between them.
+`research` hands those questions off instead of answering them from memory.
 
 ## Usage
 
